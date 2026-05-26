@@ -1,19 +1,73 @@
-import { ReactNode } from 'react';
+import { Children, ReactNode } from 'react';
 import { useDevice } from '@/lib/useDevice';
+import { colors } from '@/theme/colors';
+import { fontSizes } from '@/theme/typography';
 
-export default function AuthLayout({ children }: { children: ReactNode }) {
+type AuthLayoutProps = {
+  children: ReactNode;
+  error?: string | null;
+  onDismissError?: () => void;
+};
+
+export default function AuthLayout({
+  children,
+  error,
+  onDismissError,
+}: AuthLayoutProps) {
   const { isMobile } = useDevice();
+  const childItems = Children.toArray(children);
+  const [title, ...content] = childItems;
+  const errorMessage = error && (
+    <div
+      role="alert"
+      style={{
+        position: 'relative',
+        padding: '12px 36px 12px 14px',
+        borderRadius: 12,
+        border: `1px solid ${colors.errorBorder}`,
+        background: colors.errorSurface,
+        color: colors.errorMuted,
+        fontSize: fontSizes.bodySmall,
+        lineHeight: 1.4,
+        textAlign: 'left',
+      }}
+    >
+      {error}
+
+      <button
+        aria-label="Close error"
+        type="button"
+        onClick={onDismissError}
+        style={{
+          position: 'absolute',
+          top: 8,
+          right: 8,
+          width: 20,
+          height: 20,
+          border: 'none',
+          background: 'transparent',
+          color: colors.errorMuted,
+          cursor: 'pointer',
+          fontSize: fontSizes.caption,
+          lineHeight: 1,
+          padding: 0,
+        }}
+      >
+        x
+      </button>
+    </div>
+  );
 
   return (
     <main
       style={{
-        minHeight: '100vh',
+        minHeight: '100dvh',
         display: 'flex',
 
         justifyContent: isMobile ? 'flex-start' : 'center',
         alignItems: isMobile ? 'stretch' : 'center',
 
-        background: '#0B0B0F',
+        background: colors.background,
         padding: isMobile ? 0 : 24,
       }}
     >
@@ -30,11 +84,11 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
 
           border: isMobile
             ? 'none'
-            : '3px solid rgba(255,255,255,0.08)',
+            : `3px solid ${colors.border}`,
 
           background: isMobile
             ? 'transparent'
-            : 'rgba(255,255,255,0.04)',
+            : colors.glass,
 
           backdropFilter: isMobile ? 'none' : 'blur(20px)',
 
@@ -42,15 +96,17 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
 
           boxShadow: isMobile
             ? 'none'
-            : '0 20px 60px rgba(0,0,0,0.5)',
+            : `0 20px 60px ${colors.shadow}`,
 
           display: 'flex',
           flexDirection: 'column',
-          gap: 12,
+          gap: 18,
           textAlign: 'center'
         }}
       >
-        {children}
+        {title}
+        {errorMessage}
+        {content}
       </div>
     </main>
   );

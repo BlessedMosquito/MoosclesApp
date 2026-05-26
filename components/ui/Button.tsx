@@ -1,4 +1,5 @@
 import { useResponsive } from "@/lib/useResponsive";
+import { fontSizes } from "@/theme/typography";
 
 
 type ButtonProps = {
@@ -21,7 +22,7 @@ type ButtonProps = {
           borderRadius: 20,
           background: 'transparent',
           color: 'white',
-          fontSize: 16 * scale,
+          fontSize: fontSizes.button * scale,
           fontWeight: 600,
           cursor: 'pointer',
           transition: 'all 0.25s ease',

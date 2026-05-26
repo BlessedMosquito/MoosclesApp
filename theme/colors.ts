@@ -25,6 +25,12 @@ export const colors = {
     success: '#30D158',
   
     error: '#FF453A',
+
+    errorMuted: '#FFB4AE',
+
+    errorSurface: 'rgba(255,69,58,0.12)',
+
+    errorBorder: 'rgba(255,69,58,0.28)',
   
     warning: '#FFD60A',
   };

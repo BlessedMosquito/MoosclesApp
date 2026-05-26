@@ -7,8 +7,11 @@ import { useEffect } from 'react';
 import Button from '@/components/ui/Button';
 import AuthLayout from '@/components/layout/AuthLayout';
 import Link from 'next/link';
+import { fontSizes } from '@/theme/typography';
 
 export default function LoginPage() {
+  const router = useRouter();
+
     useEffect(() => {
         async function checkSession() {
             const {
@@ -20,48 +23,36 @@ export default function LoginPage() {
             }
         }
         checkSession();
-    }, []);
-  const router = useRouter();
+    }, [router]);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [authError, setAuthError] = useState<string | null>(null);
 
   async function signIn() {
+    setAuthError(null);
+
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (error) {
-      console.log(error.message);
+      setAuthError(error.message);
       return;
     }
 
     router.push('/dashboard');
   }
 
-  async function signUp() {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-
-    if (error) {
-      console.log(error.message);
-      return;
-    }
-
-    router.push('/confirm-email');
-  }
   return (
-    <AuthLayout>
-      <h1 style={{ color: 'white', fontSize: 28 }}>
+    <AuthLayout
+      error={authError}
+      onDismissError={() => setAuthError(null)}
+    >
+      <h1 style={{ color: 'white', fontSize: fontSizes.heading1 }}>
         MOOSCLES
       </h1>
-
-      <p style={{ color: '#888' }}>
-        Sign in to continue
-      </p>
 
       <input
           placeholder="Email"
@@ -70,7 +61,8 @@ export default function LoginPage() {
           style={{
             padding: 12,
             borderRadius: 10,
-            color: 'white'
+            color: 'white',
+            fontSize: fontSizes.input,
           }}
         />
 
@@ -82,13 +74,25 @@ export default function LoginPage() {
           style={{
             padding: 12,
             borderRadius: 10,
-            color: 'white'
+            color: 'white',
+            fontSize: fontSizes.input,
           }}
         />
 
-        <Button title='Sign In' onClick={() => signIn}></Button>
+        <Button title='Sign In' onClick={signIn}></Button>
 
-        <p style={{fontSize: 12, color: '#888'}}>New to MOOSCLES? <Link style={{color: 'white'}} href='/register'>Create an account</Link></p>
+        <p style={{fontSize: fontSizes.caption, color: '#888'}}>New to MOOSCLES? <Link
+            style={{ color: 'white', textDecoration: 'none' }}
+            href="/register"
+            onMouseEnter={(e) => {
+              e.currentTarget.style.textDecoration = 'underline';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.textDecoration = 'none';
+            }}
+          >
+            Create an account
+          </Link></p>
     </AuthLayout>
   );
 }

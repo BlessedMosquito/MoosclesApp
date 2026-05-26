@@ -6,8 +6,12 @@ import { supabase } from '@/lib/supabase';
 import { useEffect } from 'react';
 import Button from '@/components/ui/Button';
 import AuthLayout from '@/components/layout/AuthLayout';
+import Link from 'next/link';
+import { fontSizes } from '@/theme/typography';
 
-export default function LoginPage() {
+export default function RegisterPage() {
+  const router = useRouter();
+
     useEffect(() => {
         async function checkSession() {
             const {
@@ -19,44 +23,65 @@ export default function LoginPage() {
             }
         }
         checkSession();
-    }, []);
-  const router = useRouter();
+    }, [router]);
 
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [repeatedPassword, setRepeatedPassword] = useState('');
+  const [authError, setAuthError] = useState<string | null>(null);
 
-  async function signIn() {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+  async function signUp() {
+    setAuthError(null);
+    const trimmedUsername = username.trim();
 
-    if (error) {
-      console.log(error.message);
+    if (!trimmedUsername) {
+      setAuthError('Username is required.');
       return;
     }
 
-    router.push('/dashboard');
-  }
+    if(password !== repeatedPassword){
+      setAuthError('Passwords do not match.');
+      return;
+    }
 
-  async function signUp() {
     const { error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          username: trimmedUsername,
+        },
+      },
     });
 
     if (error) {
-      console.log(error.message);
+      setAuthError(error.message);
       return;
     }
 
-    router.push('/confirm-email');
+    router.push(`/confirm-email?email=${encodeURIComponent(email)}`);
   }
   return (
-    <AuthLayout>
-      <h1 style={{ color: 'white', fontSize: 28 }}>
+    <AuthLayout
+      error={authError}
+      onDismissError={() => setAuthError(null)}
+    >
+      <h1 style={{ color: 'white', fontSize: fontSizes.heading1 }}>
         MOOSCLES
       </h1>
+
+      <input
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          style={{
+            padding: 12,
+            borderRadius: 10,
+            color: 'white',
+            fontSize: fontSizes.input,
+          }}
+        />
 
       <input
           placeholder="Email"
@@ -65,7 +90,8 @@ export default function LoginPage() {
           style={{
             padding: 12,
             borderRadius: 10,
-            color: 'white'
+            color: 'white',
+            fontSize: fontSizes.input,
           }}
         />
 
@@ -77,23 +103,40 @@ export default function LoginPage() {
           style={{
             padding: 12,
             borderRadius: 10,
-            color: 'white'
+            color: 'white',
+            fontSize: fontSizes.input,
           }}
         />
 
-<       input
+        <input
           type="password"
           placeholder="Repeat Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          value={repeatedPassword}
+          onChange={(e) => setRepeatedPassword(e.target.value)}
           style={{
             padding: 12,
             borderRadius: 10,
-            color: 'white'
+            color: 'white',
+            fontSize: fontSizes.input,
           }}
         />
 
-        <Button title='Sing Up' onClick={() => signUp}></Button>
-    </AuthLayout>
+        <Button title='Sign Up' onClick={signUp}></Button>
+        <p style={{fontSize: fontSizes.caption, color: '#888'}}>
+          Already have an account?{' '}
+          <Link
+            style={{ color: 'white', textDecoration: 'none' }}
+            href="/login"
+            onMouseEnter={(e) => {
+              e.currentTarget.style.textDecoration = 'underline';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.textDecoration = 'none';
+            }}
+          >
+            Sign In
+          </Link>
+        </p>
+        </AuthLayout>
   );
 }
