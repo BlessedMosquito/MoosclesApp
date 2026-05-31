@@ -1,16 +1,16 @@
 import { supabase } from '@/lib/supabase';
 
-type CreateExerciseProperties = {
-  workoutId: string;
+type AddExerciseProperties = {
+  workoutId: number;
   name: string;
   exerciseLibraryId?: string | null;
   order: number;
 };
 
-export async function addExercise(props: CreateExerciseProperties) {
+export async function addExercise(props: AddExerciseProperties) {
     const { data, error } = await supabase.from('exercises').insert({
         workout_id: props.workoutId,
-        name,
+        name: props.name,
         exercise_library_id: props.exerciseLibraryId,
         exercise_order: props.order,
       }).select().single();
@@ -20,4 +20,18 @@ export async function addExercise(props: CreateExerciseProperties) {
     }
   
     return data;
+}
+
+export async function getExercisesByWorkout(workoutId: number) {
+  const { data, error } = await supabase
+    .from('exercises')
+    .select('*')
+    .eq('workout_id', workoutId)
+    .order('exercise_order', { ascending: true });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data ?? [];
 }
