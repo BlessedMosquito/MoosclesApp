@@ -31,3 +31,9 @@ body > div {
   min-height: 100%;
   background: var(--background);
 }
+
+@keyframes loading-circle-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

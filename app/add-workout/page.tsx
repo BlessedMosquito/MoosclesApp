@@ -3,6 +3,7 @@
 import { UIEvent, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import BackButton from '@/components/ui/BackButton';
+import LoadingCircle from '@/components/ui/LoadingCircle';
 import PrimaryButton from '@/components/ui/PrimaryButton';
 import { s, useResponsive } from '@/lib/useResponsive';
 import { createWorkout } from '@/services/workouts';
@@ -252,19 +253,18 @@ export default function AddWorkoutPage() {
                   padding: `${pickerItemHeight * 2}px 0`,
                 }}
               >
-                {workoutTypes.length === 0 ? (
-                  <div
-                    style={{
-                      height: pickerItemHeight,
-                      color: colors.textMuted,
-                      fontSize: s(fontSizes.bodySmall, scale),
-                      textAlign: 'center',
-                      lineHeight: `${pickerItemHeight}px`,
-                      scrollSnapAlign: 'center',
-                    }}
-                  >
-                    Loading workout types...
-                  </div>
+                  {workoutTypes.length === 0 ? (
+                    <div
+                      style={{
+                        height: pickerItemHeight,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        scrollSnapAlign: 'center',
+                      }}
+                    >
+                      <LoadingCircle size={18} />
+                    </div>
                 ) : (
                   workoutTypes.map((type, index) => (
                     <button

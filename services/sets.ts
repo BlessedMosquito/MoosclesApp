@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabase";
 
 type AddSetsProperties = {
-    exerciseId: number;
+    exerciseId: number | string;
     reps: number;
     weight: number;
     order: number;
@@ -20,4 +20,18 @@ export async function addSets(props: AddSetsProperties){
     }
 
     return data;
+}
+
+export async function getSetsByExercise(exerciseId: number | string) {
+    const { data, error } = await supabase
+        .from('sets')
+        .select('*')
+        .eq('exercise_id', exerciseId)
+        .order('set_order', { ascending: true });
+
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    return data ?? [];
 }

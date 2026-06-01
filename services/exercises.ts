@@ -1,7 +1,7 @@
 import { supabase } from '@/lib/supabase';
 
 type AddExerciseProperties = {
-  workoutId: number;
+  workoutId: number | string;
   name: string;
   exerciseLibraryId?: string | null;
   order: number;
@@ -22,7 +22,7 @@ export async function addExercise(props: AddExerciseProperties) {
     return data;
 }
 
-export async function getExercisesByWorkout(workoutId: number) {
+export async function getExercisesByWorkout(workoutId: number | string) {
   const { data, error } = await supabase
     .from('exercises')
     .select('*')

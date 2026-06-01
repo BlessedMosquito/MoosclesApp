@@ -1,16 +1,19 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import BackButton from '@/components/ui/BackButton';
+import LoadingCircle from '@/components/ui/LoadingCircle';
+import PrimaryButton from '@/components/ui/PrimaryButton';
 import { getExercisesByWorkout } from '@/services/exercises';
 import { getWorkouts } from '@/services/workouts';
 import { s, useResponsive } from '@/lib/useResponsive';
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
+import { getSetsByExercise } from '@/services/sets';
 
 type Workout = {
-  id: number;
+  id: number | string;
   name: string;
   workout_date: string;
   workout_types?: {
@@ -21,6 +24,12 @@ type Workout = {
 type Exercise = {
   id: number;
   name: string;
+};
+
+type ExerciseSet = {
+  id: number | string;
+  reps: number;
+  weight: number;
 };
 
 const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -67,9 +76,20 @@ function getMonthDays(monthDate: Date) {
 
 export default function CalendarPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { isMobile, isTablet, scale } = useResponsive();
   const previewRef = useRef<HTMLElement>(null);
-  const [visibleMonth, setVisibleMonth] = useState(() => new Date());
+  const [visibleMonth, setVisibleMonth] = useState(() => {
+  const year = Number(searchParams.get('year'));
+  const month = Number(searchParams.get('month'));
+
+
+    if (year && month >= 1 && month <= 12) {
+      return new Date(year, month - 1, 1);
+    }
+
+    return new Date();
+  });
   const [workouts, setWorkouts] = useState<Workout[]>([]);
   const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
   const [exercises, setExercises] = useState<Exercise[]>([]);
@@ -77,6 +97,10 @@ export default function CalendarPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingExercises, setIsLoadingExercises] = useState(false);
   const [isYearPickerOpen, setIsYearPickerOpen] = useState(false);
+  const [expandedExerciseId, setExpandedExerciseId] = useState<string | null>(null);
+  const [setsByExercise, setSetsByExercise] = useState<Record<string, ExerciseSet[]>>({});
+  const [loadingSetsByExercise, setLoadingSetsByExercise] = useState<Record<string, boolean>>({});
+  
 
   const contentMaxWidth = isMobile ? '100%' : isTablet ? 760 : 980;
   const monthDays = useMemo(() => getMonthDays(visibleMonth), [visibleMonth]);
@@ -84,6 +108,7 @@ export default function CalendarPage() {
     month: 'long',
   });
   const visibleYear = visibleMonth.getFullYear();
+  const selectedWorkoutFromParams = searchParams.get('workoutId');
 
   const workoutsByDay = useMemo(() => {
     return workouts.reduce<Record<string, Workout[]>>((result, workout) => {
@@ -114,6 +139,20 @@ export default function CalendarPage() {
 
     loadWorkouts();
   }, []);
+
+  useEffect(() => {
+    if (!selectedWorkoutFromParams || workouts.length === 0 || selectedWorkout) {
+      return;
+    }
+
+    const workout = workouts.find(
+      (workoutItem) => String(workoutItem.id) === selectedWorkoutFromParams
+    );
+
+    if (workout) {
+      openWorkout(workout);
+    }
+  }, [selectedWorkoutFromParams, workouts, selectedWorkout]);
 
   async function openWorkout(workout: Workout) {
     setSelectedWorkout(workout);
@@ -160,6 +199,62 @@ export default function CalendarPage() {
     setExercises([]);
     setIsYearPickerOpen(false);
   }
+
+  function goToAddExercises() {
+    if (!selectedWorkout) {
+      return;
+    }
+
+    const params = new URLSearchParams({
+      workoutId: String(selectedWorkout.id),
+      name: selectedWorkout.name,
+      type: selectedWorkout.workout_types?.label ?? 'workout',
+      from: 'calendar',
+      year: String(visibleMonth.getFullYear()),
+      month: String(visibleMonth.getMonth() + 1),
+    });
+
+    router.push(`/add-exercises?${params.toString()}`);
+  }
+
+  async function toggleExercise(exercise: Exercise) {
+      const exerciseId = String(exercise.id);
+  
+      if (expandedExerciseId === exerciseId) {
+        setExpandedExerciseId(null);
+        return;
+      }
+  
+      setExpandedExerciseId(exerciseId);
+      if (setsByExercise[exerciseId]) {
+        return;
+      }
+  
+      setLoadingSetsByExercise((currentLoading) => ({
+        ...currentLoading,
+        [exerciseId]: true,
+      }));
+      setError(null);
+  
+      try {
+        const setData = await getSetsByExercise(exercise.id);
+        setSetsByExercise((currentSets) => ({
+          ...currentSets,
+          [exerciseId]: setData as ExerciseSet[],
+        }));
+      } catch (loadError) {
+        setError(
+          loadError instanceof Error
+            ? loadError.message
+            : 'Could not load sets.'
+        );
+      } finally {
+        setLoadingSetsByExercise((currentLoading) => ({
+          ...currentLoading,
+          [exerciseId]: false,
+        }));
+      }
+    }
 
   return (
     <main
@@ -475,15 +570,15 @@ export default function CalendarPage() {
           )}
 
           {isLoading && (
-            <p
+            <div
               style={{
-                margin: `${s(16, scale)}px 0 0`,
-                color: colors.textMuted,
-                fontSize: s(fontSizes.bodySmall, scale),
+                display: 'flex',
+                justifyContent: 'center',
+                marginTop: s(16, scale),
               }}
             >
-              Loading workouts...
-            </p>
+              <LoadingCircle />
+            </div>
           )}
         </section>
 
@@ -526,15 +621,15 @@ export default function CalendarPage() {
               }}
             >
               {isLoadingExercises ? (
-                <p
+                <div
                   style={{
-                    margin: 0,
-                    color: colors.textMuted,
-                    fontSize: s(fontSizes.bodySmall, scale),
+                    display: 'flex',
+                    justifyContent: 'center',
+                    padding: s(8, scale),
                   }}
                 >
-                  Loading exercises...
-                </p>
+                  <LoadingCircle />
+                </div>
               ) : exercises.length === 0 ? (
                 <p
                   style={{
@@ -546,7 +641,12 @@ export default function CalendarPage() {
                   No exercises added.
                 </p>
               ) : (
-                exercises.map((exercise, index) => (
+                exercises.map((exercise, index) => {
+                  const exerciseId = String(exercise.id);
+                  const isExpanded = expandedExerciseId === exerciseId;
+                  const exerciseSets = setsByExercise[exerciseId] ?? [];
+                  const isLoadingSets = loadingSetsByExercise[exerciseId];
+                return(
                   <div
                     key={exercise.id}
                     style={{
@@ -557,10 +657,105 @@ export default function CalendarPage() {
                       fontSize: s(fontSizes.bodySmall, scale),
                     }}
                   >
-                    {index + 1}. {exercise.name}
+                    <button
+                    type="button"
+                    onClick={() => toggleExercise(exercise)}
+                    style={{
+                      width: '100%',
+                      border: 'none',
+                      background: 'transparent',
+                      color: colors.text,
+                      padding: 0,
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      gap: s(12, scale),
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      fontSize: s(fontSizes.bodySmall, scale),
+                      fontWeight: 700,
+                    }}
+                  >
+                    <span>
+                      {index + 1}. {exercise.name}
+                    </span>
+                    <span>{isExpanded ? '-' : '+'}</span>
+                  </button>
+                  {isExpanded && (
+                    <div
+                      style={{
+                        marginTop: s(14, scale),
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: s(10, scale),
+                      }}
+                    >
+                      {isLoadingSets ? (
+                        <div
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            padding: s(8, scale),
+                          }}
+                        >
+                          <LoadingCircle size={18} />
+                        </div>
+                      ) : exerciseSets.length === 0 ? (
+                        <p
+                          style={{
+                            margin: 0,
+                            color: colors.textMuted,
+                            fontSize: s(fontSizes.caption, scale),
+                          }}
+                        >
+                          No sets yet.
+                        </p>
+                      ) : (
+                        exerciseSets.map((setItem, setIndex) => (
+                          <div
+                            key={setItem.id}
+                            style={{
+                              display: 'grid',
+                              gridTemplateColumns: 'auto 1fr 1fr',
+                              gap: s(10, scale),
+                              alignItems: 'center',
+                              padding: s(10, scale),
+                              borderRadius: s(12, scale),
+                              background: colors.glass,
+                              border: `1px solid ${colors.border}`,
+                            }}
+                          >
+                            <span style={{ color: colors.textMuted }}>
+                              {setIndex + 1}
+                            </span>
+                            <span>{setItem.reps} reps</span>
+                            <span>{setItem.weight} kg</span>
+                          </div>
+                        ))
+                      )}
+
+                      <div
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: '1fr 1fr auto',
+                          gap: s(8, scale),
+                        }}
+                      > 
+                      </div>
+                    </div>
+                  )}
                   </div>
-                ))
+                )})
               )}
+            </div>
+            <div
+              style={{
+                marginTop: s(16, scale),
+              }}
+            >
+              <PrimaryButton onClick={goToAddExercises} fullWidth>
+                Edit exercises
+              </PrimaryButton>
             </div>
           </section>
         )}
