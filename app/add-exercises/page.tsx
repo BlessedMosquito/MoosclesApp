@@ -27,6 +27,8 @@ type SetDraft = {
   weight: string;
 };
 
+const decimalWeightPattern = /^\d+(?:[.,]\d{1,2})?$/;
+
 export default function AddExercisesPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -204,14 +206,20 @@ export default function AddExercisesPage() {
     const exerciseId = String(exercise.id);
     const draft = setDrafts[exerciseId] ?? { reps: '', weight: '' };
     const reps = Number(draft.reps);
-    const weight = Number(draft.weight);
+    const normalizedWeight = draft.weight.replace(',', '.');
+    const weight = Number(normalizedWeight);
 
     if (!Number.isFinite(reps) || reps <= 0) {
       setError('Reps must be greater than 0.');
       return;
     }
 
-    if (!Number.isFinite(weight) || weight < 0) {
+    if (!decimalWeightPattern.test(draft.weight) || !Number.isFinite(weight)) {
+      setError('Weight must have up to 2 decimal places.');
+      return;
+    }
+
+    if (weight < 0) {
       setError('Weight cannot be negative.');
       return;
     }
@@ -224,7 +232,7 @@ export default function AddExercisesPage() {
       const newSet = await addSets({
         exerciseId: exercise.id,
         reps,
-        weight,
+        weight: Math.round(weight * 100) / 100,
         order: existingSets.length + 1,
       });
 
@@ -517,7 +525,11 @@ export default function AddExercisesPage() {
                           placeholder="Weight in kg"
                           value={setDraft.weight}
                           onChange={(event) =>
-                            updateSetDraft(exerciseId, 'weight', event.target.value)
+                            updateSetDraft(
+                              exerciseId,
+                              'weight',
+                              event.target.value.replace(/[^0-9.,]/g, '')
+                            )
                           }
                           style={{
                             minWidth: 0,
