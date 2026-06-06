@@ -6,6 +6,8 @@ export type WorkoutTypeProperties = {
   label: string;
 };
 
+export type  WorkoutTypeGroup = 'DurationOnly' | 'DistanceDuration' | 'RepetitionBased'
+
 export async function getWorkoutTypes(): Promise<WorkoutTypeProperties[]> {
   const { data, error } = await supabase.from("workout_types").select("*").order("name", { ascending: true });
 
@@ -16,7 +18,7 @@ export async function getWorkoutTypes(): Promise<WorkoutTypeProperties[]> {
   return data ?? [];
 }
 
-export async function getWorkoutTypeGroup(id: string): Promise<string>{
+export async function getWorkoutTypeGroup(id: string): Promise<string> {
     const { data, error } = await supabase.from("workout_types").select("workout_group").filter('id', 'eq', id).single();
 
     if (error){

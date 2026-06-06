@@ -10,12 +10,13 @@ import { createWorkout } from '@/services/workouts';
 import {
   getWorkoutTypeGroup,
   getWorkoutTypes,
+  WorkoutTypeGroup,
   type WorkoutTypeProperties,
 } from '@/services/workoutTypes';
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
 
-type  WorkoutTypeGroup = 'DurationOnly' | 'DistanceDuration' | 'RepetitionBased'
+
 
 const pickerItemHeight = 44;
 
@@ -102,7 +103,7 @@ export default function AddWorkoutPage() {
       }
 
       router.push(
-        `/add-workout-data${path}?workoutId=${workout.id}&name=${encodeURIComponent(trimmedName)}&type=${encodeURIComponent(selectedType.label)}`
+        `/add-workout-data${path}?workoutId=${workout.id}&name=${encodeURIComponent(trimmedName)}&type=${encodeURIComponent(selectedType.label)}&group=${encodeURIComponent(workoutTypeGroup)}`
       );
     } catch (saveError) {
       setError(

@@ -2,8 +2,9 @@
 
 import BackButton from "@/components/ui/BackButton";
 import PrimaryButton from "@/components/ui/PrimaryButton";
-import TimeWheelPicker from "@/components/ui/TimeWheelPicker";
+import WheelPicker from "@/components/ui/WheelPicker";
 import { s, useResponsive } from "@/lib/useResponsive";
+import { WorkoutTypeGroup } from "@/services/workoutTypes";
 import { colors } from "@/theme/colors";
 import { fontSizes } from "@/theme/typography";
 import { useSearchParams } from "next/navigation";
@@ -13,7 +14,7 @@ import { useState } from "react";
 
 
 
-export default function AddWorkoutDataDistanceDuration(){
+export default function AddWorkoutDataDuration(){
 
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -25,6 +26,7 @@ export default function AddWorkoutDataDistanceDuration(){
     const from = searchParams.get('from');
     const calendarYear = searchParams.get('year');
     const calendarMonth = searchParams.get('month');
+    const workoutTypeGroup = searchParams.get('group') as WorkoutTypeGroup;
 
     const [error, setError] = useState<string | null>(null);
     const [hours, setHours] = useState(0);
@@ -94,7 +96,8 @@ export default function AddWorkoutDataDistanceDuration(){
                             fontSize: s(fontSizes.caption, scale),
                         }}
                         >
-                        Step 2 of 2
+                        
+                        {workoutTypeGroup === 'DistanceDuration' as WorkoutTypeGroup ? 'Step 2 of 3' : 'Step 2 of 2'}
                         </p>
             
                         <h1
@@ -118,7 +121,7 @@ export default function AddWorkoutDataDistanceDuration(){
                             lineHeight: 1.5,
                         }}
                         >
-                        Add time to your {workoutType} session.
+                        Add distance to your {workoutType} session.
                         </p>
                     </section>
                     {error && (
@@ -180,21 +183,21 @@ export default function AddWorkoutDataDistanceDuration(){
                             margin: `0 0 ${s(12, scale)}px`
                           }}
                         >
-                        <TimeWheelPicker
+                        <WheelPicker
                             max={24}
                             value={hours}
                             label="hours"
                             onChange={setHours}
                         />
 
-                        <TimeWheelPicker
+                        <WheelPicker
                             max={60}
                             value={minutes}
                             label="minutes"
                             onChange={setMinutes}
                         />
 
-                        <TimeWheelPicker
+                        <WheelPicker
                             max={60}
                             value={seconds}
                             label="seconds"
