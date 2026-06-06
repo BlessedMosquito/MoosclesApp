@@ -13,7 +13,7 @@ import { useState } from "react";
 
 
 
-export default function AddWorkoutDataG1(){
+export default function AddWorkoutDataDistanceDuration(){
 
     const router = useRouter();
     const searchParams = useSearchParams();

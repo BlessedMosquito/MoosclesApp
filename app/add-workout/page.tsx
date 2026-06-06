@@ -15,6 +15,8 @@ import {
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
 
+type  WorkoutTypeGroup = 'DurationOnly' | 'DistanceDuration' | 'RepetitionBased'
+
 const pickerItemHeight = 44;
 
 export default function AddWorkoutPage() {
@@ -83,13 +85,17 @@ export default function AddWorkoutPage() {
 
       const workoutTypeGroup = await getWorkoutTypeGroup(selectedType.id);
 
-      const workoutDataView: Record<number, string> = {
-        1: '/group1',
-        2: '/group2',
-        3: '/group3'
+      const workoutDataView: Record<WorkoutTypeGroup, string> = {
+        'DistanceDuration': '/distance-duration',
+        'DurationOnly': '/distance-duration',
+        'RepetitionBased': '/repetition-based'
       }
-
-      const path = workoutDataView[workoutTypeGroup];
+      
+      if (!workoutTypeGroup) {
+        setError('Workout type group not found');
+        return;
+      }
+      const path = workoutDataView[workoutTypeGroup as WorkoutTypeGroup];
 
       if(!path){
         throw new Error('Unsupported workout group')
@@ -317,7 +323,7 @@ export default function AddWorkoutPage() {
               </div>
             </div>
           </div>
-          
+
           <PrimaryButton
             onClick={goToExercises}
             disabled={isSaving}

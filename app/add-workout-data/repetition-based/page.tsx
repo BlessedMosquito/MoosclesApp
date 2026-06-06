@@ -29,7 +29,7 @@ type SetDraft = {
 
 const decimalWeightPattern = /^\d+(?:[.,]\d{1,2})?$/;
 
-export default function AddWorkoutDataG3() {
+export default function AddWorkoutDataRepetitionBased() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isMobile, isTablet, scale } = useResponsive();

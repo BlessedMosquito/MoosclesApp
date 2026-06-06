@@ -16,7 +16,7 @@ export async function getWorkoutTypes(): Promise<WorkoutTypeProperties[]> {
   return data ?? [];
 }
 
-export async function getWorkoutTypeGroup(id: string){
+export async function getWorkoutTypeGroup(id: string): Promise<string>{
     const { data, error } = await supabase.from("workout_types").select("workout_group").filter('id', 'eq', id).single();
 
     if (error){
