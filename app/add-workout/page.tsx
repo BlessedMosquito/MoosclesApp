@@ -8,6 +8,7 @@ import PrimaryButton from '@/components/ui/PrimaryButton';
 import { s, useResponsive } from '@/lib/useResponsive';
 import { createWorkout } from '@/services/workouts';
 import {
+  getWorkoutTypeGroup,
   getWorkoutTypes,
   type WorkoutTypeProperties,
 } from '@/services/workoutTypes';
@@ -80,8 +81,22 @@ export default function AddWorkoutPage() {
         date: new Date(),
       });
 
+      const workoutTypeGroup = await getWorkoutTypeGroup(selectedType.id);
+
+      const workoutDataView: Record<number, string> = {
+        1: '/group1',
+        2: '/group2',
+        3: '/group3'
+      }
+
+      const path = workoutDataView[workoutTypeGroup];
+
+      if(!path){
+        throw new Error('Unsupported workout group')
+      }
+
       router.push(
-        `/add-exercises?workoutId=${workout.id}&name=${encodeURIComponent(trimmedName)}&type=${encodeURIComponent(selectedType.label)}`
+        `/add-workout-data${path}?workoutId=${workout.id}&name=${encodeURIComponent(trimmedName)}&type=${encodeURIComponent(selectedType.label)}`
       );
     } catch (saveError) {
       setError(
@@ -302,14 +317,16 @@ export default function AddWorkoutPage() {
               </div>
             </div>
           </div>
-
+          
           <PrimaryButton
             onClick={goToExercises}
             disabled={isSaving}
-            fullWidth
+            width={'3/4'}
+            align={'center'}
           >
             {isSaving ? 'Creating...' : 'Next'}
           </PrimaryButton>
+          
         </section>
       </div>
     </main>

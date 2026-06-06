@@ -214,7 +214,7 @@ export default function CalendarPage() {
       month: String(visibleMonth.getMonth() + 1),
     });
 
-    router.push(`/add-exercises?${params.toString()}`);
+    router.push(`/add-workout-data?${params.toString()}`);
   }
 
   async function toggleExercise(exercise: Exercise) {
@@ -753,7 +753,11 @@ export default function CalendarPage() {
                 marginTop: s(16, scale),
               }}
             >
-              <PrimaryButton onClick={goToAddExercises} fullWidth>
+              <PrimaryButton 
+              onClick={goToAddExercises}
+              width={'1/2'}
+              align='center'
+              >
                 Edit exercises
               </PrimaryButton>
             </div>

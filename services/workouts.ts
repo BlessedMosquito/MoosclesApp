@@ -5,9 +5,6 @@ type CreateWorkoutProperties = {
     name: string;
     workoutType: string;
     date: Date;
-    durationHours?: number;
-    durationMinutes?: number;
-    durationSeconds?: number;
 }
 
 type GetWorkoutsProperties = {
@@ -22,19 +19,11 @@ export async function createWorkout(props: CreateWorkoutProperties){
     if(userError || !user){
         throw new Error('User not authenticated!');
     }
-
-    const hoursInSeconds = (props.durationHours ?? 0) * 3600;
-    const minutesInSeconds = (props.durationMinutes ?? 0) * 60;
-    const seconds = props.durationSeconds ?? 0;
-  
-    const durationSeconds = hoursInSeconds + minutesInSeconds + seconds;
-
     const {data, error} = await supabase.from('workouts').insert({ 
         user_id: user.id, 
         name: props.name, 
         workout_date: props.date.toISOString(),
-        workout_type_id: props.workoutType,
-        duration_seconds: durationSeconds}).select().single();
+        workout_type_id: props.workoutType}).select().single();
 
     if(error){
         throw new Error(error.message);
