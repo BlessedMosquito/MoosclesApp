@@ -2,7 +2,22 @@
 
 :root {
   --background: #0B0B0F;
-  --foreground: #FFFFFF;
+  --surface: rgba(255,255,255,0.04);
+  --surface-solid: #1C1C21;
+  --border: rgba(255,255,255,0.08);
+  --border-strong: rgba(255,255,255,0.16);
+  --text: #FFFFFF;
+  --text-secondary: #888888;
+  --text-muted: #666666;
+  --glass: rgba(255,255,255,0.04);
+  --glass-hover: rgba(255,255,255,0.08);
+  --shadow: rgba(0,0,0,0.5);
+  --success: #30D158;
+  --error: #FF453A;
+  --error-muted: #FFB4AE;
+  --error-surface: rgba(255,69,58,0.12);
+  --error-border: rgba(255,69,58,0.28);
+  --warning: #FFD60A;
 }
 
 @theme inline {

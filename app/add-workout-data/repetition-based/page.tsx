@@ -6,21 +6,10 @@ import BackButton from '@/components/ui/BackButton';
 import LoadingCircle from '@/components/ui/LoadingCircle';
 import PrimaryButton from '@/components/ui/PrimaryButton';
 import { s, useResponsive } from '@/lib/useResponsive';
-import { addExercise, getExercisesByWorkout } from '@/services/exercises';
-import { addSets, getSetsByExercise } from '@/services/sets';
+import { addExercise, getExercisesByWorkout, ReturnGetExercisesData } from '@/services/exercises';
+import { addSets, getSetsByExercise, ReturnGetSetsData } from '@/services/sets';
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
-
-type Exercise = {
-  id: number | string;
-  name: string;
-};
-
-type ExerciseSet = {
-  id: number | string;
-  reps: number;
-  weight: number;
-};
 
 type SetDraft = {
   reps: string;
@@ -42,12 +31,12 @@ export default function AddWorkoutDataRepetitionBased() {
   const calendarMonth = searchParams.get('month');
 
   const [exerciseName, setExerciseName] = useState('');
-  const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [exercises, setExercises] = useState<ReturnGetExercisesData[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingExercises, setIsLoadingExercises] = useState(false);
   const [expandedExerciseId, setExpandedExerciseId] = useState<string | null>(null);
-  const [setsByExercise, setSetsByExercise] = useState<Record<string, ExerciseSet[]>>({});
+  const [setsByExercise, setSetsByExercise] = useState<Record<string, ReturnGetSetsData[]>>({});
   const [setDrafts, setSetDrafts] = useState<Record<string, SetDraft>>({});
   const [loadingSetsByExercise, setLoadingSetsByExercise] = useState<Record<string, boolean>>({});
 
@@ -64,7 +53,7 @@ export default function AddWorkoutDataRepetitionBased() {
 
       try {
         const exerciseData = await getExercisesByWorkout(workoutId);
-        setExercises(exerciseData as Exercise[]);
+        setExercises(exerciseData as ReturnGetExercisesData[]);
         setExpandedExerciseId(null);
         setSetsByExercise({});
         setSetDrafts({});
@@ -130,7 +119,7 @@ export default function AddWorkoutDataRepetitionBased() {
 
       setExercises((currentExercises) => [
         ...currentExercises,
-        exercise as Exercise,
+        exercise as ReturnGetExercisesData,
       ]);
       setExerciseName('');
     } catch (saveError) {
@@ -144,7 +133,7 @@ export default function AddWorkoutDataRepetitionBased() {
     }
   }
 
-  async function toggleExercise(exercise: Exercise) {
+  async function toggleExercise(exercise: ReturnGetExercisesData) {
     const exerciseId = String(exercise.id);
 
     if (expandedExerciseId === exerciseId) {
@@ -172,7 +161,7 @@ export default function AddWorkoutDataRepetitionBased() {
       const setData = await getSetsByExercise(exercise.id);
       setSetsByExercise((currentSets) => ({
         ...currentSets,
-        [exerciseId]: setData as ExerciseSet[],
+        [exerciseId]: setData as ReturnGetSetsData[],
       }));
     } catch (loadError) {
       setError(
@@ -202,7 +191,7 @@ export default function AddWorkoutDataRepetitionBased() {
     }));
   }
 
-  async function handleAddSet(exercise: Exercise) {
+  async function handleAddSet(exercise: ReturnGetExercisesData) {
     const exerciseId = String(exercise.id);
     const draft = setDrafts[exerciseId] ?? { reps: '', weight: '' };
     const reps = Number(draft.reps);
@@ -238,7 +227,7 @@ export default function AddWorkoutDataRepetitionBased() {
 
       setSetsByExercise((currentSets) => ({
         ...currentSets,
-        [exerciseId]: [...existingSets, newSet as ExerciseSet],
+        [exerciseId]: [...existingSets, newSet as ReturnGetSetsData],
       }));
       setSetDrafts((currentDrafts) => ({
         ...currentDrafts,

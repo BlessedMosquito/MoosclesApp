@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabase";
 
-export type WorkoutTypeProperties = {
+export type ReturnGetWorkoutTypeData = {
   id: string;
   name: string;
   label: string;
@@ -8,7 +8,7 @@ export type WorkoutTypeProperties = {
 
 export type  WorkoutTypeGroup = 'DurationOnly' | 'DistanceDuration' | 'RepetitionBased'
 
-export async function getWorkoutTypes(): Promise<WorkoutTypeProperties[]> {
+export async function getWorkoutTypes(): Promise<ReturnGetWorkoutTypeData[]> {
   const { data, error } = await supabase.from("workout_types").select("*").order("name", { ascending: true });
 
   if (error){

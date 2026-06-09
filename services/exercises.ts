@@ -7,6 +7,11 @@ type AddExerciseProperties = {
   order: number;
 };
 
+export type ReturnGetExercisesData = {
+    id: string;
+    name: string;
+}
+
 export async function addExercise(props: AddExerciseProperties) {
     const { data, error } = await supabase.from('exercises').insert({
         workout_id: props.workoutId,
@@ -22,7 +27,7 @@ export async function addExercise(props: AddExerciseProperties) {
     return data;
 }
 
-export async function getExercisesByWorkout(workoutId: number | string) {
+export async function getExercisesByWorkout(workoutId: string): Promise<ReturnGetExercisesData[]> {
   const { data, error } = await supabase
     .from('exercises')
     .select('*')
@@ -33,5 +38,5 @@ export async function getExercisesByWorkout(workoutId: number | string) {
     throw new Error(error.message);
   }
 
-  return data ?? [];
+  return data ?? [] as ReturnGetExercisesData[];
 }

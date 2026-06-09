@@ -44,20 +44,20 @@ export default function AddWorkoutDataDuration(){
           if (calendarYear) {
             calendarParams.set('year', calendarYear);
           }
-    
           if (calendarMonth) {
             calendarParams.set('month', calendarMonth);
           }
-    
           if (workoutId) {
             calendarParams.set('workoutId', workoutId);
           }
-    
           router.push(`/calendar?${calendarParams.toString()}`);
           return;
         }
-    
         router.push('/add-workout');
+      }
+
+      function handleAdd(){
+        //
       }
 
       function pad(n: number) {

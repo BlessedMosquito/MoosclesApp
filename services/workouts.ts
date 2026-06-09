@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { ReturnGetWorkoutTypeData } from "./workoutTypes";
 
 
 type CreateWorkoutProperties = {
@@ -11,6 +12,13 @@ type GetWorkoutsProperties = {
     date?: Date;
     name?: string;
     workoutTypeId?: string;
+}
+
+export type ReturnGetWorkoutsData = {
+    id: string;
+    name: string;
+    workout_date: string;
+    workout_types: ReturnGetWorkoutTypeData;
 }
 
 export async function createWorkout(props: CreateWorkoutProperties){
@@ -32,7 +40,7 @@ export async function createWorkout(props: CreateWorkoutProperties){
     return data;
 }
 
-export async function getWorkouts(filters?: GetWorkoutsProperties) {
+export async function getWorkouts(filters?: GetWorkoutsProperties): Promise<ReturnGetWorkoutsData[]>{
     const {
       data: { user },
       error: userError,
@@ -84,5 +92,5 @@ export async function getWorkouts(filters?: GetWorkoutsProperties) {
       throw new Error(error.message);
     }
   
-    return data;
+    return data as ReturnGetWorkoutsData[];
   }

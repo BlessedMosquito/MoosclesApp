@@ -1,7 +1,7 @@
 import { supabase } from '@/lib/supabase';
 
 type UpsertWorkoutMetricsProps = {
-  workoutId: string | number;
+  workoutId: string;
   durationSeconds?: number;
   distanceMeters?: number;
   averagePaceSeconds?: number;
@@ -9,6 +9,12 @@ type UpsertWorkoutMetricsProps = {
   averageHeartRate?: number;
   maxHeartRate?: number;
 };
+
+export type ReturnGetMetricsData = {
+    duration: number;
+    distance: number;
+    pace: number;
+}
 
 export async function upsertWorkoutMetrics(props: UpsertWorkoutMetricsProps) {
   const { data, error } = await supabase
@@ -28,4 +34,15 @@ export async function upsertWorkoutMetrics(props: UpsertWorkoutMetricsProps) {
   if (error) throw error;
 
   return data;
+}
+
+export async function getWorkoutMetrics(workoutId: string): Promise<ReturnGetMetricsData[]>{
+    const {data, error} = await supabase
+    .from('workout_metrics')
+    .select('*')
+
+    if(error) throw error
+
+
+    return data
 }
