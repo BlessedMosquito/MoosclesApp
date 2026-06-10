@@ -163,6 +163,7 @@ export default function CalendarPage() {
           selectedWorkout={selectedWorkout}
           isLoading={isLoading}
           onSelectWorkout={openWorkout}
+          onClosePreview={onWorkoutPreviewClose}
         />
 
         {selectedWorkout && (

@@ -36,6 +36,7 @@ type CalendarGridProps = {
   selectedWorkout: ReturnGetWorkoutsData | null;
   isLoading: boolean;
   onSelectWorkout: (workout: ReturnGetWorkoutsData) => void;
+  onClosePreview: () => void;
 };
 
 export default function CalendarGrid({
@@ -43,6 +44,7 @@ export default function CalendarGrid({
   selectedWorkout,
   isLoading,
   onSelectWorkout,
+  onClosePreview,
 }: CalendarGridProps) {
   const { isMobile, isTablet, scale } = useResponsive();
   const [visibleMonth, setVisibleMonth] = useState(new Date());
@@ -56,11 +58,13 @@ export default function CalendarGrid({
 
   function changeMonth(offset: number) {
     setVisibleMonth(c => new Date(c.getFullYear(), c.getMonth() + offset, 1));
+    onClosePreview();
   }
 
   function changeYear(year: number) {
     setVisibleMonth(c => new Date(year, c.getMonth(), 1));
     setIsYearPickerOpen(false);
+    onClosePreview();
   }
 
   return (
@@ -158,7 +162,12 @@ export default function CalendarGrid({
               <div key={key}
                 role={hasWorkouts ? 'button' : undefined}
                 tabIndex={hasWorkouts ? 0 : undefined}
-                onClick={() => { if (hasWorkouts) onSelectWorkout(dayWorkouts[0]); }}
+                onClick={() => { if (hasWorkouts) {
+                    onSelectWorkout(dayWorkouts[0]);
+                } else {
+                    onClosePreview();
+                }
+                }}
                 onKeyDown={e => { if (hasWorkouts && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); onSelectWorkout(dayWorkouts[0]); } }}
                 style={{
                   minHeight: s(isMobile ? 54 : 112, scale),

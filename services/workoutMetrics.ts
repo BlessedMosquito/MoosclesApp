@@ -5,9 +5,6 @@ type UpsertWorkoutMetricsProps = {
   durationSeconds?: number;
   distanceMeters?: number;
   averagePaceSeconds?: number;
-  calories?: number;
-  averageHeartRate?: number;
-  maxHeartRate?: number;
 };
 
 export type ReturnGetMetricsData = {
@@ -23,10 +20,7 @@ export async function upsertWorkoutMetrics(props: UpsertWorkoutMetricsProps) {
       workout_id: props.workoutId,
       duration_seconds: props.durationSeconds ?? null,
       distance_meters: props.distanceMeters ?? null,
-      average_pace_seconds: props.averagePaceSeconds ?? null,
-      calories: props.calories ?? null,
-      average_heart_rate: props.averageHeartRate ?? null,
-      max_heart_rate: props.maxHeartRate ?? null,
+      average_pace_seconds: props.averagePaceSeconds ?? null
     })
     .select()
     .single();
@@ -39,10 +33,10 @@ export async function upsertWorkoutMetrics(props: UpsertWorkoutMetricsProps) {
 export async function getWorkoutMetrics(workoutId: string): Promise<ReturnGetMetricsData[]>{
     const {data, error} = await supabase
     .from('workout_metrics')
-    .select('*')
+    .select('*').filter('workoutId', 'eq', workoutId)
 
     if(error) throw error
 
 
-    return data
+    return data as ReturnGetMetricsData[]
 }

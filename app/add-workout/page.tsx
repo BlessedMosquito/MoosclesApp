@@ -16,6 +16,7 @@ import {
 } from '@/services/workoutTypes';
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
+import SuccessAnimation from '@/components/ui/SuccessAnimation';
 
 export default function AddWorkoutPage() {
   const router = useRouter();
@@ -26,9 +27,11 @@ export default function AddWorkoutPage() {
   const [selectedTypeIndex, setSelectedTypeIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const selectedType = workoutTypes[selectedTypeIndex];
   const contentMaxWidth = isMobile ? '100%' : isTablet ? '620px' : '760px';
+  const pendingNavRef = useRef<string | null>(null);
 
   useEffect(() => {
     async function loadWorkoutTypes() {
@@ -88,9 +91,8 @@ export default function AddWorkoutPage() {
         throw new Error('Unsupported workout group');
       }
 
-      router.push(
-        `/add-workout-data${path}?workoutId=${workout.id}&name=${encodeURIComponent(trimmedName)}&type=${encodeURIComponent(selectedType.label)}&group=${encodeURIComponent(workoutTypeGroup)}`
-      );
+      pendingNavRef.current = `/add-workout-data${path}?workoutId=${workout.id}&name=${encodeURIComponent(trimmedName)}&type=${encodeURIComponent(selectedType.label)}&group=${encodeURIComponent(workoutTypeGroup)}`;
+      setShowSuccess(true);
     } catch (saveError) {
       setError(
         saveError instanceof Error
@@ -228,6 +230,18 @@ export default function AddWorkoutPage() {
           </PrimaryButton>
         </section>
       </div>
+        {showSuccess && (
+          <SuccessAnimation
+            message="Workout created!"
+            onDone={() => {
+              setShowSuccess(false);
+              if (pendingNavRef.current) {
+                router.push(pendingNavRef.current);
+              }
+            }}
+            doneDelay={1500}
+          />
+        )}
     </main>
   );
 }
