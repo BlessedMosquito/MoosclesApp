@@ -86,8 +86,9 @@ export default function CalendarPage() {
         const data = await getExercisesByWorkout(workout.id);
         setExercises(data as ReturnGetExercisesData[]);
       } else {
-        const data = await getWorkoutMetrics(String(workout.id));
-        setMetrics(data[0] ?? null);
+        const data = await getWorkoutMetrics(workout.id);
+        console.log(data);
+        setMetrics(data as ReturnGetMetricsData);
       }
     } catch {
       setError('Failed to load workout data.');
@@ -101,8 +102,8 @@ export default function CalendarPage() {
 
     const params = new URLSearchParams({
       workoutId: String(selectedWorkout.id),
+      workoutGroupType: selectedWorkoutGroup,
       name: selectedWorkout.name,
-      type: selectedWorkout.workout_types?.label ?? 'workout',
       from: 'calendar',
     });
 

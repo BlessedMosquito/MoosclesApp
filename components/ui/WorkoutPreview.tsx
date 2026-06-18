@@ -12,20 +12,29 @@ import { ReturnGetExercisesData } from '@/services/exercises';
 import { ReturnGetMetricsData } from '@/services/workoutMetrics';
 import { ReturnGetWorkoutsData } from '@/services/workouts';
 
-function formatDuration(seconds: number): string {
+function formatDuration(seconds: number | null): string {
+  if(!seconds){
+    return [0, 0, 0].map(v => String(v).padStart(2, '0')).join(':');
+  }
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
   const s = seconds % 60;
   return [h, m, s].map(v => String(v).padStart(2, '0')).join(':');
 }
 
-function formatDistance(meters: number): string {
+function formatDistance(meters: number | null): string {
+  if(!meters){
+    return `0/km`;
+  }
   const km = meters / 1000;
   if (Number.isInteger(km)) return `${km} km`;
   return `${km.toFixed(3).replace(/\.?0+$/, '').replace('.', ',')} km`;
 }
 
-function formatPace(secondsPerKm: number): string {
+function formatPace(secondsPerKm: number | null): string {
+  if(!secondsPerKm){
+    return '0/km'
+  }
   const m = Math.floor(secondsPerKm / 60);
   const s = Math.round(secondsPerKm % 60);
   return `${m}:${String(s).padStart(2, '0')} /km`;
@@ -237,7 +246,7 @@ export default function WorkoutPreview({
         ) : workoutGroup === 'DurationOnly' ? (
           metrics ? (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: s(8, scale) }}>
-              {renderMetricCard('Time', formatDuration(metrics.duration))}
+              {renderMetricCard('Time', formatDuration(metrics.duration_seconds))}
             </div>
           ) : (
             <p style={{ margin: 0, color: colors.textMuted, fontSize: s(fontSizes.bodySmall, scale) }}>
@@ -248,9 +257,9 @@ export default function WorkoutPreview({
         ) : workoutGroup === 'DistanceDuration' ? (
           metrics ? (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: s(8, scale) }}>
-              {renderMetricCard('Time', formatDuration(metrics.duration))}
-              {renderMetricCard('Distance', formatDistance(metrics.distance))}
-              {renderMetricCard('Pace', formatPace(metrics.pace))}
+              {renderMetricCard('Time', formatDuration(metrics.duration_seconds))}
+              {renderMetricCard('Distance', formatDistance(metrics.distance_meters))}
+              {renderMetricCard('Pace', formatPace(metrics.average_pace))}
             </div>
           ) : (
             <p style={{ margin: 0, color: colors.textMuted, fontSize: s(fontSizes.bodySmall, scale) }}>

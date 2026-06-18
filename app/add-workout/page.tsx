@@ -17,6 +17,7 @@ import {
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
 import SuccessAnimation from '@/components/ui/SuccessAnimation';
+import SectionDivider from '@/components/ui/SectionDivider';
 
 export default function AddWorkoutPage() {
   const router = useRouter();
@@ -49,7 +50,7 @@ export default function AddWorkoutPage() {
     loadWorkoutTypes();
   }, []);
 
-  async function goToExercises() {
+  async function handleCreateWorkout() {
     setError(null);
     const trimmedName = name.trim();
 
@@ -91,7 +92,13 @@ export default function AddWorkoutPage() {
         throw new Error('Unsupported workout group');
       }
 
-      pendingNavRef.current = `/add-workout-data${path}?workoutId=${workout.id}&name=${encodeURIComponent(trimmedName)}&type=${encodeURIComponent(selectedType.label)}&group=${encodeURIComponent(workoutTypeGroup)}`;
+      const params = new URLSearchParams({
+        workoutId: String(workout.id),
+        workoutTypeGroup: workoutTypeGroup,
+        name: trimmedName,
+      });
+
+      pendingNavRef.current = `/add-workout-data${path}?${params.toString()}`;
       setShowSuccess(true);
     } catch (saveError) {
       setError(
@@ -120,20 +127,17 @@ export default function AddWorkoutPage() {
         <BackButton onClick={() => router.push('/dashboard')} />
 
         <section style={{ marginTop: s(28, scale) }}>
-          <p style={{ margin: 0, color: colors.textMuted, fontSize: s(fontSizes.caption, scale) }}>
-            Step 1 of 2
-          </p>
           <h1 style={{
             margin: `${s(8, scale)}px 0 0`,
             fontSize: s(isMobile ? fontSizes.heading1 : fontSizes.display, scale),
             fontWeight: 700,
           }}>
-            Add Workout
+            Create todays workout!
           </h1>
           <p style={{
             margin: `${s(10, scale)}px 0 0`,
             color: colors.textSecondary,
-            fontSize: s(fontSizes.bodySmall, scale),
+            fontSize: s(fontSizes.body, scale),
             lineHeight: 1.5,
           }}>
             Name the session and choose the workout type.
@@ -167,7 +171,7 @@ export default function AddWorkoutPage() {
             color: colors.textSecondary,
             fontSize: s(fontSizes.caption, scale),
           }}>
-            Workout name
+            <SectionDivider label='Workout name'/>
             <input
               placeholder="Push day"
               value={name}
@@ -187,14 +191,8 @@ export default function AddWorkoutPage() {
           </label>
 
           <div>
-            <p style={{
-              margin: `0 0 ${s(10, scale)}px`,
-              color: colors.textSecondary,
-              fontSize: s(fontSizes.caption, scale),
-            }}>
-              Workout type
-            </p>
-
+              <SectionDivider label='Workout type'/>
+            
             {workoutTypes.length === 0 ? (
               <div style={{
                 display: 'flex',
@@ -221,7 +219,7 @@ export default function AddWorkoutPage() {
           </div>
 
           <PrimaryButton
-            onClick={goToExercises}
+            onClick={handleCreateWorkout}
             disabled={isSaving}
             width="3/4"
             align="center"

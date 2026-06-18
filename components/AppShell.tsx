@@ -10,6 +10,7 @@ import CalendarIcon from './icons/CalendarIcon';
 import HomeIcon from './icons/HomeIcon';
 import LogoutIcon from './icons/LogoutIcon';
 import AddIcon from './icons/AddIcon';
+import ProfileIcon from './icons/ProfileIcon';
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -20,8 +21,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   const { scale, isMobile, isTablet } = useResponsive();
     const iconSize = isMobile ? 16 : isTablet ? 18 : 20;
-
-// użycie:
 
 
   return (
@@ -56,9 +55,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           background: colors.glass,
           marginBottom: s(8, scale),
         }}>
-          <p style={{ margin: 0, fontWeight: 600, fontSize: s(fontSizes.bodySmall, scale), color: colors.text }}>
-            Profile
-          </p>
+        <SidebarItem 
+            label="Profile" 
+            icon={<ProfileIcon size={iconSize} color='currentColor'/>}
+            onClick={() =>({})} 
+         />
         </div>
 
         <SidebarItem 
