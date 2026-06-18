@@ -103,6 +103,7 @@ export default function CalendarPage() {
     const params = new URLSearchParams({
       workoutId: String(selectedWorkout.id),
       workoutGroupType: selectedWorkoutGroup,
+      workoutType: selectedWorkout.workout_types.label,
       name: selectedWorkout.name,
       from: 'calendar',
     });

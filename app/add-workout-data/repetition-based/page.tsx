@@ -1,15 +1,15 @@
 'use client';
 
-import { useSearchParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
 import BackButton from '@/components/ui/BackButton';
-import LoadingCircle from '@/components/ui/LoadingCircle';
-import PrimaryButton from '@/components/ui/PrimaryButton';
+import ExerciseAccordion from '@/components/ui/ExerciseAccordion';
+import SectionDivider from '@/components/ui/SectionDivider';
 import { s, useResponsive } from '@/lib/useResponsive';
 import { addExercise, getExercisesByWorkout, ReturnGetExercisesData } from '@/services/exercises';
 import { addSets, getSetsByExercise, ReturnGetSetsData } from '@/services/sets';
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 type SetDraft = {
   reps: string;
@@ -25,7 +25,7 @@ export default function AddWorkoutDataRepetitionBased() {
 
   const workoutId = searchParams.get('workoutId');
   const workoutName = searchParams.get('name') ?? 'Workout';
-  const workoutType = searchParams.get('type') ?? 'workout';
+  const workoutType = searchParams.get('workoutType')?.toLowerCase();
   const from = searchParams.get('from');
   const calendarYear = searchParams.get('year');
   const calendarMonth = searchParams.get('month');
@@ -33,8 +33,6 @@ export default function AddWorkoutDataRepetitionBased() {
   const [exerciseName, setExerciseName] = useState('');
   const [exercises, setExercises] = useState<ReturnGetExercisesData[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
-  const [isLoadingExercises, setIsLoadingExercises] = useState(false);
   const [expandedExerciseId, setExpandedExerciseId] = useState<string | null>(null);
   const [setsByExercise, setSetsByExercise] = useState<Record<string, ReturnGetSetsData[]>>({});
   const [setDrafts, setSetDrafts] = useState<Record<string, SetDraft>>({});
@@ -47,8 +45,6 @@ export default function AddWorkoutDataRepetitionBased() {
       if (!workoutId) {
         return;
       }
-
-      setIsLoadingExercises(true);
       setError(null);
 
       try {
@@ -63,8 +59,6 @@ export default function AddWorkoutDataRepetitionBased() {
             ? loadError.message
             : 'Could not load exercises.'
         );
-      } finally {
-        setIsLoadingExercises(false);
       }
     }
 
@@ -108,8 +102,6 @@ export default function AddWorkoutDataRepetitionBased() {
       return;
     }
 
-    setIsSaving(true);
-
     try {
       const exercise = await addExercise({
         workoutId,
@@ -128,8 +120,6 @@ export default function AddWorkoutDataRepetitionBased() {
           ? saveError.message
           : 'Could not add exercise.'
       );
-    } finally {
-      setIsSaving(false);
     }
   }
 
@@ -212,8 +202,7 @@ export default function AddWorkoutDataRepetitionBased() {
       setError('Weight cannot be negative.');
       return;
     }
-
-    setIsSaving(true);
+    
     setError(null);
 
     try {
@@ -237,8 +226,6 @@ export default function AddWorkoutDataRepetitionBased() {
       setError(
         saveError instanceof Error ? saveError.message : 'Could not add set.'
       );
-    } finally {
-      setIsSaving(false);
     }
   }
 
@@ -267,16 +254,6 @@ export default function AddWorkoutDataRepetitionBased() {
             marginTop: s(28, scale),
           }}
         >
-          <p
-            style={{
-              margin: 0,
-              color: colors.textMuted,
-              fontSize: s(fontSizes.caption, scale),
-            }}
-          >
-            Step 2 of 2
-          </p>
-
           <h1
             style={{
               margin: `${s(8, scale)}px 0 0`,
@@ -294,7 +271,7 @@ export default function AddWorkoutDataRepetitionBased() {
             style={{
               margin: `${s(10, scale)}px 0 0`,
               color: colors.textSecondary,
-              fontSize: s(fontSizes.bodySmall, scale),
+              fontSize: s(fontSizes.body, scale),
               lineHeight: 1.5,
             }}
           >
@@ -318,6 +295,7 @@ export default function AddWorkoutDataRepetitionBased() {
             {error}
           </div>
         )}
+        <SectionDivider label='Exercise list'/>
 
         <section
           style={{
@@ -327,235 +305,27 @@ export default function AddWorkoutDataRepetitionBased() {
             gap: s(16, scale),
           }}
         >
-          <div
-            style={{
-              display: 'flex',
-              gap: s(10, scale),
-            }}
-          >
-            <input
-              placeholder="Exercise name"
-              value={exerciseName}
-              onChange={(event) => setExerciseName(event.target.value)}
-              style={{
-                minWidth: 0,
-                flex: 1,
-                padding: s(14, scale),
-                borderRadius: s(14, scale),
-                border: `1px solid ${colors.border}`,
-                background: colors.surface,
-                color: colors.text,
-                fontSize: s(fontSizes.input, scale),
-                outline: 'none',
-              }}
-            />
-
-            <PrimaryButton
-              onClick={handleAddExercise}
-              disabled={isSaving}
-              height={50}
-            >
-              Add
-            </PrimaryButton>
-          </div>
-
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: s(10, scale),
-            }}
-          >
-            {isLoadingExercises ? (
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  padding: s(8, scale),
-                }}
-              >
-                <LoadingCircle />
-              </div>
-            ) : exercises.length === 0 ? (
-              <p
-                style={{
-                  margin: 0,
-                  color: colors.textMuted,
-                  fontSize: s(fontSizes.bodySmall, scale),
-                }}
-              >
-                No exercises added yet.
-              </p>
-            ) : (
-              exercises.map((exercise, index) => {
-                const exerciseId = String(exercise.id);
-                const isExpanded = expandedExerciseId === exerciseId;
-                const exerciseSets = setsByExercise[exerciseId] ?? [];
-                const setDraft = setDrafts[exerciseId] ?? { reps: '', weight: '' };
-                const isLoadingSets = loadingSetsByExercise[exerciseId];
-
-                return (
-                <div
-                  key={exercise.id}
-                  style={{
-                    padding: s(14, scale),
-                    borderRadius: s(14, scale),
-                    border: `1px solid ${colors.border}`,
-                    background: colors.surface,
-                    color: colors.text,
-                    fontSize: s(fontSizes.bodySmall, scale),
-                  }}
-                >
-                  <button
-                    type="button"
-                    onClick={() => toggleExercise(exercise)}
-                    style={{
-                      width: '100%',
-                      border: 'none',
-                      background: 'transparent',
-                      color: colors.text,
-                      padding: 0,
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      gap: s(12, scale),
-                      cursor: 'pointer',
-                      textAlign: 'left',
-                      fontSize: s(fontSizes.bodySmall, scale),
-                      fontWeight: 700,
-                    }}
-                  >
-                    <span>
-                      {index + 1}. {exercise.name}
-                    </span>
-                    <span>{isExpanded ? '-' : '+'}</span>
-                  </button>
-
-                  {isExpanded && (
-                    <div
-                      style={{
-                        marginTop: s(14, scale),
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: s(10, scale),
-                      }}
-                    >
-                      {isLoadingSets ? (
-                        <div
-                          style={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            padding: s(8, scale),
-                          }}
-                        >
-                          <LoadingCircle size={18} />
-                        </div>
-                      ) : exerciseSets.length === 0 ? (
-                        <p
-                          style={{
-                            margin: 0,
-                            color: colors.textMuted,
-                            fontSize: s(fontSizes.caption, scale),
-                          }}
-                        >
-                          No sets yet.
-                        </p>
-                      ) : (
-                        exerciseSets.map((setItem, setIndex) => (
-                          <div
-                            key={setItem.id}
-                            style={{
-                              display: 'grid',
-                              gridTemplateColumns: 'auto 1fr 1fr',
-                              gap: s(10, scale),
-                              alignItems: 'center',
-                              padding: s(10, scale),
-                              borderRadius: s(12, scale),
-                              background: colors.glass,
-                              border: `1px solid ${colors.border}`,
-                            }}
-                          >
-                            <span style={{ color: colors.textMuted }}>
-                              {setIndex + 1}
-                            </span>
-                            <span>{setItem.reps} reps</span>
-                            <span>{setItem.weight} kg</span>
-                          </div>
-                        ))
-                      )}
-
-                      <div
-                        style={{
-                          display: 'grid',
-                          gridTemplateColumns: '1fr 1fr auto',
-                          gap: s(8, scale),
-                        }}
-                      >
-                        <input
-                          inputMode="numeric"
-                          placeholder="Reps"
-                          value={setDraft.reps}
-                          onChange={(event) =>
-                            updateSetDraft(exerciseId, 'reps', event.target.value)
-                          }
-                          style={{
-                            minWidth: 0,
-                            padding: s(10, scale),
-                            borderRadius: s(12, scale),
-                            border: `1px solid ${colors.border}`,
-                            background: colors.glass,
-                            color: colors.text,
-                            fontSize: s(fontSizes.bodySmall, scale),
-                            outline: 'none',
-                          }}
-                        />
-                        <input
-                          inputMode="decimal"
-                          placeholder="Weight in kg"
-                          value={setDraft.weight}
-                          onChange={(event) =>
-                            updateSetDraft(
-                              exerciseId,
-                              'weight',
-                              event.target.value.replace(/[^0-9.,]/g, '')
-                            )
-                          }
-                          style={{
-                            minWidth: 0,
-                            padding: s(10, scale),
-                            borderRadius: s(12, scale),
-                            border: `1px solid ${colors.border}`,
-                            background: colors.glass,
-                            color: colors.text,
-                            fontSize: s(fontSizes.bodySmall, scale),
-                            outline: 'none',
-                          }}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => handleAddSet(exercise)}
-                          disabled={isSaving}
-                          style={{
-                            width: s(42, scale),
-                            borderRadius: s(12, scale),
-                            border: `1px solid ${colors.borderStrong}`,
-                            background: colors.text,
-                            color: colors.background,
-                            fontSize: s(fontSizes.heading2, scale),
-                            cursor: isSaving ? 'default' : 'pointer',
-                            opacity: isSaving ? 0.7 : 1,
-                          }}
-                        >
-                          +
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                );
-              })
-            )}
-          </div>
+          {exercises.map((exercise, index) => {const exerciseId = String(exercise.id);
+            return (
+              <ExerciseAccordion
+                key={exercise.id}
+                exercise={exercise}
+                index={index}
+                isExpanded={expandedExerciseId === exerciseId}
+                exerciseSets={setsByExercise[exerciseId] ?? []}
+                setDraft={
+                  setDrafts[exerciseId] ?? {
+                    reps: '',
+                    weight: '',
+                  }
+                }
+                isLoadingSets={loadingSetsByExercise[exerciseId]}
+                onToggle={toggleExercise}
+                onDraftChange={updateSetDraft}
+                onAddSet={handleAddSet}
+              />
+            );
+          })}
         </section>
       </div>
     </main>

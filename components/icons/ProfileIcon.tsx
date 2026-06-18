@@ -1,10 +1,8 @@
-type ProfileIconProps = {
-    size?: number;
-    color?: string;
-}
+import { IconProps } from "@/types/common";
 
 
-export default function ProfileIcon({ size = 20, color = 'currentColor' }: ProfileIconProps){
+
+export default function ProfileIcon({ size = 20, color = 'currentColor' }: IconProps){
     return(
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14" id="User-Circle-Single--Streamline-Core" height={size} width={size}>
         <g id="user-circle-single--circle-geometric-human-person-single-user">

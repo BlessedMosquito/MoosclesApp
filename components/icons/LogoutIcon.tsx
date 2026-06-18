@@ -1,10 +1,8 @@
-type LogoutIconProps = {
-    size?: number;
-    color?: string;
-}
+import { IconProps } from "@/types/common";
 
 
-export default function LogoutIcon({ size = 20, color = 'currentColor' }: LogoutIconProps){
+
+export default function LogoutIcon({ size = 20, color = 'currentColor' }: IconProps){
     return(
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14" id="Logout-1--Streamline-Core" height={size} width={size}>
         <g id="logout-1--arrow-exit-frame-leave-logout-rectangle-right">

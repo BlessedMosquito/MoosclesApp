@@ -1,9 +1,7 @@
-type AddIconProps = {
-    size?: number;
-    color?: string;
-  };
+import { IconProps } from "@/types/common";
+
   
-export default function AddIcon({ size = 20, color = 'currentColor' }: AddIconProps) {
+export default function AddIcon({ size = 20, color = 'currentColor' }: IconProps) {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14" width={size} height={size}>
             <g>

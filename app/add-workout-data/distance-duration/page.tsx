@@ -23,11 +23,11 @@ export default function AddWorkoutDataDuration() {
 
   const workoutId = searchParams.get('workoutId');
   const workoutName = searchParams.get('name') ?? 'Workout';
-  const workoutType = searchParams.get('type') ?? 'workout';
   const from = searchParams.get('from');
   const calendarYear = searchParams.get('year');
   const calendarMonth = searchParams.get('month');
-  const workoutTypeGroup = searchParams.get('group') as WorkoutTypeGroup;
+  const workoutGroupType = searchParams.get('workoutGroupType') as WorkoutTypeGroup;
+  const workoutType = searchParams.get('workoutType')?.toLowerCase();
   const pendingNavRef = useRef<string | null>(null);
 
   const [error, setError] = useState<string | null>(null);
@@ -75,7 +75,7 @@ export default function AddWorkoutDataDuration() {
         durationSeconds: time,
       });
 
-      pendingNavRef.current = workoutTypeGroup === 'DistanceDuration'
+      pendingNavRef.current = workoutGroupType === 'DistanceDuration'
         ? `/distance?workoutId=${workoutId}`
         : `/dashboard`;
       setShowSuccess(true);
@@ -100,9 +100,6 @@ export default function AddWorkoutDataDuration() {
         <BackButton onClick={handleBack} />
 
         <section style={{ marginTop: s(28, scale) }}>
-          <p style={{ margin: 0, color: colors.textMuted, fontSize: s(fontSizes.caption, scale) }}>
-            {workoutTypeGroup === 'DistanceDuration' ? 'Step 2 of 3' : 'Step 2 of 2'}
-          </p>
           <h1 style={{
             margin: `${s(8, scale)}px 0 0`,
             fontSize: s(isMobile ? fontSizes.heading1 : fontSizes.display, scale),
@@ -162,7 +159,7 @@ export default function AddWorkoutDataDuration() {
 
       {showSuccess && (
         <SuccessAnimation
-          message="Time added!"
+          message="Data successfully added!"
           onDone={() => {
             setShowSuccess(false);
             if (pendingNavRef.current) router.push(pendingNavRef.current);

@@ -95,6 +95,7 @@ export default function AddWorkoutPage() {
       const params = new URLSearchParams({
         workoutId: String(workout.id),
         workoutTypeGroup: workoutTypeGroup,
+        workoutType: selectedType.label,
         name: trimmedName,
       });
 

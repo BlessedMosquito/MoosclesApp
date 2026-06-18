@@ -1,10 +1,8 @@
-type HomeIconProps = {
-    size?: number;
-    color?: string;
-}
+import { IconProps } from "@/types/common";
 
 
-export default function HomeIcon({ size = 20, color = 'currentColor' }: HomeIconProps){
+
+export default function HomeIcon({ size = 20, color = 'currentColor' }: IconProps){
     return(
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14" height={size} width={size}>
     <g id="home-4--home-house-roof-shelter">
