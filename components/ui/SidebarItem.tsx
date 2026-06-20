@@ -1,5 +1,5 @@
 'use client';
-
+import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { s, useResponsive } from '@/lib/useResponsive';
 import { colors } from '@/theme/colors';
@@ -23,15 +23,27 @@ export default function SidebarItem({
   const { scale } = useResponsive();
   const pathname = usePathname();
   const isActive = activePath ? pathname === activePath : false;
+  const [isHovered, setIsHovered] = useState(false);
 
-  const textColor = variant === 'danger'
-    ? colors.error
-    : isActive ? colors.text : colors.textSecondary;
+  const textColor =
+    variant === 'danger'
+      ? colors.error
+      : isActive || isHovered
+        ? colors.text
+        : colors.textSecondary;
+
+  const background = isActive
+    ? colors.glassHover
+    : isHovered
+      ? colors.glass
+      : 'transparent';
 
   return (
     <button
       type="button"
       onClick={onClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       style={{
         display: 'flex',
         alignItems: 'center',
@@ -39,7 +51,7 @@ export default function SidebarItem({
         padding: `${s(10, scale)}px ${s(12, scale)}px`,
         borderRadius: s(12, scale),
         border: `1px solid ${isActive ? colors.borderStrong : 'transparent'}`,
-        background: isActive ? colors.glassHover : 'transparent',
+        background,
         color: textColor,
         fontSize: s(fontSizes.body, scale),
         fontWeight: isActive ? 700 : 400,
@@ -49,15 +61,17 @@ export default function SidebarItem({
         transition: 'background 150ms ease, color 150ms ease',
       }}
     >
-      <span style={{
-        width: s(22, scale),
-        height: s(22, scale),
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        flexShrink: 0,
-        color: textColor,
-      }}>
+      <span
+        style={{
+          width: s(22, scale),
+          height: s(22, scale),
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0,
+          color: textColor,
+        }}
+      >
         {icon}
       </span>
       {label}

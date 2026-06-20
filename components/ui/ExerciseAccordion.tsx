@@ -81,9 +81,7 @@ export default function ExerciseAccordion({
           {index + 1}. {exercise.name}
         </span>
 
-        <span>
-          {isExpanded ? <CloseIcon /> : <DropDownIcon />}
-        </span>
+        <span>{isExpanded ? <CloseIcon /> : <DropDownIcon />}</span>
       </button>
 
       {isExpanded && (
@@ -130,9 +128,7 @@ export default function ExerciseAccordion({
                   border: `1px solid ${colors.border}`,
                 }}
               >
-                <span style={{ color: colors.textMuted }}>
-                  {setIndex + 1}
-                </span>
+                <span style={{ color: colors.textMuted }}>{setIndex + 1}</span>
 
                 <span>{setItem.reps} reps</span>
                 <span>{setItem.weight} kg</span>
@@ -152,11 +148,7 @@ export default function ExerciseAccordion({
               placeholder="Reps"
               value={setDraft.reps}
               onChange={(e) =>
-                onDraftChange(
-                  exerciseId,
-                  'reps',
-                  e.target.value
-                )
+                onDraftChange(exerciseId, 'reps', e.target.value)
               }
               style={{
                 minWidth: 0,
@@ -209,10 +201,7 @@ export default function ExerciseAccordion({
                 cursor: 'pointer',
               }}
             >
-              <AddIcon
-                size={18}
-                color="currentColor"
-              />
+              <AddIcon size={18} color="currentColor" />
             </button>
           </div>
         </div>

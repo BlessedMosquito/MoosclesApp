@@ -37,8 +37,7 @@ export default function DistanceInputTile({
   }, [kilometers, meters, onChange]);
 
   const totalMeters =
-    (parseInt(kilometers) || 0) * 1000 +
-    (parseInt(meters) || 0);
+    (parseInt(kilometers) || 0) * 1000 + (parseInt(meters) || 0);
 
   const totalKm = (totalMeters / 1000)
     .toFixed(3)
@@ -53,7 +52,7 @@ export default function DistanceInputTile({
     border: `1px solid ${colors.border}`,
     background: colors.surface,
     color: colors.text,
-    fontSize: s(fontSizes.input, scale),
+    fontSize: fontSizes.input,
     outline: 'none',
   };
 
@@ -86,7 +85,6 @@ export default function DistanceInputTile({
           }}
         >
           Kilometers
-
           <input
             placeholder="0"
             inputMode="numeric"
@@ -106,7 +104,6 @@ export default function DistanceInputTile({
           }}
         >
           Meters
-
           <input
             placeholder="0"
             inputMode="numeric"

@@ -24,7 +24,9 @@ export default function AddWorkoutPage() {
   const { isMobile, isTablet, scale } = useResponsive();
 
   const [name, setName] = useState('');
-  const [workoutTypes, setWorkoutTypes] = useState<ReturnGetWorkoutTypeData[]>([]);
+  const [workoutTypes, setWorkoutTypes] = useState<ReturnGetWorkoutTypeData[]>(
+    []
+  );
   const [selectedTypeIndex, setSelectedTypeIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -76,9 +78,9 @@ export default function AddWorkoutPage() {
       const workoutTypeGroup = await getWorkoutTypeGroup(selectedType.id);
 
       const workoutDataView: Record<WorkoutTypeGroup, string> = {
-        'DistanceDuration': '/distance-duration',
-        'DurationOnly': '/distance-duration',
-        'RepetitionBased': '/repetition-based',
+        DistanceDuration: '/distance-duration',
+        DurationOnly: '/distance-duration',
+        RepetitionBased: '/repetition-based',
       };
 
       if (!workoutTypeGroup) {
@@ -128,51 +130,65 @@ export default function AddWorkoutPage() {
         <BackButton onClick={() => router.push('/dashboard')} />
 
         <section style={{ marginTop: s(28, scale) }}>
-          <h1 style={{
-            margin: `${s(8, scale)}px 0 0`,
-            fontSize: s(isMobile ? fontSizes.heading1 : fontSizes.display, scale),
-            fontWeight: 700,
-          }}>
+          <h1
+            style={{
+              margin: `${s(8, scale)}px 0 0`,
+              fontSize: s(
+                isMobile ? fontSizes.heading1 : fontSizes.display,
+                scale
+              ),
+              fontWeight: 700,
+            }}
+          >
             Create todays workout!
           </h1>
-          <p style={{
-            margin: `${s(10, scale)}px 0 0`,
-            color: colors.textSecondary,
-            fontSize: s(fontSizes.body, scale),
-            lineHeight: 1.5,
-          }}>
+          <p
+            style={{
+              margin: `${s(10, scale)}px 0 0`,
+              color: colors.textSecondary,
+              fontSize: s(fontSizes.body, scale),
+              lineHeight: 1.5,
+            }}
+          >
             Name the session and choose the workout type.
           </p>
         </section>
 
         {error && (
-          <div role="alert" style={{
-            marginTop: s(18, scale),
-            padding: s(12, scale),
-            borderRadius: s(12, scale),
-            border: `1px solid ${colors.errorBorder}`,
-            background: colors.errorSurface,
-            color: colors.errorMuted,
-            fontSize: s(fontSizes.bodySmall, scale),
-          }}>
+          <div
+            role="alert"
+            style={{
+              marginTop: s(18, scale),
+              padding: s(12, scale),
+              borderRadius: s(12, scale),
+              border: `1px solid ${colors.errorBorder}`,
+              background: colors.errorSurface,
+              color: colors.errorMuted,
+              fontSize: s(fontSizes.bodySmall, scale),
+            }}
+          >
             {error}
           </div>
         )}
 
-        <section style={{
-          marginTop: s(24, scale),
-          display: 'flex',
-          flexDirection: 'column',
-          gap: s(22, scale),
-        }}>
-          <label style={{
+        <section
+          style={{
+            marginTop: s(24, scale),
             display: 'flex',
             flexDirection: 'column',
-            gap: s(8, scale),
-            color: colors.textSecondary,
-            fontSize: s(fontSizes.caption, scale),
-          }}>
-            <SectionDivider label='Workout name'/>
+            gap: s(22, scale),
+          }}
+        >
+          <label
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: s(8, scale),
+              color: colors.textSecondary,
+              fontSize: s(fontSizes.caption, scale),
+            }}
+          >
+            <SectionDivider label="Workout name" />
             <input
               placeholder="Push day"
               value={name}
@@ -192,30 +208,32 @@ export default function AddWorkoutPage() {
           </label>
 
           <div>
-              <SectionDivider label='Workout type'/>
-            
+            <SectionDivider label="Workout type" />
+
             {workoutTypes.length === 0 ? (
-              <div style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: 44 * 5,
-                borderRadius: s(18, scale),
-                border: `1px solid ${colors.border}`,
-                background: colors.surface,
-              }}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: 44 * 5,
+                  borderRadius: s(18, scale),
+                  border: `1px solid ${colors.border}`,
+                  background: colors.surface,
+                }}
+              >
                 <LoadingCircle size={18} />
               </div>
             ) : (
-            <div style={{ width: '100%' }}>
-              <WheelPicker
-                width="100%"
-                items={workoutTypes.map(t => t.label)}
-                value={selectedTypeIndex}
-                onChange={setSelectedTypeIndex}
-                visibleRows={5}
-              />
-            </div>
+              <div style={{ width: '100%' }}>
+                <WheelPicker
+                  width="100%"
+                  items={workoutTypes.map((t) => t.label)}
+                  value={selectedTypeIndex}
+                  onChange={setSelectedTypeIndex}
+                  visibleRows={5}
+                />
+              </div>
             )}
           </div>
 
@@ -229,18 +247,18 @@ export default function AddWorkoutPage() {
           </PrimaryButton>
         </section>
       </div>
-        {showSuccess && (
-          <SuccessAnimation
-            message="Workout created!"
-            onDone={() => {
-              setShowSuccess(false);
-              if (pendingNavRef.current) {
-                router.push(pendingNavRef.current);
-              }
-            }}
-            doneDelay={1500}
-          />
-        )}
+      {showSuccess && (
+        <SuccessAnimation
+          message="Workout created!"
+          onDone={() => {
+            setShowSuccess(false);
+            if (pendingNavRef.current) {
+              router.push(pendingNavRef.current);
+            }
+          }}
+          doneDelay={1500}
+        />
+      )}
     </main>
   );
 }

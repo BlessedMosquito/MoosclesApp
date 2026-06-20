@@ -35,19 +35,21 @@ export default function SuccessAnimation({
   const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
   return (
-    <div style={{
-      position: 'fixed',
-      inset: 0,
-      zIndex: 200,
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: s(16, scale),
-      background: 'rgba(0,0,0,0.5)',
-      backdropFilter: 'blur(4px)',
-      WebkitBackdropFilter: 'blur(4px)',
-    }}>
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 200,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: s(16, scale),
+        background: 'rgba(0,0,0,0.5)',
+        backdropFilter: 'blur(4px)',
+        WebkitBackdropFilter: 'blur(4px)',
+      }}
+    >
       <style>{`
         @keyframes spin {
           to { transform: rotate(360deg); }
@@ -77,7 +79,8 @@ export default function SuccessAnimation({
           viewBox={`0 0 ${SIZE} ${SIZE}`}
           style={{
             transform: 'rotate(-90deg)',
-            animation: phase === 'spinning' ? 'spin 1s linear infinite' : undefined,
+            animation:
+              phase === 'spinning' ? 'spin 1s linear infinite' : undefined,
             transition: 'animation 0.3s',
           }}
         >
@@ -103,12 +106,14 @@ export default function SuccessAnimation({
             strokeDasharray={CIRCUMFERENCE}
             strokeDashoffset={phase === 'spinning' ? CIRCUMFERENCE * 0.75 : 0}
             style={{
-              transition: phase === 'success'
-                ? 'stroke-dashoffset 0.5s ease-out, stroke 0.3s ease'
-                : undefined,
-              animation: phase === 'success'
-                ? 'draw-circle 0.5s ease-out forwards'
-                : undefined,
+              transition:
+                phase === 'success'
+                  ? 'stroke-dashoffset 0.5s ease-out, stroke 0.3s ease'
+                  : undefined,
+              animation:
+                phase === 'success'
+                  ? 'draw-circle 0.5s ease-out forwards'
+                  : undefined,
             }}
           />
         </svg>
@@ -144,13 +149,15 @@ export default function SuccessAnimation({
       </div>
 
       {phase === 'success' && (
-        <p style={{
-          margin: 0,
-          color: colors.text,
-          fontSize: s(16, scale),
-          fontWeight: 600,
-          animation: 'fade-in 0.4s ease-out forwards',
-        }}>
+        <p
+          style={{
+            margin: 0,
+            color: colors.text,
+            fontSize: s(16, scale),
+            fontWeight: 600,
+            animation: 'fade-in 0.4s ease-out forwards',
+          }}
+        >
           {message}
         </p>
       )}

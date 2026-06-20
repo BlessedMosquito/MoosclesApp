@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import Tile from '@/components/ui/Tile';    
+import Tile from '@/components/ui/Tile';
 import { s, useResponsive } from '@/lib/useResponsive';
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
@@ -35,7 +35,9 @@ export default function DashboardPage() {
   const router = useRouter();
   const { isMobile, isTablet, scale } = useResponsive();
   const contentMaxWidth = isMobile ? 420 : isTablet ? 760 : 980;
-  const gridColumns = isMobile ? 'repeat(2, minmax(0, 1fr))' : 'repeat(3, minmax(0, 1fr))';
+  const gridColumns = isMobile
+    ? 'repeat(2, minmax(0, 1fr))'
+    : 'repeat(3, minmax(0, 1fr))';
   const today = new Date();
   const currentDay = today.getDate();
   const monthLabel = today.toLocaleDateString('en-US', { month: 'short' });
@@ -80,18 +82,11 @@ export default function DashboardPage() {
           title="Start Workout"
           subtitle="Track your training session"
           onClick={() => router.push('/add-workout')}
-        >
-        </Tile>
+        ></Tile>
 
-        <Tile
-          title="Weekly Progress"
-          subtitle="4 workouts completed"
-        />
+        <Tile title="Weekly Progress" subtitle="4 workouts completed" />
 
-        <Tile
-          title="Calendar"
-          onClick={() => router.push('/calendar')}
-        >
+        <Tile title="Calendar" onClick={() => router.push('/calendar')}>
           <div
             style={{
               width: '100%',
@@ -159,10 +154,7 @@ export default function DashboardPage() {
           </div>
         </Tile>
 
-        <Tile
-          title="Current Streak"
-          subtitle="12 days"
-        />
+        <Tile title="Current Streak" subtitle="12 days" />
       </div>
     </main>
   );

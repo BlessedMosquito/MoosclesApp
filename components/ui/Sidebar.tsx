@@ -2,6 +2,8 @@
 import { useState } from 'react';
 import { s, useResponsive } from '@/lib/useResponsive';
 import { colors } from '@/theme/colors';
+import SidebarIcon from '../icons/SidebarIcon';
+import CloseIcon from '../icons/CloseIcon';
 
 type SidebarProps = {
   children: React.ReactNode;
@@ -18,7 +20,7 @@ export default function Sidebar({ children }: SidebarProps) {
       {/* toggle */}
       <button
         type="button"
-        onClick={() => setIsOpen(v => !v)}
+        onClick={() => setIsOpen((v) => !v)}
         style={{
           position: 'fixed',
           top: s(16, scale),
@@ -38,22 +40,7 @@ export default function Sidebar({ children }: SidebarProps) {
           gap: s(5, scale),
         }}
       >
-        {[0, 1, 2].map(i => (
-          <span key={i} style={{
-            display: 'block',
-            width: s(18, scale),
-            height: 2,
-            borderRadius: 2,
-            background: colors.text,
-            transition: 'transform 200ms ease, opacity 200ms ease',
-            transform: isOpen
-              ? i === 0 ? 'translateY(7px) rotate(45deg)'
-              : i === 2 ? 'translateY(-7px) rotate(-45deg)'
-              : 'scaleX(0)'
-              : 'none',
-            opacity: isOpen && i === 1 ? 0 : 1,
-          }} />
-        ))}
+        {!isOpen ? <SidebarIcon /> : <CloseIcon />}
       </button>
 
       {/* overlay */}
@@ -73,6 +60,13 @@ export default function Sidebar({ children }: SidebarProps) {
 
       {/* sidebar */}
       <nav
+        onClick={(e) => {
+          // zamknij tylko jeśli kliknięto przycisk wewnątrz (np. SidebarItem)
+          const target = e.target as HTMLElement;
+          if (target.closest('button')) {
+            setIsOpen(false);
+          }
+        }}
         style={{
           position: 'fixed',
           top: 0,
@@ -80,14 +74,17 @@ export default function Sidebar({ children }: SidebarProps) {
           bottom: 0,
           zIndex: 199,
           width: SIDEBAR_WIDTH,
-          background: '#1C1C21',
-          borderLeft: `1px solid ${colors.border}`,
+          background: colors.surfaceSolid,
+          borderLeft: `1px solid ${colors.borderStrong}`,
           borderRight: 'none',
           display: 'flex',
           flexDirection: 'column',
           padding: s(16, scale),
-          transform: isOpen ? 'translateX(0)' : `translateX(${SIDEBAR_WIDTH}px)`,
+          transform: isOpen
+            ? 'translateX(0)'
+            : `translateX(${SIDEBAR_WIDTH}px)`,
           transition: 'transform 250ms cubic-bezier(0.4, 0, 0.2, 1)',
+          borderRadius: s(24, scale),
         }}
       >
         <div style={{ height: TOGGLE_SIZE + s(16, scale) }} />

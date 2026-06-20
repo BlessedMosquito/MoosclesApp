@@ -5,23 +5,22 @@ import { s, useResponsive } from '@/lib/useResponsive';
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
 
-
 type ButtonWidth = number | '1/4' | '1/2' | '3/4' | 'full';
 
 type ButtonAlign = 'left' | 'center' | 'right';
 
 const widthMap: Record<ButtonWidth, string> = {
   full: '100%',
-  '3/4':  '75%',
-  '1/2':  '50%',
-  '1/4':  '25%',
+  '3/4': '75%',
+  '1/2': '50%',
+  '1/4': '25%',
 };
 
 const alignMap: Record<ButtonAlign, string> = {
-  left : 'flex-start',
-  center : 'center',
-  right: 'flex-end'
-}
+  left: 'flex-start',
+  center: 'center',
+  right: 'flex-end',
+};
 
 type PrimaryButtonProps = {
   children: ReactNode;
@@ -44,11 +43,12 @@ export default function PrimaryButton({
 }: PrimaryButtonProps) {
   const { scale } = useResponsive();
 
-  const resolvedWidth = width === undefined
-    ? 'auto'
-    : typeof width === 'number'
-      ? `${s(width, scale)}px`
-      : widthMap[width];
+  const resolvedWidth =
+    width === undefined
+      ? 'auto'
+      : typeof width === 'number'
+        ? `${s(width, scale)}px`
+        : widthMap[width];
 
   const button = (
     <button
@@ -77,11 +77,13 @@ export default function PrimaryButton({
   if (!align) return button;
 
   return (
-    <div style={{
-      display: 'flex',
-      justifyContent: alignMap[align],
-      width: '100%',
-    }}>
+    <div
+      style={{
+        display: 'flex',
+        justifyContent: alignMap[align],
+        width: '100%',
+      }}
+    >
       {button}
     </div>
   );

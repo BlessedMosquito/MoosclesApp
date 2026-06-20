@@ -107,7 +107,9 @@ export default function BackButton({
               width: isOverlayExpanded ? '100vw' : overlayRect.width,
               height: isOverlayExpanded ? '100dvh' : overlayRect.height,
               borderRadius: isOverlayExpanded ? 0 : s(14, scale),
-              background: isOverlayExpanded ? colors.background : colors.surface,
+              background: isOverlayExpanded
+                ? colors.background
+                : colors.surface,
               border: `1px solid ${colors.border}`,
               boxShadow: `0 ${s(8, scale)}px ${s(24, scale)}px ${colors.shadow}`,
               zIndex: 1000,

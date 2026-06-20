@@ -1,23 +1,24 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
-  --background: #0B0B0F;
-  --surface: rgba(255,255,255,0.04);
-  --surface-solid: #1C1C21;
-  --border: rgba(255,255,255,0.08);
-  --border-strong: rgba(255,255,255,0.16);
-  --text: #FFFFFF;
+  --background: #0b0b0f;
+  --surface: rgba(255, 255, 255, 0.04);
+  --surface-solid: #1c1c21;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+  --text: #ffffff;
   --text-secondary: #888888;
   --text-muted: #666666;
-  --glass: rgba(255,255,255,0.04);
-  --glass-hover: rgba(255,255,255,0.08);
-  --shadow: rgba(0,0,0,0.5);
-  --success: #30D158;
-  --error: #FF453A;
-  --error-muted: #FFB4AE;
-  --error-surface: rgba(255,69,58,0.12);
-  --error-border: rgba(255,69,58,0.28);
-  --warning: #FFD60A;
+  --glass: rgba(255, 255, 255, 0.04);
+  --glass-hover: rgba(255, 255, 255, 0.08);
+  --shadow: rgba(0, 0, 0, 0.5);
+  --success: #30d158;
+  --error: #ff453a;
+  --error-muted: #ffb4ae;
+  --error-surface: rgba(255, 69, 58, 0.12);
+  --error-border: rgba(255, 69, 58, 0.28);
+  --warning: #ffd60a;
+  --transparent: trasparent;
 }
 
 @theme inline {

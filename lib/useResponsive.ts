@@ -28,5 +28,5 @@ export function useResponsive() {
 }
 
 export function s(value: number, scale: number) {
-    return Math.round(value * scale);
-  }
+  return Math.round(value * scale);
+}

@@ -82,26 +82,20 @@ export default function AuthLayout({
 
           borderRadius: isMobile ? 0 : 28,
 
-          border: isMobile
-            ? 'none'
-            : `3px solid ${colors.border}`,
+          border: isMobile ? 'none' : `3px solid ${colors.border}`,
 
-          background: isMobile
-            ? 'transparent'
-            : colors.glass,
+          background: isMobile ? 'transparent' : colors.glass,
 
           backdropFilter: isMobile ? 'none' : 'blur(20px)',
 
           WebkitBackdropFilter: isMobile ? 'none' : 'blur(20px)',
 
-          boxShadow: isMobile
-            ? 'none'
-            : `0 20px 60px ${colors.shadow}`,
+          boxShadow: isMobile ? 'none' : `0 20px 60px ${colors.shadow}`,
 
           display: 'flex',
           flexDirection: 'column',
           gap: 18,
-          textAlign: 'center'
+          textAlign: 'center',
         }}
       >
         {title}

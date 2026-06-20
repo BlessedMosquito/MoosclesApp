@@ -1,20 +1,20 @@
-'use client'
+'use client';
 
-import BackButton from "@/components/ui/BackButton";
-import DistanceInputTile from "@/components/ui/DistanceInputTile";
-import PrimaryButton from "@/components/ui/PrimaryButton";
-import SectionDivider from "@/components/ui/SectionDivider";
-import SuccessAnimation from "@/components/ui/SuccessAnimation";
-import TimeInputTile from "@/components/ui/TimeInputTile";
-import WheelPicker from "@/components/ui/WheelPicker";
-import { s, useResponsive } from "@/lib/useResponsive";
-import { upsertWorkoutMetrics } from "@/services/workoutMetrics";
-import { WorkoutTypeGroup } from "@/services/workoutTypes";
-import { colors } from "@/theme/colors";
-import { fontSizes } from "@/theme/typography";
-import { useSearchParams } from "next/navigation";
+import BackButton from '@/components/ui/BackButton';
+import DistanceInputTile from '@/components/ui/DistanceInputTile';
+import PrimaryButton from '@/components/ui/PrimaryButton';
+import SectionDivider from '@/components/ui/SectionDivider';
+import SuccessAnimation from '@/components/ui/SuccessAnimation';
+import TimeInputTile from '@/components/ui/TimeInputTile';
+import WheelPicker from '@/components/ui/WheelPicker';
+import { s, useResponsive } from '@/lib/useResponsive';
+import { upsertWorkoutMetrics } from '@/services/workoutMetrics';
+import { WorkoutTypeGroup } from '@/services/workoutTypes';
+import { colors } from '@/theme/colors';
+import { fontSizes } from '@/theme/typography';
+import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
-import { useRef, useState } from "react";
+import { useRef, useState } from 'react';
 
 export default function AddWorkoutDataDuration() {
   const router = useRouter();
@@ -26,7 +26,9 @@ export default function AddWorkoutDataDuration() {
   const from = searchParams.get('from');
   const calendarYear = searchParams.get('year');
   const calendarMonth = searchParams.get('month');
-  const workoutGroupType = searchParams.get('workoutGroupType') as WorkoutTypeGroup;
+  const workoutGroupType = searchParams.get(
+    'workoutGroupType'
+  ) as WorkoutTypeGroup;
   const workoutType = searchParams.get('workoutType')?.toLowerCase();
   const pendingNavRef = useRef<string | null>(null);
 
@@ -38,7 +40,6 @@ export default function AddWorkoutDataDuration() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [time, setTime] = useState(0);
   const [distance, setDistance] = useState(0);
-  
 
   const contentMaxWidth = isMobile ? '100%' : isTablet ? 620 : 760;
 
@@ -75,75 +76,92 @@ export default function AddWorkoutDataDuration() {
         durationSeconds: time,
       });
 
-      pendingNavRef.current = workoutGroupType === 'DistanceDuration'
-        ? `/distance?workoutId=${workoutId}`
-        : `/dashboard`;
+      pendingNavRef.current =
+        workoutGroupType === 'DistanceDuration'
+          ? `/distance?workoutId=${workoutId}`
+          : `/dashboard`;
       setShowSuccess(true);
     } catch (saveError) {
-      setError(saveError instanceof Error ? saveError.message : 'Could not add time to workout.');
+      setError(
+        saveError instanceof Error
+          ? saveError.message
+          : 'Could not add time to workout.'
+      );
     } finally {
       setIsSaving(false);
     }
   }
 
   return (
-    <main style={{
-      minHeight: '100dvh',
-      background: colors.background,
-      padding: s(isMobile ? 18 : 28, scale),
-      color: colors.text,
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-    }}>
+    <main
+      style={{
+        minHeight: '100dvh',
+        background: colors.background,
+        padding: s(isMobile ? 18 : 28, scale),
+        color: colors.text,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+      }}
+    >
       <div style={{ width: '100%', maxWidth: contentMaxWidth }}>
         <BackButton onClick={handleBack} />
 
         <section style={{ marginTop: s(28, scale) }}>
-          <h1 style={{
-            margin: `${s(8, scale)}px 0 0`,
-            fontSize: s(isMobile ? fontSizes.heading1 : fontSizes.display, scale),
-            fontWeight: 700,
-          }}>
+          <h1
+            style={{
+              margin: `${s(8, scale)}px 0 0`,
+              fontSize: s(
+                isMobile ? fontSizes.heading1 : fontSizes.display,
+                scale
+              ),
+              fontWeight: 700,
+            }}
+          >
             {workoutName}
           </h1>
-          <p style={{
-            margin: `${s(10, scale)}px 0 0`,
-            color: colors.textSecondary,
-            fontSize: s(fontSizes.body, scale),
-            lineHeight: 1.5,
-          }}>
+          <p
+            style={{
+              margin: `${s(10, scale)}px 0 0`,
+              color: colors.textSecondary,
+              fontSize: s(fontSizes.body, scale),
+              lineHeight: 1.5,
+            }}
+          >
             Add data to your {workoutType} session.
           </p>
         </section>
 
         {error && (
-          <div role="alert" style={{
-            marginTop: s(18, scale),
-            padding: s(12, scale),
-            borderRadius: s(12, scale),
-            border: `1px solid ${colors.errorBorder}`,
-            background: colors.errorSurface,
-            color: colors.errorMuted,
-            fontSize: s(fontSizes.bodySmall, scale),
-          }}>
+          <div
+            role="alert"
+            style={{
+              marginTop: s(18, scale),
+              padding: s(12, scale),
+              borderRadius: s(12, scale),
+              border: `1px solid ${colors.errorBorder}`,
+              background: colors.errorSurface,
+              color: colors.errorMuted,
+              fontSize: s(fontSizes.bodySmall, scale),
+            }}
+          >
             {error}
           </div>
         )}
 
-        <SectionDivider label='Time'/>
-        <TimeInputTile 
-            label=""
-            inputHours={hours}
-            inputMinutes={minutes}
-            inputSeconds={seconds}
-            onChange={setTime}
+        <SectionDivider label="Time" />
+        <TimeInputTile
+          label=""
+          inputHours={hours}
+          inputMinutes={minutes}
+          inputSeconds={seconds}
+          onChange={setTime}
         />
-        <SectionDivider label='Distance'/>
+        <SectionDivider label="Distance" />
         <DistanceInputTile
-            label=""
-            valueMeters={distance}
-            onChange={setDistance}
+          label=""
+          valueMeters={distance}
+          onChange={setDistance}
         />
         <div style={{ marginTop: s(24, scale) }}>
           <PrimaryButton

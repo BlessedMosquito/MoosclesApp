@@ -20,54 +20,58 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   const { scale, isMobile, isTablet } = useResponsive();
-    const iconSize = isMobile ? 16 : isTablet ? 18 : 20;
-
+  const iconSize = isMobile ? 16 : isTablet ? 18 : 20;
 
   return (
     <>
       <Sidebar>
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: s(4, scale) }}>
-          <SidebarItem 
-                label="Dashboard"   
-                icon={<HomeIcon size={iconSize} color='currentColor'/>} 
-                onClick={() => router.push('/dashboard')}   
-                activePath="/dashboard" 
-            />
+        <div
+          style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: s(4, scale),
+          }}
+        >
           <SidebarItem
-                label="Calendar"
-                icon={<CalendarIcon size={iconSize} color='currentColor' />}
-                activePath="/calendar"
-                onClick={() => router.push('/calendar')}
-            />
-          <SidebarItem 
-                label="Add Workout" 
-                icon={<AddIcon size={iconSize} color='currentColor'/>}
-                onClick={() => router.push('/add-workout')} 
-                activePath="/add-workout" 
-            />
-          <SidebarItem label="Workouts"    icon="≡" onClick={() => router.push('/workouts')}    activePath="/workouts" />
+            label="Dashboard"
+            icon={<HomeIcon size={iconSize} color="currentColor" />}
+            onClick={() => router.push('/dashboard')}
+            activePath="/dashboard"
+          />
+          <SidebarItem
+            label="Calendar"
+            icon={<CalendarIcon size={iconSize} color="currentColor" />}
+            activePath="/calendar"
+            onClick={() => router.push('/calendar')}
+          />
+          <SidebarItem
+            label="Add Workout"
+            icon={<AddIcon size={iconSize} color="currentColor" />}
+            onClick={() => router.push('/add-workout')}
+            activePath="/add-workout"
+          />
+          <SidebarItem
+            label="Workouts"
+            icon="≡"
+            onClick={() => router.push('/workouts')}
+            activePath="/workouts"
+          />
         </div>
 
-        <div style={{
-          padding: s(12, scale),
-          borderRadius: s(12, scale),
-          border: `1px solid ${colors.border}`,
-          background: colors.glass,
-          marginBottom: s(8, scale),
-        }}>
-        <SidebarItem 
-            label="Profile" 
-            icon={<ProfileIcon size={iconSize} color='currentColor'/>}
-            onClick={() =>({})} 
-         />
-        </div>
+        <SidebarItem
+          label="Profile"
+          icon={<ProfileIcon size={iconSize} color="currentColor" />}
+          onClick={() => ({})}
+        />
 
-        <SidebarItem 
-            label="Log out" 
-            icon={<LogoutIcon size={iconSize} color='red'/>}
-            onClick={handleLogout} 
-            variant="danger" />
-        </Sidebar>
+        <SidebarItem
+          label="Log out"
+          icon={<LogoutIcon size={iconSize} color="red" />}
+          onClick={handleLogout}
+          variant="danger"
+        />
+      </Sidebar>
 
       {children}
     </>

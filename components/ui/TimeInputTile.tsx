@@ -5,6 +5,8 @@ import { s, useResponsive } from '@/lib/useResponsive';
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
 import WheelPicker from './WheelPicker';
+import DropDownIcon from '../icons/DropDownIcon';
+import CloseIcon from '../icons/CloseIcon';
 
 type TimeInputProps = {
   label: string;
@@ -37,10 +39,7 @@ export default function TimeInputTile({
   }, [inputHours, inputMinutes, inputSeconds]);
 
   useEffect(() => {
-    const totalSeconds =
-      hours * 3600 +
-      minutes * 60 +
-      seconds;
+    const totalSeconds = hours * 3600 + minutes * 60 + seconds;
 
     onChange(totalSeconds);
   }, [hours, minutes, seconds, onChange]);
@@ -63,7 +62,7 @@ export default function TimeInputTile({
 
       <button
         type="button"
-        onClick={() => setPickerOpen(v => !v)}
+        onClick={() => setPickerOpen((v) => !v)}
         style={{
           width: '100%',
           display: 'flex',
@@ -91,16 +90,11 @@ export default function TimeInputTile({
           {`${pad(hours)}:${pad(minutes)}:${pad(seconds)}`}
         </span>
 
-        <span
-          style={{
-            color: colors.textMuted,
-            fontSize: s(fontSizes.caption, scale),
-            transform: pickerOpen ? 'rotate(180deg)' : 'none',
-            transition: 'transform 200ms ease',
-          }}
-        >
-          ▼
-        </span>
+        {!pickerOpen ? (
+          <DropDownIcon color={colors.text} />
+        ) : (
+          <CloseIcon color={colors.text} />
+        )}
       </button>
 
       {pickerOpen && (
@@ -108,9 +102,7 @@ export default function TimeInputTile({
           style={{
             marginTop: s(8, scale),
             padding: s(16, scale),
-            borderRadius: s(14, scale),
-            border: `1px solid ${colors.border}`,
-            background: colors.surface,
+            background: colors.transparent,
             display: 'flex',
             justifyContent: 'center',
             gap: s(16, scale),

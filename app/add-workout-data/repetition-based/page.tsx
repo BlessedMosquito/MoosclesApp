@@ -4,7 +4,11 @@ import BackButton from '@/components/ui/BackButton';
 import ExerciseAccordion from '@/components/ui/ExerciseAccordion';
 import SectionDivider from '@/components/ui/SectionDivider';
 import { s, useResponsive } from '@/lib/useResponsive';
-import { addExercise, getExercisesByWorkout, ReturnGetExercisesData } from '@/services/exercises';
+import {
+  addExercise,
+  getExercisesByWorkout,
+  ReturnGetExercisesData,
+} from '@/services/exercises';
 import { addSets, getSetsByExercise, ReturnGetSetsData } from '@/services/sets';
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
@@ -33,10 +37,16 @@ export default function AddWorkoutDataRepetitionBased() {
   const [exerciseName, setExerciseName] = useState('');
   const [exercises, setExercises] = useState<ReturnGetExercisesData[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [expandedExerciseId, setExpandedExerciseId] = useState<string | null>(null);
-  const [setsByExercise, setSetsByExercise] = useState<Record<string, ReturnGetSetsData[]>>({});
+  const [expandedExerciseId, setExpandedExerciseId] = useState<string | null>(
+    null
+  );
+  const [setsByExercise, setSetsByExercise] = useState<
+    Record<string, ReturnGetSetsData[]>
+  >({});
   const [setDrafts, setSetDrafts] = useState<Record<string, SetDraft>>({});
-  const [loadingSetsByExercise, setLoadingSetsByExercise] = useState<Record<string, boolean>>({});
+  const [loadingSetsByExercise, setLoadingSetsByExercise] = useState<
+    Record<string, boolean>
+  >({});
 
   const contentMaxWidth = isMobile ? '100%' : isTablet ? 620 : 760;
 
@@ -155,9 +165,7 @@ export default function AddWorkoutDataRepetitionBased() {
       }));
     } catch (loadError) {
       setError(
-        loadError instanceof Error
-          ? loadError.message
-          : 'Could not load sets.'
+        loadError instanceof Error ? loadError.message : 'Could not load sets.'
       );
     } finally {
       setLoadingSetsByExercise((currentLoading) => ({
@@ -202,7 +210,7 @@ export default function AddWorkoutDataRepetitionBased() {
       setError('Weight cannot be negative.');
       return;
     }
-    
+
     setError(null);
 
     try {
@@ -295,7 +303,7 @@ export default function AddWorkoutDataRepetitionBased() {
             {error}
           </div>
         )}
-        <SectionDivider label='Exercise list'/>
+        <SectionDivider label="Exercise list" />
 
         <section
           style={{
@@ -305,7 +313,8 @@ export default function AddWorkoutDataRepetitionBased() {
             gap: s(16, scale),
           }}
         >
-          {exercises.map((exercise, index) => {const exerciseId = String(exercise.id);
+          {exercises.map((exercise, index) => {
+            const exerciseId = String(exercise.id);
             return (
               <ExerciseAccordion
                 key={exercise.id}
