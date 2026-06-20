@@ -75,6 +75,7 @@ export default function CalendarGrid({
       <button
         type="button"
         onClick={onClickFunction}
+        disabled={isLoading}
         style={{
           display: 'flex',
           alignItems: 'center',

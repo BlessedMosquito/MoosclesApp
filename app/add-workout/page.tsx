@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import BackButton from '@/components/ui/BackButton';
+import ErrorPopUp from '@/components/ui/ErrorPopUp';
 import LoadingCircle from '@/components/ui/LoadingCircle';
 import PrimaryButton from '@/components/ui/PrimaryButton';
+import SectionDivider from '@/components/ui/SectionDivider';
+import SuccessAnimation from '@/components/ui/SuccessAnimation';
 import WheelPicker from '@/components/ui/WheelPicker';
 import { s, useResponsive } from '@/lib/useResponsive';
 import { createWorkout } from '@/services/workouts';
@@ -16,8 +16,8 @@ import {
 } from '@/services/workoutTypes';
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
-import SuccessAnimation from '@/components/ui/SuccessAnimation';
-import SectionDivider from '@/components/ui/SectionDivider';
+import { useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 
 export default function AddWorkoutPage() {
   const router = useRouter();
@@ -127,8 +127,6 @@ export default function AddWorkoutPage() {
       }}
     >
       <div style={{ width: '100%', maxWidth: contentMaxWidth }}>
-        <BackButton onClick={() => router.push('/dashboard')} />
-
         <section style={{ marginTop: s(28, scale) }}>
           <h1
             style={{
@@ -154,22 +152,7 @@ export default function AddWorkoutPage() {
           </p>
         </section>
 
-        {error && (
-          <div
-            role="alert"
-            style={{
-              marginTop: s(18, scale),
-              padding: s(12, scale),
-              borderRadius: s(12, scale),
-              border: `1px solid ${colors.errorBorder}`,
-              background: colors.errorSurface,
-              color: colors.errorMuted,
-              fontSize: s(fontSizes.bodySmall, scale),
-            }}
-          >
-            {error}
-          </div>
-        )}
+        {error && <ErrorPopUp children={error} />}
 
         <section
           style={{

@@ -11,6 +11,7 @@ import { WorkoutTypeGroup } from '@/services/workoutTypes';
 import { ReturnGetExercisesData } from '@/services/exercises';
 import { ReturnGetMetricsData } from '@/services/workoutMetrics';
 import { ReturnGetWorkoutsData } from '@/services/workouts';
+import CloseIcon from '../icons/CloseIcon';
 
 function formatDuration(seconds: number | null): string {
   if (!seconds) {
@@ -176,7 +177,7 @@ export default function WorkoutPreview({
             padding: 0,
           }}
         >
-          ×
+          <CloseIcon />
         </button>
       </div>
       <p
@@ -396,7 +397,7 @@ export default function WorkoutPreview({
 
       <div style={{ marginTop: s(16, scale) }}>
         <PrimaryButton onClick={onEdit} width="1/2" align="center">
-          Edit workout
+          Edit
         </PrimaryButton>
       </div>
     </section>

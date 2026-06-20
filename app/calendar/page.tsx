@@ -19,6 +19,7 @@ import {
   ReturnGetMetricsData,
 } from '@/services/workoutMetrics';
 import LoadingCircle from '@/components/ui/LoadingCircle';
+import SectionDivider from '@/components/ui/SectionDivider';
 
 function getWorkoutDateKey(workoutDate: string) {
   if (/^\d{4}-\d{2}-\d{2}$/.test(workoutDate)) return workoutDate;
@@ -159,8 +160,6 @@ export default function CalendarPage() {
       }}
     >
       <div style={{ width: '100%', maxWidth: contentMaxWidth }}>
-        <BackButton onClick={() => router.push('/dashboard')} />
-
         <header style={{ marginTop: s(isMobile ? 20 : 28, scale) }}>
           <h1
             style={{
@@ -172,17 +171,8 @@ export default function CalendarPage() {
               fontWeight: 700,
             }}
           >
-            Calendar
+            <SectionDivider label="Calendar" />
           </h1>
-          <p
-            style={{
-              margin: `${s(8, scale)}px 0 0`,
-              color: colors.textSecondary,
-              fontSize: s(fontSizes.bodySmall, scale),
-            }}
-          >
-            Tap a workout to preview details.
-          </p>
         </header>
 
         {error && (

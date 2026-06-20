@@ -53,3 +53,20 @@ body > div {
     transform: rotate(360deg);
   }
 }
+
+@keyframes errorPopupOpen {
+  0% {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+
+  55% {
+    opacity: 1;
+    transform: scaleX(1) scaleY(0.15);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scaleX(1) scaleY(1);
+  }
+}
