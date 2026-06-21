@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 import { useEffect } from 'react';
 import Button from '@/components/ui/Button';
 import AuthLayout from '@/components/layout/AuthLayout';
@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { fontSizes } from '@/theme/typography';
 
 export default function RegisterPage() {
+  const supabase = createClient();
   const router = useRouter();
 
   useEffect(() => {
@@ -30,8 +31,10 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('');
   const [repeatedPassword, setRepeatedPassword] = useState('');
   const [authError, setAuthError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   async function signUp() {
+    setIsLoading(true);
     setAuthError(null);
     const trimmedUsername = username.trim();
 
@@ -60,6 +63,7 @@ export default function RegisterPage() {
       return;
     }
 
+    setIsLoading(false);
     router.push(`/confirm-email?email=${encodeURIComponent(email)}`);
   }
   return (
@@ -116,7 +120,9 @@ export default function RegisterPage() {
         }}
       />
 
-      <Button title="Sign Up" onClick={signUp}></Button>
+      <Button onClick={signUp}>
+        {isLoading ? 'Signing up...' : 'Sign up'}
+      </Button>
       <p style={{ fontSize: fontSizes.caption, color: '#888' }}>
         Already have an account?{' '}
         <Link

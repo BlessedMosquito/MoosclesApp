@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 
 type UpsertWorkoutMetricsProps = {
   workoutId: string;
@@ -14,6 +14,8 @@ export type ReturnGetMetricsData = {
   average_pace: number | null;
   created_at: string;
 };
+
+const supabase = createClient();
 
 export async function upsertWorkoutMetrics(props: UpsertWorkoutMetricsProps) {
   const { data, error } = await supabase

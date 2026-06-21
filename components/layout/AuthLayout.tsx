@@ -2,6 +2,7 @@ import { Children, ReactNode } from 'react';
 import { useDevice } from '@/lib/useDevice';
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
+import ErrorPopUp from '../ui/ErrorPopUp';
 
 type AuthLayoutProps = {
   children: ReactNode;
@@ -18,44 +19,7 @@ export default function AuthLayout({
   const childItems = Children.toArray(children);
   const [title, ...content] = childItems;
   const errorMessage = error && (
-    <div
-      role="alert"
-      style={{
-        position: 'relative',
-        padding: '12px 36px 12px 14px',
-        borderRadius: 12,
-        border: `1px solid ${colors.errorBorder}`,
-        background: colors.errorSurface,
-        color: colors.errorMuted,
-        fontSize: fontSizes.bodySmall,
-        lineHeight: 1.4,
-        textAlign: 'left',
-      }}
-    >
-      {error}
-
-      <button
-        aria-label="Close error"
-        type="button"
-        onClick={onDismissError}
-        style={{
-          position: 'absolute',
-          top: 8,
-          right: 8,
-          width: 20,
-          height: 20,
-          border: 'none',
-          background: 'transparent',
-          color: colors.errorMuted,
-          cursor: 'pointer',
-          fontSize: fontSizes.caption,
-          lineHeight: 1,
-          padding: 0,
-        }}
-      >
-        x
-      </button>
-    </div>
+    <ErrorPopUp onClose={() => onDismissError}>{error}</ErrorPopUp>
   );
 
   return (

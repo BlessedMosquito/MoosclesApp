@@ -1,6 +1,6 @@
 'use client';
 
-import BackButton from '@/components/ui/BackButton';
+import ErrorPopUp from '@/components/ui/ErrorPopUp';
 import ExerciseAccordion from '@/components/ui/ExerciseAccordion';
 import SectionDivider from '@/components/ui/SectionDivider';
 import { s, useResponsive } from '@/lib/useResponsive';
@@ -74,29 +74,6 @@ export default function AddWorkoutDataRepetitionBased() {
 
     loadExercises();
   }, [workoutId]);
-
-  function handleBack() {
-    if (from === 'calendar') {
-      const calendarParams = new URLSearchParams();
-
-      if (calendarYear) {
-        calendarParams.set('year', calendarYear);
-      }
-
-      if (calendarMonth) {
-        calendarParams.set('month', calendarMonth);
-      }
-
-      if (workoutId) {
-        calendarParams.set('workoutId', workoutId);
-      }
-
-      router.push(`/calendar?${calendarParams.toString()}`);
-      return;
-    }
-
-    router.push('/add-workout');
-  }
 
   async function handleAddExercise() {
     setError(null);
@@ -255,8 +232,6 @@ export default function AddWorkoutDataRepetitionBased() {
           maxWidth: contentMaxWidth,
         }}
       >
-        <BackButton onClick={handleBack} />
-
         <section
           style={{
             marginTop: s(28, scale),
@@ -288,20 +263,7 @@ export default function AddWorkoutDataRepetitionBased() {
         </section>
 
         {error && (
-          <div
-            role="alert"
-            style={{
-              marginTop: s(18, scale),
-              padding: s(12, scale),
-              borderRadius: s(12, scale),
-              border: `1px solid ${colors.errorBorder}`,
-              background: colors.errorSurface,
-              color: colors.errorMuted,
-              fontSize: s(fontSizes.bodySmall, scale),
-            }}
-          >
-            {error}
-          </div>
+          <ErrorPopUp onClose={() => setError(null)}>{error}</ErrorPopUp>
         )}
         <SectionDivider label="Exercise list" />
 

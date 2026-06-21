@@ -1,22 +1,48 @@
+import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function middleware(request: NextRequest) {
-  const token = request.cookies.get('sb-access-token');
+const PUBLIC_PATHS = ['/login', '/register', '/confirm-email'];
 
-  const isAuthPage = request.nextUrl.pathname === '/login';
+export async function middleware(request: NextRequest) {
+  let response = NextResponse.next({ request });
 
-  if (!token && !isAuthPage) {
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value)
+          );
+          response = NextResponse.next({ request });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          );
+        },
+      },
+    }
+  );
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const isPublicPath = PUBLIC_PATHS.includes(request.nextUrl.pathname);
+
+  if (!user && !isPublicPath) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
-
-  if (token && isAuthPage) {
+  if (user && isPublicPath) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
-  return NextResponse.next();
+  return response;
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/login'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)'],
 };

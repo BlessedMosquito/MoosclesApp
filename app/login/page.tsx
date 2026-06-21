@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 import { useEffect } from 'react';
 import Button from '@/components/ui/Button';
 import AuthLayout from '@/components/layout/AuthLayout';
@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { fontSizes } from '@/theme/typography';
 
 export default function LoginPage() {
+  const supabase = createClient();
   const router = useRouter();
 
   useEffect(() => {
@@ -28,9 +29,11 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   async function signIn() {
     setAuthError(null);
+    setIsLoading(true);
 
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -42,6 +45,7 @@ export default function LoginPage() {
       return;
     }
 
+    setIsLoading(false);
     router.push('/dashboard');
   }
 
@@ -74,7 +78,9 @@ export default function LoginPage() {
         }}
       />
 
-      <Button title="Sign In" onClick={signIn}></Button>
+      <Button onClick={signIn}>
+        {isLoading ? 'Signing in...' : 'Sign in'}
+      </Button>
 
       <p style={{ fontSize: fontSizes.caption, color: '#888' }}>
         New to MOOSCLES?{' '}

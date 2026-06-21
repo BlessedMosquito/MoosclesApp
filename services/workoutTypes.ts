@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 
 export type ReturnGetWorkoutTypeData = {
   id: string;
@@ -10,6 +10,8 @@ export type WorkoutTypeGroup =
   | 'DurationOnly'
   | 'DistanceDuration'
   | 'RepetitionBased';
+
+const supabase = createClient();
 
 export async function getWorkoutTypes(): Promise<ReturnGetWorkoutTypeData[]> {
   const { data, error } = await supabase

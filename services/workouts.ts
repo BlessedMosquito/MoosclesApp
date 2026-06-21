@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 import { ReturnGetWorkoutTypeData } from './workoutTypes';
 
 type CreateWorkoutProperties = {
@@ -19,6 +19,8 @@ export type ReturnGetWorkoutsData = {
   workout_date: string;
   workout_types: ReturnGetWorkoutTypeData;
 };
+
+const supabase = createClient();
 
 export async function createWorkout(props: CreateWorkoutProperties) {
   const {

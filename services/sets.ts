@@ -1,4 +1,4 @@
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 
 type AddSetsProperties = {
   exerciseId: number | string;
@@ -12,6 +12,8 @@ export type ReturnGetSetsData = {
   reps: number;
   weight: number;
 };
+
+const supabase = createClient();
 
 export async function addSets(props: AddSetsProperties) {
   const { data, error } = await supabase

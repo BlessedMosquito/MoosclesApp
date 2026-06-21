@@ -1,8 +1,8 @@
 'use client';
 
+import Button from '@/components/ui/Button';
 import ErrorPopUp from '@/components/ui/ErrorPopUp';
 import LoadingCircle from '@/components/ui/LoadingCircle';
-import PrimaryButton from '@/components/ui/PrimaryButton';
 import SectionDivider from '@/components/ui/SectionDivider';
 import SuccessAnimation from '@/components/ui/SuccessAnimation';
 import WheelPicker from '@/components/ui/WheelPicker';
@@ -16,6 +16,7 @@ import {
 } from '@/services/workoutTypes';
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
+import { Mode } from '@/types/common';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
@@ -99,6 +100,7 @@ export default function AddWorkoutPage() {
         workoutTypeGroup: workoutTypeGroup,
         workoutType: selectedType.label,
         name: trimmedName,
+        mode: 'NEW' as Mode,
       });
 
       pendingNavRef.current = `/add-workout-data${path}?${params.toString()}`;
@@ -138,7 +140,7 @@ export default function AddWorkoutPage() {
               fontWeight: 700,
             }}
           >
-            Create todays workout!
+            Create today's workout!
           </h1>
           <p
             style={{
@@ -152,7 +154,9 @@ export default function AddWorkoutPage() {
           </p>
         </section>
 
-        {error && <ErrorPopUp children={error} />}
+        {error && (
+          <ErrorPopUp onClose={() => setError(null)}>{error}</ErrorPopUp>
+        )}
 
         <section
           style={{
@@ -220,14 +224,14 @@ export default function AddWorkoutPage() {
             )}
           </div>
 
-          <PrimaryButton
+          <Button
             onClick={handleCreateWorkout}
             disabled={isSaving}
             width="3/4"
             align="center"
           >
-            {isSaving ? 'Creating...' : 'Next'}
-          </PrimaryButton>
+            {isSaving ? 'Creating...' : 'Create'}
+          </Button>
         </section>
       </div>
       {showSuccess && (

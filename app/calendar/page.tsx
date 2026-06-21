@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import BackButton from '@/components/ui/BackButton';
 import CalendarGrid from '@/components/ui/CalendarGrid';
 import WorkoutPreview from '@/components/ui/WorkoutPreview';
 import { s, useResponsive } from '@/lib/useResponsive';
@@ -20,6 +19,8 @@ import {
 } from '@/services/workoutMetrics';
 import LoadingCircle from '@/components/ui/LoadingCircle';
 import SectionDivider from '@/components/ui/SectionDivider';
+import ErrorPopUp from '@/components/ui/ErrorPopUp';
+import { Mode } from '@/types/common';
 
 function getWorkoutDateKey(workoutDate: string) {
   if (/^\d{4}-\d{2}-\d{2}$/.test(workoutDate)) return workoutDate;
@@ -108,7 +109,6 @@ export default function CalendarPage() {
         setExercises(data as ReturnGetExercisesData[]);
       } else {
         const data = await getWorkoutMetrics(workout.id);
-        console.log(data);
         setMetrics(data as ReturnGetMetricsData);
       }
     } catch {
@@ -126,7 +126,7 @@ export default function CalendarPage() {
       workoutGroupType: selectedWorkoutGroup,
       workoutType: selectedWorkout.workout_types.label,
       name: selectedWorkout.name,
-      from: 'calendar',
+      mode: 'EDIT' as Mode,
     });
 
     const workoutDataView: Record<WorkoutTypeGroup, string> = {
@@ -176,20 +176,7 @@ export default function CalendarPage() {
         </header>
 
         {error && (
-          <div
-            role="alert"
-            style={{
-              marginTop: s(18, scale),
-              padding: s(12, scale),
-              borderRadius: s(12, scale),
-              border: `1px solid ${colors.errorBorder}`,
-              background: colors.errorSurface,
-              color: colors.errorMuted,
-              fontSize: s(fontSizes.bodySmall, scale),
-            }}
-          >
-            {error}
-          </div>
+          <ErrorPopUp onClose={() => setError(null)}>{error}</ErrorPopUp>
         )}
 
         <CalendarGrid

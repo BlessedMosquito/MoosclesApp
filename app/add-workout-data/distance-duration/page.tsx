@@ -1,20 +1,23 @@
 'use client';
 
-import BackButton from '@/components/ui/BackButton';
+import Button from '@/components/ui/Button';
 import DistanceInputTile from '@/components/ui/DistanceInputTile';
-import PrimaryButton from '@/components/ui/PrimaryButton';
+import ErrorPopUp from '@/components/ui/ErrorPopUp';
 import SectionDivider from '@/components/ui/SectionDivider';
 import SuccessAnimation from '@/components/ui/SuccessAnimation';
 import TimeInputTile from '@/components/ui/TimeInputTile';
-import WheelPicker from '@/components/ui/WheelPicker';
+import { formatDistance, formatDuration } from '@/lib/format';
 import { s, useResponsive } from '@/lib/useResponsive';
-import { upsertWorkoutMetrics } from '@/services/workoutMetrics';
+import {
+  getWorkoutMetrics,
+  upsertWorkoutMetrics,
+} from '@/services/workoutMetrics';
 import { WorkoutTypeGroup } from '@/services/workoutTypes';
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
-import { useSearchParams } from 'next/navigation';
-import { useRouter } from 'next/navigation';
-import { useRef, useState } from 'react';
+import { Mode } from '@/types/common';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 
 export default function AddWorkoutDataDuration() {
   const router = useRouter();
@@ -23,13 +26,11 @@ export default function AddWorkoutDataDuration() {
 
   const workoutId = searchParams.get('workoutId');
   const workoutName = searchParams.get('name') ?? 'Workout';
-  const from = searchParams.get('from');
-  const calendarYear = searchParams.get('year');
-  const calendarMonth = searchParams.get('month');
   const workoutGroupType = searchParams.get(
     'workoutGroupType'
   ) as WorkoutTypeGroup;
   const workoutType = searchParams.get('workoutType')?.toLowerCase();
+  const mode = searchParams.get('mode') as Mode;
   const pendingNavRef = useRef<string | null>(null);
 
   const [error, setError] = useState<string | null>(null);
@@ -43,19 +44,41 @@ export default function AddWorkoutDataDuration() {
 
   const contentMaxWidth = isMobile ? '100%' : isTablet ? 620 : 760;
 
-  function handleBack() {
-    if (from === 'calendar') {
-      const calendarParams = new URLSearchParams();
-      if (calendarYear) calendarParams.set('year', calendarYear);
-      if (calendarMonth) calendarParams.set('month', calendarMonth);
-      if (workoutId) calendarParams.set('workoutId', workoutId);
-      router.push(`/calendar?${calendarParams.toString()}`);
-      return;
+  function validateTime(time: number) {
+    setError(null);
+    if (isNaN(time)) {
+      setError('Time must be a number.');
+      return false;
     }
-    router.push('/add-workout');
+    if (time <= 0) {
+      setError('Time must be bigger than 0.');
+      return false;
+    }
+    return true;
   }
 
-  async function handleAddTime() {
+  useEffect(() => {
+    async function getData() {
+      if (mode === 'NEW') {
+        return;
+      }
+      if (!workoutId) {
+        setError('Something went wrong.');
+        return;
+      }
+      const data = await getWorkoutMetrics(workoutId);
+      if (data) {
+        const formatedTime = formatDuration(data.duration_seconds);
+        setHours(formatedTime.h);
+        setMinutes(formatedTime.m);
+        setSeconds(formatedTime.s);
+        setDistance(data.distance_meters ?? 0);
+      }
+    }
+    getData();
+  }, [mode, workoutId]);
+
+  async function handleAddWorkoutData() {
     setError(null);
 
     if (!workoutId) {
@@ -63,17 +86,23 @@ export default function AddWorkoutDataDuration() {
       return;
     }
 
-    if (time <= 0) {
-      setError('Time must be bigger than 0s.');
+    if (!validateTime(time)) {
       return;
     }
 
     setIsSaving(true);
 
     try {
+      //TODO: zrobic kolumne pace w bazie jako float albo string, poprawic te wyliczanie i walidacje
+      let pace;
+      if (time) {
+        pace = distance / time;
+      }
       await upsertWorkoutMetrics({
         workoutId: workoutId,
         durationSeconds: time,
+        distanceMeters: distance,
+        averagePaceSeconds: pace,
       });
 
       pendingNavRef.current =
@@ -105,8 +134,6 @@ export default function AddWorkoutDataDuration() {
       }}
     >
       <div style={{ width: '100%', maxWidth: contentMaxWidth }}>
-        <BackButton onClick={handleBack} />
-
         <section style={{ marginTop: s(28, scale) }}>
           <h1
             style={{
@@ -133,20 +160,7 @@ export default function AddWorkoutDataDuration() {
         </section>
 
         {error && (
-          <div
-            role="alert"
-            style={{
-              marginTop: s(18, scale),
-              padding: s(12, scale),
-              borderRadius: s(12, scale),
-              border: `1px solid ${colors.errorBorder}`,
-              background: colors.errorSurface,
-              color: colors.errorMuted,
-              fontSize: s(fontSizes.bodySmall, scale),
-            }}
-          >
-            {error}
-          </div>
+          <ErrorPopUp onClose={() => setError(null)}>{error}</ErrorPopUp>
         )}
 
         <SectionDivider label="Time" />
@@ -164,14 +178,14 @@ export default function AddWorkoutDataDuration() {
           onChange={setDistance}
         />
         <div style={{ marginTop: s(24, scale) }}>
-          <PrimaryButton
-            onClick={handleAddTime}
+          <Button
+            onClick={handleAddWorkoutData}
             disabled={isSaving}
             width="3/4"
             align="center"
           >
             {isSaving ? 'Adding...' : 'Add'}
-          </PrimaryButton>
+          </Button>
         </div>
       </div>
 

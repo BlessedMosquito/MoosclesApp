@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import LoadingCircle from '@/components/ui/LoadingCircle';
-import PrimaryButton from '@/components/ui/PrimaryButton';
 import { s, useResponsive } from '@/lib/useResponsive';
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
@@ -12,36 +11,28 @@ import { ReturnGetExercisesData } from '@/services/exercises';
 import { ReturnGetMetricsData } from '@/services/workoutMetrics';
 import { ReturnGetWorkoutsData } from '@/services/workouts';
 import CloseIcon from '../icons/CloseIcon';
+import Button from './Button';
+import { formatDuration, formatDistance, formatPace } from '@/lib/format';
 
-function formatDuration(seconds: number | null): string {
-  if (!seconds) {
-    return [0, 0, 0].map((v) => String(v).padStart(2, '0')).join(':');
-  }
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = seconds % 60;
-  return [h, m, s].map((v) => String(v).padStart(2, '0')).join(':');
+export function formatDurationToString(seconds: number | null): string {
+  const data = formatDuration(seconds);
+  return [data.h, data.m, data.s]
+    .map((v) => String(v).padStart(2, '0'))
+    .join(':');
 }
 
-function formatDistance(meters: number | null): string {
-  if (!meters) {
-    return `0/km`;
-  }
-  const km = meters / 1000;
-  if (Number.isInteger(km)) return `${km} km`;
-  return `${km
+export function formatDistanceToString(meters: number | null): string {
+  const data = formatDistance(meters);
+  if (Number.isInteger(data.km)) return `${data.km} km`;
+  return `${data.km
     .toFixed(3)
     .replace(/\.?0+$/, '')
     .replace('.', ',')} km`;
 }
 
-function formatPace(secondsPerKm: number | null): string {
-  if (!secondsPerKm) {
-    return '0/km';
-  }
-  const m = Math.floor(secondsPerKm / 60);
-  const s = Math.round(secondsPerKm % 60);
-  return `${m}:${String(s).padStart(2, '0')} /km`;
+export function formatPaceToString(metersPerSeconds: number | null): string {
+  const pace = formatPace(metersPerSeconds);
+  return `${pace} km/h`;
 }
 
 type WorkoutPreviewProps = {
@@ -348,7 +339,7 @@ export default function WorkoutPreview({
             >
               {renderMetricCard(
                 'Time',
-                formatDuration(metrics.duration_seconds)
+                formatDurationToString(metrics.duration_seconds)
               )}
             </div>
           ) : (
@@ -373,13 +364,16 @@ export default function WorkoutPreview({
             >
               {renderMetricCard(
                 'Time',
-                formatDuration(metrics.duration_seconds)
+                formatDurationToString(metrics.duration_seconds)
               )}
               {renderMetricCard(
                 'Distance',
-                formatDistance(metrics.distance_meters)
+                formatDistanceToString(metrics.distance_meters)
               )}
-              {renderMetricCard('Pace', formatPace(metrics.average_pace))}
+              {renderMetricCard(
+                'Pace',
+                formatPaceToString(metrics.average_pace)
+              )}
             </div>
           ) : (
             <p
@@ -396,9 +390,9 @@ export default function WorkoutPreview({
       </div>
 
       <div style={{ marginTop: s(16, scale) }}>
-        <PrimaryButton onClick={onEdit} width="1/2" align="center">
-          Edit
-        </PrimaryButton>
+        <Button onClick={onEdit} width="1/2" align="center">
+          {'Edit'}
+        </Button>
       </div>
     </section>
   );

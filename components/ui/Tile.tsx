@@ -1,6 +1,7 @@
 'use client';
 
 import { KeyboardEvent, ReactNode, useRef, useState } from 'react';
+import { motion } from 'motion/react';
 import { s, useResponsive } from '@/lib/useResponsive';
 import { fontSizes } from '@/theme/typography';
 import { colors } from '@/theme/colors';
@@ -65,12 +66,15 @@ export default function Tile({
 
   return (
     <>
-      <div
+      <motion.div
         ref={tileRef}
         role={onClick ? 'button' : undefined}
         tabIndex={onClick ? 0 : undefined}
         onClick={handleOpen}
         onKeyDown={handleKeyDown}
+        whileHover={onClick ? { scale: 0.97 } : undefined}
+        whileTap={onClick ? { scale: 0.94 } : undefined}
+        transition={{ duration: 0.18, ease: 'easeOut' }}
         style={{
           width: '100%',
           aspectRatio: '1 / 1',
@@ -87,7 +91,6 @@ export default function Tile({
           overflow: 'hidden',
           cursor: onClick ? 'pointer' : 'default',
           opacity: isExpanding ? 0 : 1,
-          transition: 'opacity 120ms ease',
         }}
       >
         <div
@@ -129,7 +132,7 @@ export default function Tile({
         >
           {children}
         </div>
-      </div>
+      </motion.div>
 
       {overlayRect && (
         <>
