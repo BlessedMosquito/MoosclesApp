@@ -47,7 +47,7 @@ export default function DashboardPage() {
     <main
       style={{
         minHeight: '100dvh',
-        background: colors.background,
+        background: colors.bg,
 
         padding: s(isMobile ? 18 : 24, scale),
 
@@ -98,7 +98,7 @@ export default function DashboardPage() {
             <p
               style={{
                 margin: 0,
-                color: colors.text,
+                color: colors.bg,
                 fontSize: s(isMobile ? 9 : 11, scale),
                 fontWeight: 700,
                 lineHeight: 1,
@@ -118,8 +118,8 @@ export default function DashboardPage() {
                 <span
                   key={`${weekday}-${index}`}
                   style={{
-                    color: colors.textMuted,
-                    fontSize: s(isMobile ? 5 : 7, scale),
+                    color: colors.bg,
+                    fontSize: s(isMobile ? 7 : 9, scale),
                     textAlign: 'center',
                     lineHeight: 1,
                   }}
@@ -134,13 +134,9 @@ export default function DashboardPage() {
                   style={{
                     aspectRatio: '1 / 1',
                     borderRadius: 999,
-                    background:
-                      day === currentDay ? colors.text : 'transparent',
-                    color:
-                      day === currentDay
-                        ? colors.background
-                        : colors.textSecondary,
-                    fontSize: s(isMobile ? 5 : 7, scale),
+                    background: day === currentDay ? colors.bg : 'transparent',
+                    color: day === currentDay ? 'white' : colors.bg,
+                    fontSize: s(isMobile ? 7 : 9, scale),
                     lineHeight: 1,
                     display: 'flex',
                     alignItems: 'center',

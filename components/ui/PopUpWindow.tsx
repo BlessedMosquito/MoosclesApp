@@ -4,6 +4,7 @@
 import { useEffect, useRef } from 'react';
 import { s, useResponsive } from '@/lib/useResponsive';
 import { colors } from '@/theme/colors';
+import CloseIcon from '../icons/CloseIcon';
 
 type PopupWindowProps = {
   onClose: () => void;
@@ -51,7 +52,7 @@ export default function PopupWindow({
           maxWidth: s(320, scale),
           borderRadius: s(20, scale),
           border: `1px solid ${colors.border}`,
-          background: colors.background,
+          background: colors.bg,
           boxShadow: '0 16px 48px rgba(0,0,0,0.8)',
           padding: s(16, scale),
           display: 'flex',
@@ -64,7 +65,7 @@ export default function PopupWindow({
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            marginBottom: s(4, scale),
+            marginBottom: s(12, scale),
           }}
         >
           {title && (
@@ -86,14 +87,14 @@ export default function PopupWindow({
               marginLeft: 'auto',
               border: 'none',
               background: 'none',
-              color: colors.textMuted,
+              color: colors.text,
               fontSize: s(20, scale),
               cursor: 'pointer',
               lineHeight: 1,
               padding: 0,
             }}
           >
-            ×
+            <CloseIcon />
           </button>
         </div>
 

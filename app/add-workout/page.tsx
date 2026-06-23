@@ -120,7 +120,7 @@ export default function AddWorkoutPage() {
     <main
       style={{
         minHeight: '100dvh',
-        background: colors.background,
+        background: colors.bg,
         padding: s(isMobile ? 18 : 28, scale),
         color: colors.text,
         display: 'flex',

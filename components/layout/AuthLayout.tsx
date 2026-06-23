@@ -31,7 +31,7 @@ export default function AuthLayout({
         justifyContent: isMobile ? 'flex-start' : 'center',
         alignItems: isMobile ? 'stretch' : 'center',
 
-        background: colors.background,
+        background: colors.bg,
         padding: isMobile ? 0 : 24,
       }}
     >

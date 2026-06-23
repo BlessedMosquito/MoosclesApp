@@ -13,6 +13,7 @@ import { ReturnGetWorkoutsData } from '@/services/workouts';
 import CloseIcon from '../icons/CloseIcon';
 import Button from './Button';
 import { formatDuration, formatDistance, formatPace } from '@/lib/format';
+import ExerciseAccordion from './ExerciseAccordion';
 
 export function formatDurationToString(seconds: number | null): string {
   const data = formatDuration(seconds);
@@ -30,10 +31,18 @@ export function formatDistanceToString(meters: number | null): string {
     .replace('.', ',')} km`;
 }
 
-export function formatPaceToString(metersPerSeconds: number | null): string {
-  const pace = formatPace(metersPerSeconds);
+export function formatPaceToString(
+  durationSeconds: number | null,
+  distanceMeters: number | null
+): string {
+  const pace = formatPace(durationSeconds, distanceMeters);
   return `${pace} km/h`;
 }
+
+type SetDraft = {
+  reps: string;
+  weight: string;
+};
 
 type WorkoutPreviewProps = {
   workout: ReturnGetWorkoutsData;
@@ -44,6 +53,7 @@ type WorkoutPreviewProps = {
   onEdit: () => void;
   onClose: () => void;
   previewRef: React.RefObject<HTMLElement | null>;
+  mode?: 'EDIT' | 'PREVIEW';
 };
 
 export default function WorkoutPreview({
@@ -55,6 +65,7 @@ export default function WorkoutPreview({
   onEdit,
   onClose,
   previewRef,
+  mode = 'PREVIEW',
 }: WorkoutPreviewProps) {
   const { scale } = useResponsive();
   const [expandedExerciseId, setExpandedExerciseId] = useState<string | null>(
@@ -66,6 +77,7 @@ export default function WorkoutPreview({
   const [loadingSetsByExercise, setLoadingSetsByExercise] = useState<
     Record<string, boolean>
   >({});
+  const [setDrafts, setSetDrafts] = useState<Record<string, SetDraft>>({});
   const [error, setError] = useState<string | null>(null);
 
   async function toggleExercise(exercise: ReturnGetExercisesData) {
@@ -92,6 +104,24 @@ export default function WorkoutPreview({
     } finally {
       setLoadingSetsByExercise((c) => ({ ...c, [exerciseId]: false }));
     }
+  }
+
+  function updateSetDraft(
+    exerciseId: string,
+    field: keyof SetDraft,
+    value: string
+  ) {
+    setSetDrafts((c) => ({
+      ...c,
+      [exerciseId]: {
+        ...(c[exerciseId] ?? { reps: '', weight: '' }),
+        [field]: value,
+      },
+    }));
+  }
+
+  function handleAddSet(exercise: ReturnGetExercisesData) {
+    // placeholder — podłącz do swojego serwisu
   }
 
   function renderMetricCard(label: string, value: string) {
@@ -171,6 +201,7 @@ export default function WorkoutPreview({
           <CloseIcon />
         </button>
       </div>
+
       <p
         style={{
           margin: 0,
@@ -230,101 +261,20 @@ export default function WorkoutPreview({
           ) : (
             exercises.map((exercise, index) => {
               const exerciseId = String(exercise.id);
-              const isExpanded = expandedExerciseId === exerciseId;
-              const exerciseSets = setsByExercise[exerciseId] ?? [];
-              const isLoadingSets = loadingSetsByExercise[exerciseId];
-
               return (
-                <div
+                <ExerciseAccordion
                   key={exercise.id}
-                  style={{
-                    padding: s(12, scale),
-                    borderRadius: s(12, scale),
-                    border: `1px solid ${colors.border}`,
-                    background: colors.glass,
-                    fontSize: s(fontSizes.bodySmall, scale),
-                  }}
-                >
-                  <button
-                    type="button"
-                    onClick={() => toggleExercise(exercise)}
-                    style={{
-                      width: '100%',
-                      border: 'none',
-                      background: 'transparent',
-                      color: colors.text,
-                      padding: 0,
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      gap: s(12, scale),
-                      cursor: 'pointer',
-                      textAlign: 'left',
-                      fontSize: s(fontSizes.bodySmall, scale),
-                      fontWeight: 700,
-                    }}
-                  >
-                    <span>
-                      {index + 1}. {exercise.name}
-                    </span>
-                    <span>{isExpanded ? '-' : '+'}</span>
-                  </button>
-
-                  {isExpanded && (
-                    <div
-                      style={{
-                        marginTop: s(14, scale),
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: s(10, scale),
-                      }}
-                    >
-                      {isLoadingSets ? (
-                        <div
-                          style={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                            padding: s(8, scale),
-                          }}
-                        >
-                          <LoadingCircle size={18} />
-                        </div>
-                      ) : exerciseSets.length === 0 ? (
-                        <p
-                          style={{
-                            margin: 0,
-                            color: colors.textMuted,
-                            fontSize: s(fontSizes.caption, scale),
-                          }}
-                        >
-                          No sets yet.
-                        </p>
-                      ) : (
-                        exerciseSets.map((setItem, setIndex) => (
-                          <div
-                            key={setItem.id}
-                            style={{
-                              display: 'grid',
-                              gridTemplateColumns: 'auto 1fr 1fr',
-                              gap: s(10, scale),
-                              alignItems: 'center',
-                              padding: s(10, scale),
-                              borderRadius: s(12, scale),
-                              background: colors.glass,
-                              border: `1px solid ${colors.border}`,
-                            }}
-                          >
-                            <span style={{ color: colors.textMuted }}>
-                              {setIndex + 1}
-                            </span>
-                            <span>{setItem.reps} reps</span>
-                            <span>{setItem.weight} kg</span>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  )}
-                </div>
+                  exercise={exercise}
+                  index={index}
+                  isExpanded={expandedExerciseId === exerciseId}
+                  exerciseSets={setsByExercise[exerciseId] ?? []}
+                  setDraft={setDrafts[exerciseId] ?? { reps: '', weight: '' }}
+                  isLoadingSets={loadingSetsByExercise[exerciseId]}
+                  onToggle={toggleExercise}
+                  onDraftChange={updateSetDraft}
+                  onAddSet={handleAddSet}
+                  mode={mode}
+                />
               );
             })
           )
@@ -372,7 +322,10 @@ export default function WorkoutPreview({
               )}
               {renderMetricCard(
                 'Pace',
-                formatPaceToString(metrics.average_pace)
+                formatPaceToString(
+                  metrics.duration_seconds,
+                  metrics.distance_meters
+                )
               )}
             </div>
           ) : (
@@ -388,10 +341,9 @@ export default function WorkoutPreview({
           )
         ) : null}
       </div>
-
       <div style={{ marginTop: s(16, scale) }}>
         <Button onClick={onEdit} width="1/2" align="center">
-          {'Edit'}
+          Edit
         </Button>
       </div>
     </section>

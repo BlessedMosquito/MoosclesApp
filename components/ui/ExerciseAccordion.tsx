@@ -9,6 +9,8 @@ import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
 import { ReturnGetExercisesData } from '@/services/exercises';
 import { ReturnGetSetsData } from '@/services/sets';
+import { Mode } from '@/types/common';
+import Button from './Button';
 
 type SetDraft = {
   reps: string;
@@ -22,7 +24,7 @@ type ExerciseAccordionProps = {
   exerciseSets: ReturnGetSetsData[];
   setDraft: SetDraft;
   isLoadingSets?: boolean;
-
+  mode: Mode;
   onToggle: (exercise: ReturnGetExercisesData) => void;
   onDraftChange: (
     exerciseId: string,
@@ -39,6 +41,7 @@ export default function ExerciseAccordion({
   exerciseSets,
   setDraft,
   isLoadingSets,
+  mode,
   onToggle,
   onDraftChange,
   onAddSet,
@@ -55,7 +58,7 @@ export default function ExerciseAccordion({
         border: `1px solid ${colors.border}`,
         background: colors.surface,
         color: colors.text,
-        fontSize: s(fontSizes.bodySmall, scale),
+        fontSize: fontSizes.body,
       }}
     >
       <button
@@ -73,7 +76,7 @@ export default function ExerciseAccordion({
           gap: s(12, scale),
           cursor: 'pointer',
           textAlign: 'left',
-          fontSize: s(fontSizes.bodySmall, scale),
+          fontSize: fontSizes.body,
           fontWeight: 700,
         }}
       >
@@ -136,74 +139,59 @@ export default function ExerciseAccordion({
             ))
           )}
 
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr auto',
-              gap: s(8, scale),
-            }}
-          >
-            <input
-              inputMode="numeric"
-              placeholder="Reps"
-              value={setDraft.reps}
-              onChange={(e) =>
-                onDraftChange(exerciseId, 'reps', e.target.value)
-              }
+          {mode !== 'PREVIEW' && (
+            <div
               style={{
-                minWidth: 0,
-                padding: s(10, scale),
-                borderRadius: s(12, scale),
-                border: `1px solid ${colors.border}`,
-                background: colors.glass,
-                color: colors.text,
-                fontSize: s(fontSizes.bodySmall, scale),
-                outline: 'none',
-              }}
-            />
-
-            <input
-              inputMode="decimal"
-              placeholder="Weight"
-              value={setDraft.weight}
-              onChange={(e) =>
-                onDraftChange(
-                  exerciseId,
-                  'weight',
-                  e.target.value.replace(/[^0-9.,]/g, '')
-                )
-              }
-              style={{
-                minWidth: 0,
-                padding: s(10, scale),
-                borderRadius: s(12, scale),
-                border: `1px solid ${colors.border}`,
-                background: colors.glass,
-                color: colors.text,
-                fontSize: s(fontSizes.bodySmall, scale),
-                outline: 'none',
-              }}
-            />
-
-            <button
-              type="button"
-              onClick={() => onAddSet(exercise)}
-              style={{
-                width: s(42, scale),
-                height: s(42, scale),
-                borderRadius: s(12, scale),
-                border: `1px solid ${colors.borderStrong}`,
-                background: colors.text,
-                color: colors.background,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr auto',
+                gap: s(15, scale),
               }}
             >
-              <AddIcon size={18} color="currentColor" />
-            </button>
-          </div>
+              <input
+                inputMode="numeric"
+                placeholder="Reps"
+                value={setDraft.reps}
+                onChange={(e) =>
+                  onDraftChange(exerciseId, 'reps', e.target.value)
+                }
+                style={{
+                  minWidth: 0,
+                  padding: s(10, scale),
+                  borderRadius: s(12, scale),
+                  border: `1px solid ${colors.border}`,
+                  background: colors.glass,
+                  color: colors.text,
+                  fontSize: fontSizes.body,
+                  outline: 'none',
+                }}
+              />
+
+              <input
+                inputMode="decimal"
+                placeholder="Weight"
+                value={setDraft.weight}
+                onChange={(e) =>
+                  onDraftChange(
+                    exerciseId,
+                    'weight',
+                    e.target.value.replace(/[^0-9.,]/g, '')
+                  )
+                }
+                style={{
+                  minWidth: 0,
+                  padding: s(10, scale),
+                  borderRadius: s(12, scale),
+                  border: `1px solid ${colors.border}`,
+                  background: colors.glass,
+                  color: colors.text,
+                  fontSize: fontSizes.body,
+                  outline: 'none',
+                }}
+              />
+
+              <Button onClick={() => onAddSet(exercise)}>{'Add'}</Button>
+            </div>
+          )}
         </div>
       )}
     </div>

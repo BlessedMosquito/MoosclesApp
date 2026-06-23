@@ -315,13 +315,13 @@ export default function CalendarGrid({
                             }}
                             style={{
                               width: '100%',
-                              border: `1px solid ${colors.borderStrong}`,
+                              border: `1px solid ${colors.accentBorder}`,
                               borderRadius: s(isMobile ? 6 : 8, scale),
                               background:
                                 selectedWorkout?.id === workout.id
-                                  ? colors.glassHover
-                                  : colors.glass,
-                              color: colors.text,
+                                  ? colors.accent
+                                  : colors.accentDark,
+                              color: colors.bg,
                               padding: `${s(isMobile ? 2 : 5, scale)}px ${s(isMobile ? 3 : 6, scale)}px`,
                               fontSize: s(isMobile ? 8 : 11, scale),
                               textAlign: 'left',
@@ -346,7 +346,7 @@ export default function CalendarGrid({
                             style={{
                               border: 'none',
                               background: 'none',
-                              color: colors.textMuted,
+                              color: colors.text,
                               fontSize: s(isMobile ? 8 : 11, scale),
                               textAlign: 'left',
                               cursor: 'pointer',
@@ -378,16 +378,17 @@ export default function CalendarGrid({
               }}
               style={{
                 width: '100%',
-                border: `1px solid ${selectedWorkout?.id === workout.id ? colors.borderStrong : colors.border}`,
+                border: `1px solid ${selectedWorkout?.id === workout.id ? colors.text : colors.border}`,
                 borderRadius: s(12, scale),
                 background:
                   selectedWorkout?.id === workout.id
-                    ? colors.glassHover
-                    : colors.glass,
-                color: colors.text,
+                    ? colors.accent
+                    : colors.accentDark,
+                color: colors.bg,
                 padding: s(12, scale),
-                fontSize: s(fontSizes.bodySmall, scale),
+                fontSize: s(fontSizes.body, scale),
                 textAlign: 'left',
+                marginBottom: 10,
                 cursor: 'pointer',
               }}
             >
@@ -395,7 +396,7 @@ export default function CalendarGrid({
               <p
                 style={{
                   margin: `${s(2, scale)}px 0 0`,
-                  color: colors.textMuted,
+                  color: colors.bg,
                   fontSize: s(fontSizes.caption, scale),
                 }}
               >

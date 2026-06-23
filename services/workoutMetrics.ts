@@ -2,9 +2,9 @@ import { createClient } from '@/lib/supabase/client';
 
 type UpsertWorkoutMetricsProps = {
   workoutId: string;
-  durationSeconds?: number;
-  distanceMeters?: number;
-  averagePaceSeconds?: number;
+  durationSeconds: number;
+  distanceMeters: number;
+  wellBeing: number;
 };
 
 export type ReturnGetMetricsData = {
@@ -13,6 +13,7 @@ export type ReturnGetMetricsData = {
   distance_meters: number | null;
   average_pace: number | null;
   created_at: string;
+  well_being: number;
 };
 
 const supabase = createClient();
@@ -24,7 +25,7 @@ export async function upsertWorkoutMetrics(props: UpsertWorkoutMetricsProps) {
       workout_id: props.workoutId,
       duration_seconds: props.durationSeconds ?? null,
       distance_meters: props.distanceMeters ?? null,
-      average_pace: props.averagePaceSeconds ?? null,
+      well_being: props.wellBeing,
     })
     .select()
     .single();

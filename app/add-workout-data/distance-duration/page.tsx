@@ -93,16 +93,11 @@ export default function AddWorkoutDataDuration() {
     setIsSaving(true);
 
     try {
-      //TODO: zrobic kolumne pace w bazie jako float albo string, poprawic te wyliczanie i walidacje
-      let pace;
-      if (time) {
-        pace = distance / time;
-      }
       await upsertWorkoutMetrics({
         workoutId: workoutId,
         durationSeconds: time,
         distanceMeters: distance,
-        averagePaceSeconds: pace,
+        wellBeing: 0,
       });
 
       pendingNavRef.current =
@@ -125,7 +120,7 @@ export default function AddWorkoutDataDuration() {
     <main
       style={{
         minHeight: '100dvh',
-        background: colors.background,
+        background: colors.bg,
         padding: s(isMobile ? 18 : 28, scale),
         color: colors.text,
         display: 'flex',
@@ -184,7 +179,7 @@ export default function AddWorkoutDataDuration() {
             width="3/4"
             align="center"
           >
-            {isSaving ? 'Adding...' : 'Add'}
+            {isSaving ? 'Saving...' : 'Save'}
           </Button>
         </div>
       </div>

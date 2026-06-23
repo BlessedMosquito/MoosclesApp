@@ -151,12 +151,13 @@ export default function CalendarPage() {
     <main
       style={{
         minHeight: '100dvh',
-        background: colors.background,
+        background: colors.bg,
         padding: s(isMobile ? 18 : 24, scale),
         color: colors.text,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
+        marginTop: 20,
       }}
     >
       <div style={{ width: '100%', maxWidth: contentMaxWidth }}>

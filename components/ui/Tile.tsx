@@ -81,8 +81,8 @@ export default function Tile({
           minHeight: 0,
           padding: s(14, scale),
           borderRadius: s(16, scale),
-          background: colors.surface,
-          border: `1px solid ${colors.border}`,
+          background: colors.accentDark,
+          border: `1px solid ${colors.text}`,
           boxShadow: `0 ${s(8, scale)}px ${s(24, scale)}px ${colors.shadow}`,
           color: colors.text,
           display: 'flex',
@@ -106,6 +106,7 @@ export default function Tile({
               fontSize: Math.max(s(fontSizes.body, scale), fontSizes.bodySmall),
               fontWeight: 700,
               lineHeight: 1.2,
+              color: colors.bg,
             }}
           >
             {title}
@@ -115,7 +116,7 @@ export default function Tile({
             <p
               style={{
                 margin: 0,
-                color: colors.textSecondary,
+                color: colors.bg,
                 fontSize: Math.max(s(fontSizes.caption, scale), 11),
                 lineHeight: 1.35,
               }}
@@ -141,7 +142,7 @@ export default function Tile({
             style={{
               position: 'fixed',
               inset: 0,
-              background: colors.background,
+              background: colors.bg,
               opacity: isOverlayExpanded ? 1 : 0,
               zIndex: 999,
               pointerEvents: 'none',
@@ -158,10 +159,8 @@ export default function Tile({
               width: isOverlayExpanded ? '100vw' : overlayRect.width,
               height: isOverlayExpanded ? '100dvh' : overlayRect.height,
               borderRadius: isOverlayExpanded ? 0 : s(16, scale),
-              background: isOverlayExpanded
-                ? colors.background
-                : colors.surface,
-              border: `1px solid ${colors.border}`,
+              background: isOverlayExpanded ? colors.bg : colors.bg,
+              border: `1px solid ${colors.bg}`,
               boxShadow: `0 ${s(8, scale)}px ${s(24, scale)}px ${colors.shadow}`,
               zIndex: 1000,
               pointerEvents: 'none',

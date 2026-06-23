@@ -1,51 +1,53 @@
 @import 'tailwindcss';
 
 :root {
-  --background: #0b0b0f;
+  --bg: #0b0b0f;
   --surface: rgba(255, 255, 255, 0.04);
   --surface-solid: #1c1c21;
   --border: rgba(255, 255, 255, 0.08);
   --border-strong: rgba(255, 255, 255, 0.16);
   --text: #ffffff;
   --text-secondary: #888888;
-  --text-muted: #666666;
+  --text-muted: #555555;
   --glass: rgba(255, 255, 255, 0.04);
   --glass-hover: rgba(255, 255, 255, 0.08);
   --shadow: rgba(0, 0, 0, 0.5);
-  --success: #30d158;
+  --accent: #00e676;
+  --accent-dark: #00b85c;
+  --accent-surface: rgba(0, 230, 118, 0.08);
+  --accent-border: rgba(0, 230, 118, 0.2);
+  --success: #00e676;
   --error: #ff453a;
   --error-muted: #ffb4ae;
   --error-surface: rgba(255, 69, 58, 0.12);
   --error-border: rgba(255, 69, 58, 0.28);
   --warning: #ffd60a;
-  --transparent: trasparent;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: var(--bg);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-html,
-body {
+html {
+  background: #0b0b0f;
   min-height: 100%;
-  width: 100%;
-  margin: 0;
-  background: var(--background);
 }
 
 body {
   min-height: 100dvh;
-  background: var(--background);
-  color: var(--foreground);
+  width: 100%;
+  margin: 0;
+  background: #0b0b0f;
+  color: var(--text);
   font-family: Arial, Helvetica, sans-serif;
+  overscroll-behavior: none;
 }
 
 body > div {
-  min-height: 100%;
-  background: var(--background);
+  min-height: 100dvh;
+  background: #0b0b0f;
 }
 
 @keyframes loading-circle-spin {

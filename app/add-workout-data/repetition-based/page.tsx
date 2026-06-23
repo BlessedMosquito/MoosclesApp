@@ -1,5 +1,6 @@
 'use client';
 
+import Button from '@/components/ui/Button';
 import ErrorPopUp from '@/components/ui/ErrorPopUp';
 import ExerciseAccordion from '@/components/ui/ExerciseAccordion';
 import SectionDivider from '@/components/ui/SectionDivider';
@@ -12,6 +13,8 @@ import {
 import { addSets, getSetsByExercise, ReturnGetSetsData } from '@/services/sets';
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
+import { Mode } from '@/types/common';
+import { style } from 'motion/react-client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -33,6 +36,7 @@ export default function AddWorkoutDataRepetitionBased() {
   const from = searchParams.get('from');
   const calendarYear = searchParams.get('year');
   const calendarMonth = searchParams.get('month');
+  const mode = searchParams.get('mode') as Mode;
 
   const [exerciseName, setExerciseName] = useState('');
   const [exercises, setExercises] = useState<ReturnGetExercisesData[]>([]);
@@ -218,7 +222,7 @@ export default function AddWorkoutDataRepetitionBased() {
     <main
       style={{
         minHeight: '100dvh',
-        background: colors.background,
+        background: colors.bg,
         padding: s(isMobile ? 18 : 28, scale),
         color: colors.text,
         display: 'flex',
@@ -290,6 +294,7 @@ export default function AddWorkoutDataRepetitionBased() {
                     weight: '',
                   }
                 }
+                mode={mode}
                 isLoadingSets={loadingSetsByExercise[exerciseId]}
                 onToggle={toggleExercise}
                 onDraftChange={updateSetDraft}
@@ -298,6 +303,9 @@ export default function AddWorkoutDataRepetitionBased() {
             );
           })}
         </section>
+        <Button onClick={() => ({})} width={'full'}>
+          {'Add exercise'}
+        </Button>
       </div>
     </main>
   );
