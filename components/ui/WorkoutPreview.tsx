@@ -132,13 +132,13 @@ export default function WorkoutPreview({
           padding: s(12, scale),
           borderRadius: s(12, scale),
           border: `1px solid ${colors.border}`,
-          background: colors.glass,
+          background: colors.componentsBg,
         }}
       >
         <p
           style={{
             margin: 0,
-            color: colors.textMuted,
+            color: colors.text,
             fontSize: s(fontSizes.caption, scale),
           }}
         >
@@ -164,7 +164,7 @@ export default function WorkoutPreview({
         marginTop: s(18, scale),
         border: `1px solid ${colors.border}`,
         borderRadius: s(20, scale),
-        background: colors.surface,
+        background: colors.componentsBg,
         padding: s(16, scale),
       }}
     >
@@ -191,7 +191,7 @@ export default function WorkoutPreview({
             marginLeft: 'auto',
             border: 'none',
             background: 'none',
-            color: colors.textMuted,
+            color: colors.text,
             fontSize: s(20, scale),
             cursor: 'pointer',
             lineHeight: 1,
@@ -205,7 +205,7 @@ export default function WorkoutPreview({
       <p
         style={{
           margin: 0,
-          color: colors.textMuted,
+          color: colors.text,
           fontSize: s(fontSizes.caption, scale),
         }}
       >

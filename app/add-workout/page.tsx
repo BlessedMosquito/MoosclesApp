@@ -145,7 +145,7 @@ export default function AddWorkoutPage() {
           <p
             style={{
               margin: `${s(10, scale)}px 0 0`,
-              color: colors.textSecondary,
+              color: colors.text,
               fontSize: s(fontSizes.body, scale),
               lineHeight: 1.5,
             }}
@@ -171,7 +171,7 @@ export default function AddWorkoutPage() {
               display: 'flex',
               flexDirection: 'column',
               gap: s(8, scale),
-              color: colors.textSecondary,
+              color: colors.text,
               fontSize: s(fontSizes.caption, scale),
             }}
           >
@@ -186,7 +186,7 @@ export default function AddWorkoutPage() {
                 padding: s(14, scale),
                 borderRadius: s(14, scale),
                 border: `1px solid ${colors.border}`,
-                background: colors.surface,
+                background: colors.componentsBg,
                 color: colors.text,
                 fontSize: Math.max(s(fontSizes.input, scale), 16),
                 outline: 'none',
@@ -206,7 +206,7 @@ export default function AddWorkoutPage() {
                   height: 44 * 5,
                   borderRadius: s(18, scale),
                   border: `1px solid ${colors.border}`,
-                  background: colors.surface,
+                  background: colors.componentsBg,
                 }}
               >
                 <LoadingCircle size={18} />

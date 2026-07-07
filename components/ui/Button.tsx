@@ -80,7 +80,7 @@ export default function Button({
         paddingLeft: s(24, scale),
         paddingRight: s(24, scale),
         borderRadius: s(20, scale),
-        background: colors.accentDark,
+        background: colors.limeGreen,
         color: colors.bg,
         fontSize: s(fontSizes.button, scale),
         fontWeight: 600,

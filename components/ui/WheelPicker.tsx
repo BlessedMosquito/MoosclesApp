@@ -213,7 +213,7 @@ export default function WheelPicker({
           style={{
             margin: 0,
             fontSize: s(13, scale),
-            color: colors.textSecondary,
+            color: colors.text,
             letterSpacing: '0.02em',
           }}
         >
@@ -240,7 +240,7 @@ export default function WheelPicker({
           minWidth: width ? undefined : WIDTH,
           borderRadius: s(16, scale),
           border: `1px solid ${colors.border}`,
-          background: colors.transparent,
+          background: colors.componentsBg,
           overflow: 'hidden',
           userSelect: 'none',
           touchAction: 'none',
@@ -258,7 +258,7 @@ export default function WheelPicker({
             height: ITEM_H,
             transform: 'translateY(-50%)',
             borderRadius: s(10, scale),
-            background: colors.glassHover,
+            background: colors.componentsBg,
             pointerEvents: 'none',
             zIndex: 1,
           }}
@@ -273,7 +273,7 @@ export default function WheelPicker({
             left: 0,
             right: 0,
             height: ITEM_H * Math.floor(visibleRows / 2),
-            background: `linear-gradient(to bottom, ${colors.surface} 10%, transparent)`,
+            background: `linear-gradient(to bottom, ${colors.componentsBg} 10%, transparent)`,
             pointerEvents: 'none',
             zIndex: 2,
           }}
@@ -288,7 +288,7 @@ export default function WheelPicker({
             left: 0,
             right: 0,
             height: ITEM_H * Math.floor(visibleRows / 2),
-            background: `linear-gradient(to top, ${colors.surface} 10%, transparent)`,
+            background: `linear-gradient(to top, ${colors.componentsBg} 10%, transparent)`,
             pointerEvents: 'none',
             zIndex: 2,
           }}
@@ -328,7 +328,7 @@ export default function WheelPicker({
                   justifyContent: 'center',
                   fontSize: FONT_SIZE,
                   fontWeight: 600,
-                  color: isActive ? colors.text : colors.textMuted,
+                  color: isActive ? colors.text : colors.text,
                   cursor: 'pointer',
                   paddingLeft: s(12, scale),
                   paddingRight: s(12, scale),

@@ -8,6 +8,8 @@ import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
 import { ReturnGetWorkoutsData } from '@/services/workouts';
 import ArrowIcon from '../icons/ArrowIcon';
+import { color } from 'motion';
+import Button from './Button';
 
 const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const yearOptions = Array.from({ length: 21 }, (_, i) => 2010 + i);
@@ -80,10 +82,10 @@ export default function CalendarGrid({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          border: `1px solid ${colors.borderStrong}`,
+          border: `1px solid ${colors.text}`,
           borderRadius: s(12, scale),
-          background: colors.glass,
-          color: colors.text,
+          background: colors.limeGreen,
+          color: colors.bg,
           width: s(isMobile ? 32 : 38, scale),
           height: s(isMobile ? 52 : 58, scale),
           cursor: 'pointer',
@@ -112,7 +114,7 @@ export default function CalendarGrid({
         marginTop: s(isMobile ? 16 : 24, scale),
         border: `1px solid ${colors.border}`,
         borderRadius: s(isMobile ? 16 : 20, scale),
-        background: colors.surface,
+        background: colors.componentsBg,
         padding: s(isMobile ? 8 : 18, scale),
       }}
     >
@@ -143,7 +145,7 @@ export default function CalendarGrid({
             onClick={() => setIsYearPickerOpen((v) => !v)}
             style={{
               border: 'none',
-              background: 'transparent',
+              background: colors.transparent,
               color: colors.text,
               padding: 0,
               fontSize: s(
@@ -190,8 +192,7 @@ export default function CalendarGrid({
                 minHeight: s(isMobile ? 54 : 72, scale),
                 border: `2px solid ${year === visibleYear ? colors.text : colors.border}`,
                 borderRadius: s(14, scale),
-                background:
-                  year === visibleYear ? colors.glassHover : colors.glass,
+                background: colors.componentsBg,
                 color: colors.text,
                 fontSize: s(
                   isMobile ? fontSizes.body : fontSizes.heading2,
@@ -239,8 +240,8 @@ export default function CalendarGrid({
               <div
                 key={weekday}
                 style={{
-                  color: colors.textMuted,
-                  fontSize: s(fontSizes.caption, scale),
+                  color: colors.text,
+                  fontSize: s(fontSizes.body, scale),
                   textAlign: 'center',
                   paddingBottom: s(isMobile ? 2 : 4, scale),
                 }}
@@ -254,9 +255,6 @@ export default function CalendarGrid({
               const dayWorkouts = day
                 ? (workoutsByDay[toDateKey(day)] ?? [])
                 : [];
-              const visibleWorkouts = dayWorkouts.slice(0, isMobile ? 1 : 2);
-              const remainingWorkouts =
-                dayWorkouts.length - visibleWorkouts.length;
               const hasWorkouts = dayWorkouts.length > 0;
               return (
                 <div
@@ -265,7 +263,12 @@ export default function CalendarGrid({
                   tabIndex={hasWorkouts ? 0 : undefined}
                   onClick={() => {
                     if (hasWorkouts) {
-                      onSelectWorkout(dayWorkouts[0]);
+                      if (dayWorkouts.length === 1) {
+                        onSelectWorkout(dayWorkouts[0]);
+                      } else {
+                        setPopupDay(key);
+                        setPopupWorkouts(dayWorkouts);
+                      }
                     } else {
                       onClosePreview();
                     }
@@ -280,7 +283,11 @@ export default function CalendarGrid({
                     minHeight: s(isMobile ? 54 : 112, scale),
                     borderRadius: s(isMobile ? 8 : 12, scale),
                     border: `1px solid ${day ? colors.border : 'transparent'}`,
-                    background: day ? 'rgba(255,255,255,0.025)' : 'transparent',
+                    background: hasWorkouts
+                      ? colors.limeGreen
+                      : day
+                        ? colors.componentsBg
+                        : 'transparent',
                     padding: s(isMobile ? 3 : 6, scale),
                     overflow: 'hidden',
                     cursor: hasWorkouts ? 'pointer' : 'default',
@@ -291,8 +298,11 @@ export default function CalendarGrid({
                       <p
                         style={{
                           margin: 0,
-                          color: colors.textSecondary,
-                          fontSize: s(isMobile ? 10 : fontSizes.caption, scale),
+                          color: hasWorkouts ? 'black' : colors.text,
+                          fontSize: s(
+                            isMobile ? fontSizes.bodySmall : fontSizes.body,
+                            scale
+                          ),
                         }}
                       >
                         {day.getDate()}
@@ -303,61 +313,9 @@ export default function CalendarGrid({
                           display: 'flex',
                           flexDirection: 'column',
                           gap: s(isMobile ? 2 : 5, scale),
+                          color: colors.limeGreen,
                         }}
-                      >
-                        {visibleWorkouts.map((workout) => (
-                          <button
-                            key={workout.id}
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onSelectWorkout(workout);
-                            }}
-                            style={{
-                              width: '100%',
-                              border: `1px solid ${colors.accentBorder}`,
-                              borderRadius: s(isMobile ? 6 : 8, scale),
-                              background:
-                                selectedWorkout?.id === workout.id
-                                  ? colors.accent
-                                  : colors.accentDark,
-                              color: colors.bg,
-                              padding: `${s(isMobile ? 2 : 5, scale)}px ${s(isMobile ? 3 : 6, scale)}px`,
-                              fontSize: s(isMobile ? 8 : 11, scale),
-                              textAlign: 'left',
-                              cursor: 'pointer',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap',
-                            }}
-                          >
-                            {workout.name}
-                          </button>
-                        ))}
-
-                        {remainingWorkouts > 0 && (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setPopupDay(key);
-                              setPopupWorkouts(dayWorkouts);
-                            }}
-                            style={{
-                              border: 'none',
-                              background: 'none',
-                              color: colors.text,
-                              fontSize: s(isMobile ? 8 : 11, scale),
-                              textAlign: 'left',
-                              cursor: 'pointer',
-                              padding: 0,
-                              lineHeight: 1,
-                            }}
-                          >
-                            +{remainingWorkouts} more
-                          </button>
-                        )}
-                      </div>
+                      ></div>
                     </>
                   )}
                 </div>
@@ -367,42 +325,21 @@ export default function CalendarGrid({
         </div>
       )}
       {popupDay && (
-        <PopupWindow title={popupDay} onClose={() => setPopupDay(null)}>
+        <PopupWindow
+          title={'Select workout for preview'}
+          onClose={() => setPopupDay(null)}
+        >
           {popupWorkouts.map((workout) => (
-            <button
-              key={workout.id}
-              type="button"
+            <Button
               onClick={() => {
                 setPopupDay(null);
                 onSelectWorkout(workout);
               }}
-              style={{
-                width: '100%',
-                border: `1px solid ${selectedWorkout?.id === workout.id ? colors.text : colors.border}`,
-                borderRadius: s(12, scale),
-                background:
-                  selectedWorkout?.id === workout.id
-                    ? colors.accent
-                    : colors.accentDark,
-                color: colors.bg,
-                padding: s(12, scale),
-                fontSize: s(fontSizes.body, scale),
-                textAlign: 'left',
-                marginBottom: 10,
-                cursor: 'pointer',
-              }}
+              width={'3/4'}
+              key={workout.id}
             >
-              <p style={{ margin: 0, fontWeight: 600 }}>{workout.name}</p>
-              <p
-                style={{
-                  margin: `${s(2, scale)}px 0 0`,
-                  color: colors.bg,
-                  fontSize: s(fontSizes.caption, scale),
-                }}
-              >
-                {workout.workout_types?.label ?? 'Workout'}
-              </p>
-            </button>
+              {workout.name}
+            </Button>
           ))}
         </PopupWindow>
       )}

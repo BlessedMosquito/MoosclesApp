@@ -145,7 +145,7 @@ export default function AddWorkoutDataDuration() {
           <p
             style={{
               margin: `${s(10, scale)}px 0 0`,
-              color: colors.textSecondary,
+              color: colors.text,
               fontSize: s(fontSizes.body, scale),
               lineHeight: 1.5,
             }}

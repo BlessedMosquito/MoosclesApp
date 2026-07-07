@@ -46,9 +46,9 @@ export default function AuthLayout({
 
           borderRadius: isMobile ? 0 : 28,
 
-          border: isMobile ? 'none' : `3px solid ${colors.border}`,
+          border: isMobile ? 'none' : `2px solid ${colors.border}`,
 
-          background: isMobile ? 'transparent' : colors.glass,
+          background: isMobile ? 'transparent' : colors.componentsBg,
 
           backdropFilter: isMobile ? 'none' : 'blur(20px)',
 

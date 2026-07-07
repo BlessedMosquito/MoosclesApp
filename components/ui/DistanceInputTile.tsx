@@ -61,7 +61,7 @@ export default function DistanceInputTile({
       <p
         style={{
           margin: `0 0 ${s(8, scale)}px`,
-          color: colors.textSecondary,
+          color: colors.text,
           fontSize: s(fontSizes.caption, scale),
         }}
       >
@@ -80,7 +80,7 @@ export default function DistanceInputTile({
             display: 'flex',
             flexDirection: 'column',
             gap: s(8, scale),
-            color: colors.textSecondary,
+            color: colors.text,
             fontSize: s(fontSizes.caption, scale),
           }}
         >
@@ -99,7 +99,7 @@ export default function DistanceInputTile({
             display: 'flex',
             flexDirection: 'column',
             gap: s(8, scale),
-            color: colors.textSecondary,
+            color: colors.text,
             fontSize: s(fontSizes.caption, scale),
           }}
         >
@@ -123,7 +123,7 @@ export default function DistanceInputTile({
           padding: s(12, scale),
           borderRadius: s(12, scale),
           border: `1px solid ${colors.border}`,
-          background: colors.glass,
+          background: colors.componentsBg,
         }}
       >
         <p

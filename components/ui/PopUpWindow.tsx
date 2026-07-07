@@ -5,6 +5,7 @@ import { useEffect, useRef } from 'react';
 import { s, useResponsive } from '@/lib/useResponsive';
 import { colors } from '@/theme/colors';
 import CloseIcon from '../icons/CloseIcon';
+import { fontSizes } from '@/theme/typography';
 
 type PopupWindowProps = {
   onClose: () => void;
@@ -39,8 +40,8 @@ export default function PopupWindow({
         WebkitBackdropFilter: 'blur(4px)',
         background: 'rgba(0,0,0,0.3)',
         display: 'flex',
-        alignItems: 'center',
         justifyContent: 'center',
+        alignItems: 'center',
         padding: s(24, scale),
       }}
     >
@@ -57,48 +58,43 @@ export default function PopupWindow({
           padding: s(16, scale),
           display: 'flex',
           flexDirection: 'column',
-          gap: s(8, scale),
+          alignItems: 'center', // wyśrodkowuje całą zawartość
         }}
       >
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: s(12, scale),
-          }}
-        >
-          {title && (
+        {title && (
+          <div
+            style={{
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              paddingBottom: s(16, scale), // odstęp od children
+            }}
+          >
             <p
               style={{
                 margin: 0,
                 fontWeight: 700,
-                fontSize: s(14, scale),
+                fontSize: s(fontSizes.body, scale),
                 color: colors.text,
+                textAlign: 'center',
               }}
             >
               {title}
             </p>
-          )}
-          <button
-            type="button"
-            onClick={onClose}
-            style={{
-              marginLeft: 'auto',
-              border: 'none',
-              background: 'none',
-              color: colors.text,
-              fontSize: s(20, scale),
-              cursor: 'pointer',
-              lineHeight: 1,
-              padding: 0,
-            }}
-          >
-            <CloseIcon />
-          </button>
+          </div>
+        )}
+        <div
+          style={{
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: s(12, scale),
+          }}
+        >
+          {children}
         </div>
-
-        {children}
       </div>
     </div>
   );

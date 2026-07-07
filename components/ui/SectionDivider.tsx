@@ -22,7 +22,7 @@ export default function SectionDivider({ label }: SectionDividerProps) {
         style={{
           flex: 1,
           height: 1,
-          background: colors.border,
+          background: colors.text,
         }}
       />
 
@@ -43,7 +43,7 @@ export default function SectionDivider({ label }: SectionDividerProps) {
         style={{
           flex: 1,
           height: 1,
-          background: colors.border,
+          background: colors.text,
         }}
       />
     </div>

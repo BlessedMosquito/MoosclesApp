@@ -127,7 +127,7 @@ export default function ExerciseAccordion({
                   alignItems: 'center',
                   padding: s(10, scale),
                   borderRadius: s(12, scale),
-                  background: colors.glass,
+                  background: colors.componentsBg,
                   border: `1px solid ${colors.border}`,
                 }}
               >
@@ -159,7 +159,7 @@ export default function ExerciseAccordion({
                   padding: s(10, scale),
                   borderRadius: s(12, scale),
                   border: `1px solid ${colors.border}`,
-                  background: colors.glass,
+                  background: colors.componentsBg,
                   color: colors.text,
                   fontSize: fontSizes.body,
                   outline: 'none',
@@ -182,7 +182,7 @@ export default function ExerciseAccordion({
                   padding: s(10, scale),
                   borderRadius: s(12, scale),
                   border: `1px solid ${colors.border}`,
-                  background: colors.glass,
+                  background: colors.componentsBg,
                   color: colors.text,
                   fontSize: fontSizes.body,
                   outline: 'none',

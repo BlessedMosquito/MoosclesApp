@@ -53,7 +53,7 @@ export default function TimeInputTile({
       <p
         style={{
           margin: `0 0 ${s(8, scale)}px`,
-          color: colors.textSecondary,
+          color: colors.text,
           fontSize: s(fontSizes.caption, scale),
         }}
       >
@@ -70,10 +70,8 @@ export default function TimeInputTile({
           justifyContent: 'space-between',
           padding: `${s(14, scale)}px ${s(16, scale)}px`,
           borderRadius: s(14, scale),
-          border: `1px solid ${
-            pickerOpen ? colors.borderStrong : colors.border
-          }`,
-          background: colors.surface,
+          border: `1px solid ${pickerOpen ? colors.text : colors.border}`,
+          background: colors.componentsBg,
           color: hasTime ? colors.text : colors.textMuted,
           cursor: 'pointer',
           transition: 'border-color 150ms ease',
