@@ -4,7 +4,7 @@ import { fontSizes } from '@/theme/typography';
 import { motion, AnimatePresence } from 'motion/react';
 import { s } from '@/lib/useResponsive';
 import { useState } from 'react';
-import CloseIcon from '../icons/CloseIcon';
+import CloseIcon from '@/components/icons/CloseIcon';
 
 type ErrorPopUpProps = {
   children: React.ReactNode;

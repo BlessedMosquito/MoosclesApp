@@ -1,8 +1,7 @@
-import { Children, ReactNode } from 'react';
 import { useDevice } from '@/lib/useDevice';
 import { colors } from '@/theme/colors';
-import { fontSizes } from '@/theme/typography';
-import ErrorPopUp from '../ui/ErrorPopUp';
+import { Children, ReactNode } from 'react';
+import ErrorPopUp from '../ui/feedback/ErrorPopUp';
 
 type AuthLayoutProps = {
   children: ReactNode;
@@ -31,7 +30,7 @@ export default function AuthLayout({
         justifyContent: isMobile ? 'flex-start' : 'center',
         alignItems: isMobile ? 'stretch' : 'center',
 
-        background: colors.bg,
+        background: 'transparent',
         padding: isMobile ? 0 : 24,
       }}
     >
@@ -48,7 +47,7 @@ export default function AuthLayout({
 
           border: isMobile ? 'none' : `2px solid ${colors.border}`,
 
-          background: isMobile ? 'transparent' : colors.componentsBg,
+          background: isMobile ? colors.transparent : colors.componentsBg,
 
           backdropFilter: isMobile ? 'none' : 'blur(20px)',
 

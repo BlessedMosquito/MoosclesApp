@@ -21,7 +21,7 @@ export default function ConfirmEmailPage() {
           padding: 18,
           borderRadius: 16,
           border: `1px solid ${colors.border}`,
-          background: colors.surface,
+          background: colors.componentsBg,
           textAlign: 'center',
         }}
       >
@@ -38,7 +38,7 @@ export default function ConfirmEmailPage() {
         <p
           style={{
             margin: '12px 0 0',
-            color: colors.textSecondary,
+            color: colors.text,
             fontSize: fontSizes.bodySmall,
             lineHeight: 1.5,
           }}
@@ -51,7 +51,7 @@ export default function ConfirmEmailPage() {
         </p>
       </div>
 
-      <p style={{ fontSize: fontSizes.caption, color: colors.textSecondary }}>
+      <p style={{ fontSize: fontSizes.caption, color: colors.text }}>
         Already confirmed?{' '}
         <Link
           style={{ color: colors.text, textDecoration: 'none' }}

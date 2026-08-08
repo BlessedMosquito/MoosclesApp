@@ -1,7 +1,7 @@
 'use client';
 
 import Button from '@/components/ui/Button';
-import ErrorPopUp from '@/components/ui/ErrorPopUp';
+import ErrorPopUp from '@/components/ui/feedback/ErrorPopUp';
 import ExerciseAccordion from '@/components/ui/ExerciseAccordion';
 import SectionDivider from '@/components/ui/SectionDivider';
 import { s, useResponsive } from '@/lib/useResponsive';
@@ -14,9 +14,8 @@ import { addSets, getSetsByExercise, ReturnGetSetsData } from '@/services/sets';
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
 import { Mode } from '@/types/common';
-import { style } from 'motion/react-client';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 
 type SetDraft = {
   reps: string;
@@ -26,16 +25,12 @@ type SetDraft = {
 const decimalWeightPattern = /^\d+(?:[.,]\d{1,2})?$/;
 
 export default function AddWorkoutDataRepetitionBased() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const { isMobile, isTablet, scale } = useResponsive();
 
   const workoutId = searchParams.get('workoutId');
   const workoutName = searchParams.get('name') ?? 'Workout';
   const workoutType = searchParams.get('workoutType')?.toLowerCase();
-  const from = searchParams.get('from');
-  const calendarYear = searchParams.get('year');
-  const calendarMonth = searchParams.get('month');
   const mode = searchParams.get('mode') as Mode;
 
   const [exerciseName, setExerciseName] = useState('');
@@ -51,16 +46,15 @@ export default function AddWorkoutDataRepetitionBased() {
   const [loadingSetsByExercise, setLoadingSetsByExercise] = useState<
     Record<string, boolean>
   >({});
+  const [isAddingExercise, setIsAddingExercise] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const contentMaxWidth = isMobile ? '100%' : isTablet ? 620 : 760;
 
   useEffect(() => {
     async function loadExercises() {
-      if (!workoutId) {
-        return;
-      }
+      if (!workoutId) return;
       setError(null);
-
       try {
         const exerciseData = await getExercisesByWorkout(workoutId);
         setExercises(exerciseData as ReturnGetExercisesData[]);
@@ -75,9 +69,15 @@ export default function AddWorkoutDataRepetitionBased() {
         );
       }
     }
-
     loadExercises();
   }, [workoutId]);
+
+  // focus input gdy się pojawi
+  useEffect(() => {
+    if (isAddingExercise) {
+      setTimeout(() => inputRef.current?.focus(), 50);
+    }
+  }, [isAddingExercise]);
 
   async function handleAddExercise() {
     setError(null);
@@ -100,11 +100,11 @@ export default function AddWorkoutDataRepetitionBased() {
         order: exercises.length + 1,
       });
 
-      setExercises((currentExercises) => [
-        ...currentExercises,
-        exercise as ReturnGetExercisesData,
-      ]);
+      const newExercise = exercise as ReturnGetExercisesData;
+      setExercises((c) => [...c, newExercise]);
+      setExpandedExerciseId(String(newExercise.id)); // ← otwórz nowo dodany
       setExerciseName('');
+      setIsAddingExercise(false);
     } catch (saveError) {
       setError(
         saveError instanceof Error
@@ -112,6 +112,11 @@ export default function AddWorkoutDataRepetitionBased() {
           : 'Could not add exercise.'
       );
     }
+  }
+
+  function handleCancelAdd() {
+    setExerciseName('');
+    setIsAddingExercise(false);
   }
 
   async function toggleExercise(exercise: ReturnGetExercisesData) {
@@ -123,25 +128,20 @@ export default function AddWorkoutDataRepetitionBased() {
     }
 
     setExpandedExerciseId(exerciseId);
-    setSetDrafts((currentDrafts) => ({
-      ...currentDrafts,
-      [exerciseId]: currentDrafts[exerciseId] ?? { reps: '', weight: '' },
+    setSetDrafts((c) => ({
+      ...c,
+      [exerciseId]: c[exerciseId] ?? { reps: '', weight: '' },
     }));
 
-    if (setsByExercise[exerciseId]) {
-      return;
-    }
+    if (setsByExercise[exerciseId]) return;
 
-    setLoadingSetsByExercise((currentLoading) => ({
-      ...currentLoading,
-      [exerciseId]: true,
-    }));
+    setLoadingSetsByExercise((c) => ({ ...c, [exerciseId]: true }));
     setError(null);
 
     try {
       const setData = await getSetsByExercise(exercise.id);
-      setSetsByExercise((currentSets) => ({
-        ...currentSets,
+      setSetsByExercise((c) => ({
+        ...c,
         [exerciseId]: setData as ReturnGetSetsData[],
       }));
     } catch (loadError) {
@@ -149,10 +149,7 @@ export default function AddWorkoutDataRepetitionBased() {
         loadError instanceof Error ? loadError.message : 'Could not load sets.'
       );
     } finally {
-      setLoadingSetsByExercise((currentLoading) => ({
-        ...currentLoading,
-        [exerciseId]: false,
-      }));
+      setLoadingSetsByExercise((c) => ({ ...c, [exerciseId]: false }));
     }
   }
 
@@ -161,10 +158,10 @@ export default function AddWorkoutDataRepetitionBased() {
     field: keyof SetDraft,
     value: string
   ) {
-    setSetDrafts((currentDrafts) => ({
-      ...currentDrafts,
+    setSetDrafts((c) => ({
+      ...c,
       [exerciseId]: {
-        ...(currentDrafts[exerciseId] ?? { reps: '', weight: '' }),
+        ...(c[exerciseId] ?? { reps: '', weight: '' }),
         [field]: value,
       },
     }));
@@ -203,12 +200,12 @@ export default function AddWorkoutDataRepetitionBased() {
         order: existingSets.length + 1,
       });
 
-      setSetsByExercise((currentSets) => ({
-        ...currentSets,
+      setSetsByExercise((c) => ({
+        ...c,
         [exerciseId]: [...existingSets, newSet as ReturnGetSetsData],
       }));
-      setSetDrafts((currentDrafts) => ({
-        ...currentDrafts,
+      setSetDrafts((c) => ({
+        ...c,
         [exerciseId]: { reps: '', weight: '' },
       }));
     } catch (saveError) {
@@ -222,7 +219,7 @@ export default function AddWorkoutDataRepetitionBased() {
     <main
       style={{
         minHeight: '100dvh',
-        background: colors.bg,
+        background: 'transparent',
         padding: s(isMobile ? 18 : 28, scale),
         color: colors.text,
         display: 'flex',
@@ -230,17 +227,8 @@ export default function AddWorkoutDataRepetitionBased() {
         alignItems: 'center',
       }}
     >
-      <div
-        style={{
-          width: '100%',
-          maxWidth: contentMaxWidth,
-        }}
-      >
-        <section
-          style={{
-            marginTop: s(28, scale),
-          }}
-        >
+      <div style={{ width: '100%', maxWidth: contentMaxWidth }}>
+        <section style={{ marginTop: s(28, scale) }}>
           <h1
             style={{
               margin: `${s(8, scale)}px 0 0`,
@@ -253,7 +241,6 @@ export default function AddWorkoutDataRepetitionBased() {
           >
             {workoutName}
           </h1>
-
           <p
             style={{
               margin: `${s(10, scale)}px 0 0`,
@@ -269,6 +256,7 @@ export default function AddWorkoutDataRepetitionBased() {
         {error && (
           <ErrorPopUp onClose={() => setError(null)}>{error}</ErrorPopUp>
         )}
+
         <SectionDivider label="Exercise list" />
 
         <section
@@ -288,12 +276,7 @@ export default function AddWorkoutDataRepetitionBased() {
                 index={index}
                 isExpanded={expandedExerciseId === exerciseId}
                 exerciseSets={setsByExercise[exerciseId] ?? []}
-                setDraft={
-                  setDrafts[exerciseId] ?? {
-                    reps: '',
-                    weight: '',
-                  }
-                }
+                setDraft={setDrafts[exerciseId] ?? { reps: '', weight: '' }}
                 mode={mode}
                 isLoadingSets={loadingSetsByExercise[exerciseId]}
                 onToggle={toggleExercise}
@@ -302,10 +285,72 @@ export default function AddWorkoutDataRepetitionBased() {
               />
             );
           })}
+
+          {/* inline input do dodania ćwiczenia */}
+          {isAddingExercise && (
+            <div
+              style={{
+                padding: s(14, scale),
+                borderRadius: s(14, scale),
+                border: `1px solid ${colors.border}`,
+                background: colors.componentsBg,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: s(10, scale),
+              }}
+            >
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: s(fontSizes.caption, scale),
+                  color: colors.text,
+                  fontWeight: 600,
+                }}
+              >
+                Exercise {exercises.length + 1}
+              </p>
+
+              <input
+                ref={inputRef}
+                placeholder="Exercise name"
+                value={exerciseName}
+                onChange={(e) => setExerciseName(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleAddExercise();
+                  if (e.key === 'Escape') handleCancelAdd();
+                }}
+                style={{
+                  width: '100%',
+                  boxSizing: 'border-box',
+                  padding: s(12, scale),
+                  borderRadius: s(12, scale),
+                  border: `1px solid ${colors.border}`,
+                  background: colors.componentsBg,
+                  color: colors.text,
+                  fontSize: Math.max(s(fontSizes.input, scale), 16),
+                  outline: 'none',
+                }}
+              />
+
+              <div style={{ display: 'flex', gap: s(8, scale) }}>
+                <Button onClick={handleAddExercise} width="full">
+                  Add
+                </Button>
+                <Button onClick={handleCancelAdd} width="full">
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
         </section>
-        <Button onClick={() => ({})} width={'full'}>
-          {'Add exercise'}
-        </Button>
+
+        {!isAddingExercise && (
+          <div style={{ marginTop: s(16, scale) }}>
+            <Button onClick={() => setIsAddingExercise(true)} width="full">
+              + Add exercise
+            </Button>
+          </div>
+        )}
       </div>
     </main>
   );

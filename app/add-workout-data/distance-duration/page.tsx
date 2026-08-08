@@ -1,11 +1,11 @@
 'use client';
 
 import Button from '@/components/ui/Button';
-import DistanceInputTile from '@/components/ui/DistanceInputTile';
-import ErrorPopUp from '@/components/ui/ErrorPopUp';
+import DistanceInput from '@/components/ui/inputs/DistanceInput';
+import ErrorPopUp from '@/components/ui/feedback/ErrorPopUp';
 import SectionDivider from '@/components/ui/SectionDivider';
-import SuccessAnimation from '@/components/ui/SuccessAnimation';
-import TimeInputTile from '@/components/ui/TimeInputTile';
+import SuccessAnimation from '@/components/ui/feedback/SuccessAnimation';
+import TimeInput from '@/components/ui/inputs/TimeInput';
 import { formatDistance, formatDuration } from '@/lib/format';
 import { s, useResponsive } from '@/lib/useResponsive';
 import {
@@ -34,26 +34,34 @@ export default function AddWorkoutDataDuration() {
   const pendingNavRef = useRef<string | null>(null);
 
   const [error, setError] = useState<string | null>(null);
-  const [hours, setHours] = useState(0);
-  const [minutes, setMinutes] = useState(0);
-  const [seconds, setSeconds] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [time, setTime] = useState(0);
-  const [distance, setDistance] = useState(0);
+  const [time, setTime] = useState({
+    hours: 0,
+    minutes: 0,
+  });
+  const [distance, setDistance] = useState({
+    km: 0,
+    m: 0,
+  });
 
   const contentMaxWidth = isMobile ? '100%' : isTablet ? 620 : 760;
 
-  function validateTime(time: number) {
+  function validateTime(time: { hours: number; minutes: number }) {
     setError(null);
-    if (isNaN(time)) {
+
+    const totalMinutes = time.hours * 60 + time.minutes;
+
+    if (isNaN(totalMinutes)) {
       setError('Time must be a number.');
       return false;
     }
-    if (time <= 0) {
+
+    if (totalMinutes <= 0) {
       setError('Time must be bigger than 0.');
       return false;
     }
+
     return true;
   }
 
@@ -68,11 +76,13 @@ export default function AddWorkoutDataDuration() {
       }
       const data = await getWorkoutMetrics(workoutId);
       if (data) {
-        const formatedTime = formatDuration(data.duration_seconds);
-        setHours(formatedTime.h);
-        setMinutes(formatedTime.m);
-        setSeconds(formatedTime.s);
-        setDistance(data.distance_meters ?? 0);
+        const formatedTime = formatDuration(data.duration_minutes);
+        setTime({
+          hours: formatedTime.h,
+          minutes: formatedTime.m,
+        });
+        const formatedDistance = formatDistance(data.distance_meters);
+        setDistance(formatedDistance);
       }
     }
     getData();
@@ -92,11 +102,14 @@ export default function AddWorkoutDataDuration() {
 
     setIsSaving(true);
 
+    const durationMinutes = time.hours * 60 + time.minutes;
+    const distanceMeters = distance.km * 1000 + distance.m;
+
     try {
       await upsertWorkoutMetrics({
         workoutId: workoutId,
-        durationSeconds: time,
-        distanceMeters: distance,
+        distanceMeters: distanceMeters,
+        durationMinutes,
         wellBeing: 0,
       });
 
@@ -120,7 +133,7 @@ export default function AddWorkoutDataDuration() {
     <main
       style={{
         minHeight: '100dvh',
-        background: colors.bg,
+        background: 'transparent',
         padding: s(isMobile ? 18 : 28, scale),
         color: colors.text,
         display: 'flex',
@@ -159,17 +172,16 @@ export default function AddWorkoutDataDuration() {
         )}
 
         <SectionDivider label="Time" />
-        <TimeInputTile
-          label=""
-          inputHours={hours}
-          inputMinutes={minutes}
-          inputSeconds={seconds}
+        <TimeInput
+          hours={time.hours}
+          minutes={time.minutes}
           onChange={setTime}
+          disabled={false}
         />
         <SectionDivider label="Distance" />
-        <DistanceInputTile
-          label=""
-          valueMeters={distance}
+        <DistanceInput
+          value={distance}
+          disabled={false}
           onChange={setDistance}
         />
         <div style={{ marginTop: s(24, scale) }}>

@@ -1,11 +1,11 @@
 'use client';
 
 import Button from '@/components/ui/Button';
-import ErrorPopUp from '@/components/ui/ErrorPopUp';
-import LoadingCircle from '@/components/ui/LoadingCircle';
+import ErrorPopUp from '@/components/ui/feedback/ErrorPopUp';
+import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
 import SectionDivider from '@/components/ui/SectionDivider';
-import SuccessAnimation from '@/components/ui/SuccessAnimation';
-import WheelPicker from '@/components/ui/WheelPicker';
+import SuccessAnimation from '@/components/ui/feedback/SuccessAnimation';
+import WheelPicker from '@/components/ui/inputs/WheelPicker';
 import { s, useResponsive } from '@/lib/useResponsive';
 import { createWorkout } from '@/services/workouts';
 import {
@@ -120,7 +120,7 @@ export default function AddWorkoutPage() {
     <main
       style={{
         minHeight: '100dvh',
-        background: colors.bg,
+        background: 'transparent',
         padding: s(isMobile ? 18 : 28, scale),
         color: colors.text,
         display: 'flex',
@@ -140,7 +140,7 @@ export default function AddWorkoutPage() {
               fontWeight: 700,
             }}
           >
-            Create today's workout!
+            Create today&apos;s workout!
           </h1>
           <p
             style={{

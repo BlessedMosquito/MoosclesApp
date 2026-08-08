@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import LoadingCircle from '@/components/ui/LoadingCircle';
+import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
 import { s, useResponsive } from '@/lib/useResponsive';
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
@@ -17,9 +17,7 @@ import ExerciseAccordion from './ExerciseAccordion';
 
 export function formatDurationToString(seconds: number | null): string {
   const data = formatDuration(seconds);
-  return [data.h, data.m, data.s]
-    .map((v) => String(v).padStart(2, '0'))
-    .join(':');
+  return [data.h, data.m].map((v) => String(v).padStart(2, '0')).join(':');
 }
 
 export function formatDistanceToString(meters: number | null): string {
@@ -32,10 +30,10 @@ export function formatDistanceToString(meters: number | null): string {
 }
 
 export function formatPaceToString(
-  durationSeconds: number | null,
+  durationMinutes: number | null,
   distanceMeters: number | null
 ): string {
-  const pace = formatPace(durationSeconds, distanceMeters);
+  const pace = formatPace(durationMinutes, distanceMeters);
   return `${pace} km/h`;
 }
 
@@ -289,7 +287,7 @@ export default function WorkoutPreview({
             >
               {renderMetricCard(
                 'Time',
-                formatDurationToString(metrics.duration_seconds)
+                formatDurationToString(metrics.duration_minutes)
               )}
             </div>
           ) : (
@@ -314,7 +312,7 @@ export default function WorkoutPreview({
             >
               {renderMetricCard(
                 'Time',
-                formatDurationToString(metrics.duration_seconds)
+                formatDurationToString(metrics.duration_minutes)
               )}
               {renderMetricCard(
                 'Distance',
@@ -323,7 +321,7 @@ export default function WorkoutPreview({
               {renderMetricCard(
                 'Pace',
                 formatPaceToString(
-                  metrics.duration_seconds,
+                  metrics.duration_minutes,
                   metrics.distance_meters
                 )
               )}

@@ -1,26 +1,25 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import CalendarGrid from '@/components/ui/CalendarGrid';
+import ErrorPopUp from '@/components/ui/feedback/ErrorPopUp';
+import SectionDivider from '@/components/ui/SectionDivider';
 import WorkoutPreview from '@/components/ui/WorkoutPreview';
 import { s, useResponsive } from '@/lib/useResponsive';
-import { colors } from '@/theme/colors';
-import { fontSizes } from '@/theme/typography';
 import {
   getExercisesByWorkout,
   ReturnGetExercisesData,
 } from '@/services/exercises';
-import { getWorkouts, ReturnGetWorkoutsData } from '@/services/workouts';
-import { getWorkoutTypeGroup, WorkoutTypeGroup } from '@/services/workoutTypes';
 import {
   getWorkoutMetrics,
   ReturnGetMetricsData,
 } from '@/services/workoutMetrics';
-import LoadingCircle from '@/components/ui/LoadingCircle';
-import SectionDivider from '@/components/ui/SectionDivider';
-import ErrorPopUp from '@/components/ui/ErrorPopUp';
+import { getWorkouts, ReturnGetWorkoutsData } from '@/services/workouts';
+import { getWorkoutTypeGroup, WorkoutTypeGroup } from '@/services/workoutTypes';
+import { colors } from '@/theme/colors';
+import { fontSizes } from '@/theme/typography';
 import { Mode } from '@/types/common';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 function getWorkoutDateKey(workoutDate: string) {
   if (/^\d{4}-\d{2}-\d{2}$/.test(workoutDate)) return workoutDate;
@@ -151,7 +150,7 @@ export default function CalendarPage() {
     <main
       style={{
         minHeight: '100dvh',
-        background: colors.bg,
+        background: 'transparent',
         padding: s(isMobile ? 18 : 24, scale),
         color: colors.text,
         display: 'flex',

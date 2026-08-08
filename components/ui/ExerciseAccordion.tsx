@@ -1,6 +1,6 @@
 'use client';
 
-import LoadingCircle from '@/components/ui/LoadingCircle';
+import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
 import AddIcon from '@/components/icons/AddIcon';
 import CloseIcon from '@/components/icons/CloseIcon';
 import DropDownIcon from '@/components/icons/DropDownIcon';
@@ -56,7 +56,7 @@ export default function ExerciseAccordion({
         padding: s(14, scale),
         borderRadius: s(14, scale),
         border: `1px solid ${colors.border}`,
-        background: colors.surface,
+        background: colors.componentsBg,
         color: colors.text,
         fontSize: fontSizes.body,
       }}
@@ -67,7 +67,7 @@ export default function ExerciseAccordion({
         style={{
           width: '100%',
           border: 'none',
-          background: 'transparent',
+          background: colors.transparent,
           color: colors.text,
           padding: 0,
           display: 'flex',

@@ -1,15 +1,14 @@
 import Big from 'big.js';
 
-export function formatDuration(seconds: number | null) {
-  if (seconds == null) {
-    return { h: 0, m: 0, s: 0 };
+export function formatDuration(minutes: number | null) {
+  if (minutes === null) {
+    return { h: 0, m: 0 };
   }
 
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  const s = seconds % 60;
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
 
-  return { h, m, s };
+  return { h, m };
 }
 
 export function formatDistance(meters: number | null) {
@@ -29,21 +28,21 @@ export function formatDistance(meters: number | null) {
 }
 
 export function formatPace(
-  durationSeconds: number | null,
+  durationMinutes: number | null,
   distanceMeters: number | null
 ) {
   if (
-    durationSeconds == null ||
+    durationMinutes == null ||
     distanceMeters == null ||
-    durationSeconds <= 0 ||
+    durationMinutes <= 0 ||
     distanceMeters <= 0
   ) {
     return 0;
   }
 
   return new Big(distanceMeters)
-    .div(durationSeconds)
-    .times(3.6)
+    .div(durationMinutes)
+    .times(0.06)
     .round(2)
     .toNumber();
 }

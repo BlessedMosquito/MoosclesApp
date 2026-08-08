@@ -97,9 +97,7 @@ export default function WeeklyStreakTile({
                 justifyContent: 'center',
                 gap: s(3, scale),
 
-                background: hasWorkout
-                  ? 'rgba(48, 209, 88, 0.3)'
-                  : colors.componentsBg,
+                background: hasWorkout ? colors.limeGreen : colors.componentsBg,
 
                 border: isToday
                   ? `1px solid ${colors.text}`
@@ -114,6 +112,7 @@ export default function WeeklyStreakTile({
                   fontSize: s(9, scale),
                   lineHeight: 1,
                   fontWeight: 700,
+                  color: colors.text,
                 }}
               >
                 {weekdays[index]}
@@ -124,6 +123,7 @@ export default function WeeklyStreakTile({
                   fontSize: s(12, scale),
                   lineHeight: 1,
                   fontWeight: 800,
+                  color: colors.text,
                 }}
               >
                 {date.getDate()}

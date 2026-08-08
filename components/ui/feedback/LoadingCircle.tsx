@@ -24,7 +24,7 @@ export default function LoadingCircle({
         width: scaledSize,
         height: scaledSize,
         borderRadius: '50%',
-        border: `${Math.max(s(2, scale), 2)}px solid ${colors.borderStrong}`,
+        border: `${Math.max(s(2, scale), 2)}px solid ${colors.limeGreen}`,
         borderTopColor: colors.text,
         display: 'inline-block',
         animation: 'loading-circle-spin 700ms linear infinite',

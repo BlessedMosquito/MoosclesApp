@@ -205,7 +205,7 @@ export default function WheelPicker({
         flexDirection: 'column',
         alignItems: 'center',
         gap: s(6, scale),
-        background: 'transparent',
+        background: colors.transparent,
       }}
     >
       {label && (

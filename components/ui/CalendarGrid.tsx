@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import LoadingCircle from '@/components/ui/LoadingCircle';
+import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
 import PopupWindow from '@/components/ui/PopUpWindow';
 import { s, useResponsive } from '@/lib/useResponsive';
 import { colors } from '@/theme/colors';
@@ -282,12 +282,12 @@ export default function CalendarGrid({
                   style={{
                     minHeight: s(isMobile ? 54 : 112, scale),
                     borderRadius: s(isMobile ? 8 : 12, scale),
-                    border: `1px solid ${day ? colors.border : 'transparent'}`,
+                    border: `1px solid ${day ? colors.border : colors.transparent}`,
                     background: hasWorkouts
                       ? colors.limeGreen
                       : day
                         ? colors.componentsBg
-                        : 'transparent',
+                        : colors.transparent,
                     padding: s(isMobile ? 3 : 6, scale),
                     overflow: 'hidden',
                     cursor: hasWorkouts ? 'pointer' : 'default',

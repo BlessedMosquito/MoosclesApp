@@ -29,6 +29,7 @@ type ButtonProps = {
   height?: number;
   align?: ButtonAlign;
   type?: 'button' | 'submit' | 'reset';
+  color?: string;
 };
 
 export default function Button({
@@ -39,6 +40,7 @@ export default function Button({
   height = 56,
   align,
   type = 'button',
+  color,
 }: ButtonProps) {
   const { scale } = useResponsive();
 
@@ -77,15 +79,18 @@ export default function Button({
       style={{
         width: resolvedWidth,
         height: s(height, scale),
-        paddingLeft: s(24, scale),
-        paddingRight: s(24, scale),
+        padding: `0 ${s(24, scale)}px`,
         borderRadius: s(20, scale),
-        background: colors.limeGreen,
+        background: color ? color : colors.limeGreen,
         color: colors.bg,
         fontSize: s(fontSizes.button, scale),
         fontWeight: 600,
         cursor: disabled ? 'default' : 'pointer',
         border: `1px solid ${colors.border}`,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: s(8, scale),
       }}
     >
       {children}

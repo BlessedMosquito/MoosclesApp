@@ -2,11 +2,46 @@ import { s, useResponsive } from '@/lib/useResponsive';
 import Tile from './Tile';
 import { colors } from '@/theme/colors';
 import CircularProgress from '../CircularProgress';
+import { getUserData, ReturnGetUserData } from '@/services/userData';
+import { createClient } from '@/lib/supabase/client';
+import { useEffect, useState } from 'react';
+import ErrorPopUp from '../feedback/ErrorPopUp';
+import { getWeeklyDataSummary } from '@/services/workoutMetrics';
 
-export default function WeeklyWorkoutDataTile() {
+export default function WeeklyWorkoutDataTile(userData: ReturnGetUserData) {
+  const supabase = createClient();
+
   const { isMobile, scale } = useResponsive();
   const width = isMobile ? 420 : 600;
   const height = isMobile ? 220 : 350;
+
+  const [weeklyDistanceGoal, setWeeklyDistanceGoal] = useState(0);
+  const [weeklyDurationGoal, setWeeklyDurationGoal] = useState(0);
+  const [weeklyDistance, setWeeklyDistance] = useState(0);
+  const [weeklyDuration, setWeeklyDuration] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  async function loadData() {
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      setWeeklyDistanceGoal(userData.weekly_distance_goal_meters / 1000);
+      setWeeklyDurationGoal(userData.weekly_duration_goal_minutes / 60);
+
+      const weeklyData = await getWeeklyDataSummary({ userId: user.id });
+      setWeeklyDistance(Number(weeklyData.distance_meters) / 1000);
+      setWeeklyDuration(weeklyData.duration_minutes / 60);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not load data.');
+    }
+  }
+
   return (
     <Tile width={width} height={height}>
       <p
@@ -28,18 +63,18 @@ export default function WeeklyWorkoutDataTile() {
         }}
       >
         <CircularProgress
-          title="Calories"
-          value={1350}
+          title="Duration"
+          value={weeklyDuration}
           min={0}
-          max={1500}
-          unit="kcal"
+          max={weeklyDurationGoal}
+          unit="hours"
         />
 
         <CircularProgress
           title="Distance"
-          value={1.5}
+          value={weeklyDistance}
           min={0}
-          max={100}
+          max={weeklyDistanceGoal}
           unit="km"
         />
       </div>

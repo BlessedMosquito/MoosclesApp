@@ -36,7 +36,7 @@ export default function BottomBarItem({
         height: 56,
         borderRadius: 999,
         border: 'none',
-        background: 'transparent',
+        background: colors.transparent,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -63,7 +63,7 @@ export default function BottomBarItem({
               backdropFilter: 'blur(18px)',
               WebkitBackdropFilter: 'blur(18px)',
 
-              border: `1px solid ${colors.borderStrong}`,
+              border: `1px solid ${colors.limeGreen}`,
               boxShadow: '0 6px 25px rgba(0,0,0,0.35)',
               zIndex: 0,
             }}

@@ -87,7 +87,7 @@ export default function CircularProgress({
             cy={finalSize / 2}
             r={radius}
             fill="none"
-            stroke="#30D158"
+            stroke={colors.limeGreen}
             strokeWidth={finalStrokeWidth}
             strokeLinecap="round"
             strokeDasharray={circumference}

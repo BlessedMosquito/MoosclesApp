@@ -6,7 +6,8 @@ import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
 
 type ProgressBarProps = {
-  value: number;
+  progress?: number;
+  value?: number;
   min?: number;
   max?: number;
   height?: number;
@@ -19,12 +20,13 @@ type ProgressBarProps = {
 };
 
 export default function ProgressBar({
-  value,
+  progress,
+  value = 0,
   min = 0,
   max = 100,
   height = 14,
   color = colors.limeGreen,
-  trackColor = colors.surface,
+  trackColor = colors.border,
   marker,
   showLabels = false,
   labelLeft,
@@ -32,8 +34,13 @@ export default function ProgressBar({
 }: ProgressBarProps) {
   const { scale } = useResponsive();
 
-  const clamped = Math.min(Math.max(value, min), max);
-  const progress = (clamped - min) / (max - min);
+  const safeProgress = (() => {
+    if (progress !== undefined) return Math.min(Math.max(progress, 0), 1);
+    if (max === min) return 0;
+    const clamped = Math.min(Math.max(value, min), max);
+    const p = (clamped - min) / (max - min);
+    return isNaN(p) ? 0 : p;
+  })();
 
   const barHeight = s(height, scale);
   const markerOffset = s(6, scale);
@@ -49,14 +56,10 @@ export default function ProgressBar({
           overflow: marker ? 'visible' : 'hidden',
         }}
       >
-        {/* Fill */}
         <motion.div
           initial={{ width: 0 }}
-          animate={{ width: `${progress * 100}%` }}
-          transition={{
-            duration: 0.8,
-            ease: 'easeOut',
-          }}
+          animate={{ width: `${safeProgress * 100}%` }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
           style={{
             position: 'absolute',
             left: 0,
@@ -67,16 +70,10 @@ export default function ProgressBar({
           }}
         />
 
-        {/* Marker */}
         {marker && (
           <motion.div
-            animate={{
-              left: `${progress * 100}%`,
-            }}
-            transition={{
-              duration: 0.8,
-              ease: 'easeOut',
-            }}
+            animate={{ left: `${safeProgress * 100}%` }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
             style={{
               position: 'absolute',
               top: -markerOffset,
@@ -90,7 +87,6 @@ export default function ProgressBar({
         )}
       </div>
 
-      {/* Labels */}
       {showLabels && (labelLeft || labelRight) && (
         <div
           style={{
@@ -103,16 +99,10 @@ export default function ProgressBar({
           }}
         >
           <span>{labelLeft}</span>
-          {/* Current value */}
           <div
-            style={{
-              textAlign: 'center',
-              color: colors.text,
-              fontWeight: 700,
-              fontSize: s(fontSizes.bodySmall, scale),
-            }}
+            style={{ textAlign: 'center', color: colors.text, fontWeight: 700 }}
           >
-            {value} kg
+            {value}
           </div>
           <span>{labelRight}</span>
         </div>
