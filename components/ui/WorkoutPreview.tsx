@@ -49,6 +49,7 @@ type WorkoutPreviewProps = {
   metrics: ReturnGetMetricsData | null;
   isLoading: boolean;
   onEdit: () => void;
+  onConfirm: () => void;
   onClose: () => void;
   previewRef: React.RefObject<HTMLElement | null>;
   mode?: 'EDIT' | 'PREVIEW';
@@ -61,6 +62,7 @@ export default function WorkoutPreview({
   metrics,
   isLoading,
   onEdit,
+  onConfirm,
   onClose,
   previewRef,
   mode = 'PREVIEW',
@@ -116,10 +118,6 @@ export default function WorkoutPreview({
         [field]: value,
       },
     }));
-  }
-
-  function handleAddSet(exercise: ReturnGetExercisesData) {
-    // placeholder — podłącz do swojego serwisu
   }
 
   function renderMetricCard(label: string, value: string) {
@@ -270,7 +268,7 @@ export default function WorkoutPreview({
                   isLoadingSets={loadingSetsByExercise[exerciseId]}
                   onToggle={toggleExercise}
                   onDraftChange={updateSetDraft}
-                  onAddSet={handleAddSet}
+                  onAddSet={() => {}}
                   mode={mode}
                 />
               );
@@ -339,10 +337,41 @@ export default function WorkoutPreview({
           )
         ) : null}
       </div>
-      <div style={{ marginTop: s(16, scale) }}>
-        <Button onClick={onEdit} width="1/2" align="center">
-          Edit
-        </Button>
+      <div
+        style={{
+          marginTop: s(16, scale),
+          display: 'flex',
+          gap: s(8, scale),
+        }}
+      >
+        {workout.completed_at ? (
+          <div
+            style={{
+              flex: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: s(12, scale),
+              borderRadius: s(14, scale),
+              border: `1px solid ${colors.limeGreen}`,
+              background: 'rgba(48,209,88,0.12)',
+              color: colors.limeGreen,
+              fontSize: s(fontSizes.bodySmall, scale),
+              fontWeight: 700,
+            }}
+          >
+            Completed
+          </div>
+        ) : (
+          <>
+            <Button onClick={onConfirm} width="3/4" align="center">
+              Confirm
+            </Button>
+            <Button onClick={onEdit} width="3/4" align="center">
+              Edit
+            </Button>
+          </>
+        )}
       </div>
     </section>
   );

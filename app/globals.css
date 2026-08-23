@@ -14,6 +14,7 @@
   --lime-green: #30d158;
   --red: #d73c33;
   --white: #dddddd;
+  --transparent: transparent;
 }
 
 @theme inline {

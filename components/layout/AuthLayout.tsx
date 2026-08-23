@@ -1,4 +1,4 @@
-import { useDevice } from '@/lib/useDevice';
+import { useResponsive } from '@/lib/useResponsive';
 import { colors } from '@/theme/colors';
 import { Children, ReactNode } from 'react';
 import ErrorPopUp from '../ui/feedback/ErrorPopUp';
@@ -14,11 +14,11 @@ export default function AuthLayout({
   error,
   onDismissError,
 }: AuthLayoutProps) {
-  const { isMobile } = useDevice();
+  const { isMobile } = useResponsive();
   const childItems = Children.toArray(children);
   const [title, ...content] = childItems;
   const errorMessage = error && (
-    <ErrorPopUp onClose={() => onDismissError}>{error}</ErrorPopUp>
+    <ErrorPopUp onClose={() => onDismissError?.()}>{error}</ErrorPopUp>
   );
 
   return (

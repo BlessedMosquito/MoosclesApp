@@ -17,7 +17,20 @@ export type ReturnGetWorkoutsData = {
   id: string;
   name: string;
   workout_date: string;
+  completed_at: string | null;
   workout_types: ReturnGetWorkoutTypeData;
+};
+
+export type ExperienceBreakdownItem = {
+  type: 'workout' | 'exercises' | 'sets' | 'reps' | 'duration' | 'distance';
+  label: string;
+  value?: number;
+  amount: number;
+};
+
+export type CompleteWorkoutResult = {
+  total_exp: number;
+  breakdown: ExperienceBreakdownItem[];
 };
 
 const supabase = createClient();
@@ -96,4 +109,16 @@ export async function getWorkouts(
   }
 
   return data as ReturnGetWorkoutsData[];
+}
+
+export async function completeWorkout({ workoutId }: { workoutId: string }) {
+  const { data, error } = await supabase.rpc('complete_workout', {
+    p_workout_id: workoutId,
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data as CompleteWorkoutResult;
 }

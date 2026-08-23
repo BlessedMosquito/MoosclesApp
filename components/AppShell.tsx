@@ -8,7 +8,13 @@ import BottomBar from './ui/bottomBar/BottomBar';
 import BottomBarItem from './ui/bottomBar/BottomBarItem';
 import ProfileIcon from './icons/ProfileIcon';
 
-const HIDDEN_SIDEBAR_PATHS = ['/', '/login', '/register', '/confirm-email'];
+const AUTHENTICATED_PATHS = [
+  '/dashboard',
+  '/calendar',
+  '/add-workout',
+  '/add-workout-data',
+  '/profile',
+];
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -18,7 +24,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   const iconSize = isMobile ? 16 : isTablet ? 18 : 20;
 
-  const hideSidebar = HIDDEN_SIDEBAR_PATHS.includes(pathname);
+  const hideSidebar = !AUTHENTICATED_PATHS.some((p) =>
+    pathname.startsWith(p)
+  );
 
   const BOTTOM_BAR_HEIGHT = 90;
 

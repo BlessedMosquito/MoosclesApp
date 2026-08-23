@@ -13,5 +13,5 @@ export const colors = {
   errorSurface: 'var(--error-surface)',
   errorBorder: 'var(--error-border)',
 
-  transparent: 'var(--tranparent)',
+  transparent: 'var(--transparent)',
 };

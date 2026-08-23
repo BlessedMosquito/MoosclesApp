@@ -2,11 +2,13 @@
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 import AuthLayout from '@/components/layout/AuthLayout';
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
+import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
 
-export default function ConfirmEmailPage() {
+function ConfirmEmailContent() {
   const searchParams = useSearchParams();
   const email = searchParams.get('email');
 
@@ -67,5 +69,27 @@ export default function ConfirmEmailPage() {
         </Link>
       </p>
     </AuthLayout>
+  );
+}
+
+export default function ConfirmEmailPage() {
+  return (
+    <Suspense
+      fallback={
+        <main
+          style={{
+            minHeight: '100dvh',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            background: 'transparent',
+          }}
+        >
+          <LoadingCircle />
+        </main>
+      }
+    >
+      <ConfirmEmailContent />
+    </Suspense>
   );
 }

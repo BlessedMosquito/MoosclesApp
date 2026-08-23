@@ -6,6 +6,7 @@ type UpsertWorkoutMetricsProps = {
   durationMinutes: number;
   distanceMeters: number;
   wellBeing: number;
+  userId: string;
 };
 
 export type ReturnGetMetricsData = {
@@ -18,7 +19,7 @@ export type ReturnGetMetricsData = {
 };
 
 type GetWeeklyDataSummaryProps = {
-  userId: number;
+  userId: string;
 };
 
 const supabase = createClient();
@@ -31,6 +32,7 @@ export async function upsertWorkoutMetrics(props: UpsertWorkoutMetricsProps) {
       duration_minutes: props.durationMinutes ?? null,
       distance_meters: props.distanceMeters ?? null,
       well_being: props.wellBeing,
+      user_id: props.userId,
     })
     .select()
     .single();
@@ -63,7 +65,7 @@ export async function getWeeklyDataSummary(props: GetWeeklyDataSummaryProps) {
     .eq('user_id', props.userId)
     .gte('created_at', start.toISOString())
     .lt('created_at', end.toISOString())
-    .single();
+    .maybeSingle();
 
   if (error) throw error;
 

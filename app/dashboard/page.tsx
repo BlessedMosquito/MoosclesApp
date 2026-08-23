@@ -2,7 +2,6 @@
 
 import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
 import LevelTile from '@/components/ui/tiles/LevelTile';
-import TotalWeightMovedTile from '@/components/ui/tiles/LevelTile';
 import WeeklyWorkoutDataTile from '@/components/ui/tiles/WeeklyWorkoutDataTile';
 import WeeklyWorkoutTile from '@/components/ui/tiles/WeeklyWorkoutTile';
 import { createClient } from '@/lib/supabase/client';
@@ -45,8 +44,12 @@ export default function DashboardPage() {
         data: { user },
       } = await supabase.auth.getUser();
 
+      if (!user) {
+        setError('User not authenticated.');
+        return;
+      }
+
       const data = await getUserData(user.id);
-      console.log('Dashboard', data);
       setUserData(data);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not load data.');

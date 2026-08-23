@@ -7,6 +7,7 @@ import SectionDivider from '@/components/ui/SectionDivider';
 import { s, useResponsive } from '@/lib/useResponsive';
 import {
   addExercise,
+  deleteExercise,
   getExercisesByWorkout,
   ReturnGetExercisesData,
 } from '@/services/exercises';
@@ -16,6 +17,9 @@ import { fontSizes } from '@/theme/typography';
 import { Mode } from '@/types/common';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import DeleteIcon from '@/components/icons/DeleteIcon';
+import QuestionPopUp from '@/components/ui/popups/QuestionPopUp';
+import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
 
 type SetDraft = {
   reps: string;
@@ -47,6 +51,9 @@ export default function AddWorkoutDataRepetitionBased() {
     Record<string, boolean>
   >({});
   const [isAddingExercise, setIsAddingExercise] = useState(false);
+  const [showDeletePopUp, setShowDeletePopUp] = useState(false);
+  const [exerciseToDelete, setExerciseToDelete] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const contentMaxWidth = isMobile ? '100%' : isTablet ? 620 : 760;
@@ -55,6 +62,7 @@ export default function AddWorkoutDataRepetitionBased() {
     async function loadExercises() {
       if (!workoutId) return;
       setError(null);
+      setIsLoading(true);
       try {
         const exerciseData = await getExercisesByWorkout(workoutId);
         setExercises(exerciseData as ReturnGetExercisesData[]);
@@ -67,12 +75,13 @@ export default function AddWorkoutDataRepetitionBased() {
             ? loadError.message
             : 'Could not load exercises.'
         );
+      } finally {
+        setIsLoading(false);
       }
     }
     loadExercises();
   }, [workoutId]);
 
-  // focus input gdy się pojawi
   useEffect(() => {
     if (isAddingExercise) {
       setTimeout(() => inputRef.current?.focus(), 50);
@@ -87,7 +96,6 @@ export default function AddWorkoutDataRepetitionBased() {
       setError('Missing workout id.');
       return;
     }
-
     if (!trimmedExerciseName) {
       setError('Exercise name is required.');
       return;
@@ -99,10 +107,9 @@ export default function AddWorkoutDataRepetitionBased() {
         name: trimmedExerciseName,
         order: exercises.length + 1,
       });
-
       const newExercise = exercise as ReturnGetExercisesData;
       setExercises((c) => [...c, newExercise]);
-      setExpandedExerciseId(String(newExercise.id)); // ← otwórz nowo dodany
+      setExpandedExerciseId(String(newExercise.id));
       setExerciseName('');
       setIsAddingExercise(false);
     } catch (saveError) {
@@ -117,6 +124,37 @@ export default function AddWorkoutDataRepetitionBased() {
   function handleCancelAdd() {
     setExerciseName('');
     setIsAddingExercise(false);
+  }
+
+  function beforeDeletePopUp(exercise: ReturnGetExercisesData) {
+    setShowDeletePopUp(true);
+    setExerciseToDelete(exercise.id);
+  }
+
+  async function handleDeleteExercise() {
+    try {
+      if (!exerciseToDelete)
+        throw new Error('No exercise selected for deletion.');
+
+      setShowDeletePopUp(false);
+      setIsLoading(true);
+
+      await deleteExercise({ exerciseId: exerciseToDelete });
+
+      setExercises((current) =>
+        current.filter((exercise) => exercise.id !== exerciseToDelete)
+      );
+
+      if (expandedExerciseId === String(exerciseToDelete)) {
+        setExpandedExerciseId(null);
+      }
+
+      setExerciseToDelete(null);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not delete exercise.');
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   async function toggleExercise(exercise: ReturnGetExercisesData) {
@@ -178,12 +216,10 @@ export default function AddWorkoutDataRepetitionBased() {
       setError('Reps must be greater than 0.');
       return;
     }
-
     if (!decimalWeightPattern.test(draft.weight) || !Number.isFinite(weight)) {
       setError('Weight must have up to 2 decimal places.');
       return;
     }
-
     if (weight < 0) {
       setError('Weight cannot be negative.');
       return;
@@ -199,15 +235,11 @@ export default function AddWorkoutDataRepetitionBased() {
         weight: Math.round(weight * 100) / 100,
         order: existingSets.length + 1,
       });
-
       setSetsByExercise((c) => ({
         ...c,
         [exerciseId]: [...existingSets, newSet as ReturnGetSetsData],
       }));
-      setSetDrafts((c) => ({
-        ...c,
-        [exerciseId]: { reps: '', weight: '' },
-      }));
+      setSetDrafts((c) => ({ ...c, [exerciseId]: { reps: '', weight: '' } }));
     } catch (saveError) {
       setError(
         saveError instanceof Error ? saveError.message : 'Could not add set.'
@@ -267,84 +299,117 @@ export default function AddWorkoutDataRepetitionBased() {
             gap: s(16, scale),
           }}
         >
-          {exercises.map((exercise, index) => {
-            const exerciseId = String(exercise.id);
-            return (
-              <ExerciseAccordion
-                key={exercise.id}
-                exercise={exercise}
-                index={index}
-                isExpanded={expandedExerciseId === exerciseId}
-                exerciseSets={setsByExercise[exerciseId] ?? []}
-                setDraft={setDrafts[exerciseId] ?? { reps: '', weight: '' }}
-                mode={mode}
-                isLoadingSets={loadingSetsByExercise[exerciseId]}
-                onToggle={toggleExercise}
-                onDraftChange={updateSetDraft}
-                onAddSet={handleAddSet}
-              />
-            );
-          })}
-
-          {/* inline input do dodania ćwiczenia */}
-          {isAddingExercise && (
+          {isLoading ? (
             <div
               style={{
-                padding: s(14, scale),
-                borderRadius: s(14, scale),
-                border: `1px solid ${colors.border}`,
-                background: colors.componentsBg,
                 display: 'flex',
-                flexDirection: 'column',
-                gap: s(10, scale),
+                justifyContent: 'center',
+                alignItems: 'center',
+                minHeight: s(120, scale),
               }}
             >
-              <p
-                style={{
-                  margin: 0,
-                  fontSize: s(fontSizes.caption, scale),
-                  color: colors.text,
-                  fontWeight: 600,
-                }}
-              >
-                Exercise {exercises.length + 1}
-              </p>
-
-              <input
-                ref={inputRef}
-                placeholder="Exercise name"
-                value={exerciseName}
-                onChange={(e) => setExerciseName(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleAddExercise();
-                  if (e.key === 'Escape') handleCancelAdd();
-                }}
-                style={{
-                  width: '100%',
-                  boxSizing: 'border-box',
-                  padding: s(12, scale),
-                  borderRadius: s(12, scale),
-                  border: `1px solid ${colors.border}`,
-                  background: colors.componentsBg,
-                  color: colors.text,
-                  fontSize: Math.max(s(fontSizes.input, scale), 16),
-                  outline: 'none',
-                }}
-              />
-
-              <div style={{ display: 'flex', gap: s(8, scale) }}>
-                <Button onClick={handleAddExercise} width="full">
-                  Add
-                </Button>
-                <Button onClick={handleCancelAdd} width="full">
-                  Cancel
-                </Button>
-              </div>
+              <LoadingCircle />
             </div>
+          ) : (
+            <>
+              {exercises.map((exercise, index) => {
+                const exerciseId = String(exercise.id);
+                return (
+                  <div
+                    key={exercise.id}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: s(8, scale),
+                    }}
+                  >
+                    <div style={{ flex: 1 }}>
+                      <ExerciseAccordion
+                        exercise={exercise}
+                        index={index}
+                        isExpanded={expandedExerciseId === exerciseId}
+                        exerciseSets={setsByExercise[exerciseId] ?? []}
+                        setDraft={
+                          setDrafts[exerciseId] ?? { reps: '', weight: '' }
+                        }
+                        mode={mode}
+                        isLoadingSets={loadingSetsByExercise[exerciseId]}
+                        onToggle={toggleExercise}
+                        onDraftChange={updateSetDraft}
+                        onAddSet={handleAddSet}
+                      />
+                    </div>
+
+                    {mode !== 'PREVIEW' && (
+                      <Button
+                        onClick={() => beforeDeletePopUp(exercise)}
+                        color={colors.red}
+                      >
+                        <DeleteIcon />
+                      </Button>
+                    )}
+                  </div>
+                );
+              })}
+
+              {isAddingExercise && (
+                <div
+                  style={{
+                    padding: s(14, scale),
+                    borderRadius: s(14, scale),
+                    border: `1px solid ${colors.border}`,
+                    background: colors.componentsBg,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: s(10, scale),
+                  }}
+                >
+                  <p
+                    style={{
+                      margin: 0,
+                      fontSize: s(fontSizes.caption, scale),
+                      color: colors.text,
+                      fontWeight: 600,
+                    }}
+                  >
+                    Exercise {exercises.length + 1}
+                  </p>
+                  <input
+                    ref={inputRef}
+                    placeholder="Exercise name"
+                    value={exerciseName}
+                    onChange={(e) => setExerciseName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleAddExercise();
+                      if (e.key === 'Escape') handleCancelAdd();
+                    }}
+                    style={{
+                      width: '100%',
+                      boxSizing: 'border-box',
+                      padding: s(12, scale),
+                      borderRadius: s(12, scale),
+                      border: `1px solid ${colors.border}`,
+                      background: colors.componentsBg,
+                      color: colors.text,
+                      fontSize: Math.max(s(fontSizes.input, scale), 16),
+                      outline: 'none',
+                    }}
+                  />
+                  <div style={{ display: 'flex', gap: s(8, scale) }}>
+                    <Button onClick={handleAddExercise} width="full">
+                      Add
+                    </Button>
+                    <Button onClick={handleCancelAdd} width="full">
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </section>
 
-        {!isAddingExercise && (
+        {!isLoading && !isAddingExercise && (
           <div style={{ marginTop: s(16, scale) }}>
             <Button onClick={() => setIsAddingExercise(true)} width="full">
               + Add exercise
@@ -352,6 +417,14 @@ export default function AddWorkoutDataRepetitionBased() {
           </div>
         )}
       </div>
+
+      {showDeletePopUp && (
+        <QuestionPopUp
+          text="Do you really want to delete selected exercise?"
+          onYes={handleDeleteExercise}
+          onNo={() => setShowDeletePopUp(false)}
+        />
+      )}
     </main>
   );
 }

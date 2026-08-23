@@ -18,8 +18,10 @@ import { fontSizes } from '@/theme/typography';
 import { Mode } from '@/types/common';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
 
 export default function AddWorkoutDataDuration() {
+  const supabase = createClient();
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isMobile, isTablet, scale } = useResponsive();
@@ -106,11 +108,19 @@ export default function AddWorkoutDataDuration() {
     const distanceMeters = distance.km * 1000 + distance.m;
 
     try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        setError('Not authenticated.');
+        return;
+      }
       await upsertWorkoutMetrics({
         workoutId: workoutId,
         distanceMeters: distanceMeters,
         durationMinutes,
         wellBeing: 0,
+        userId: user.id,
       });
 
       pendingNavRef.current =

@@ -1,232 +1,231 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
-import type { CSSProperties } from 'react';
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
 import { s, useResponsive } from '@/lib/useResponsive';
+import { motion } from 'motion/react';
 
-const highlights = [
+const features = [
   {
-    title: 'Workouts',
-    text: 'Log distance, time, and reps in one place.',
+    icon: '01',
+    title: 'Track Workouts',
+    text: 'Log distance, time, reps and weight. Everything in one clean view.',
   },
   {
-    title: 'Progress',
-    text: 'See weekly movement and weight trends at a glance.',
+    icon: '02',
+    title: 'Weekly Goals',
+    text: 'Set distance and duration goals. See your progress at a glance.',
   },
   {
-    title: 'Streaks',
-    text: 'Keep a simple weekly rhythm without extra noise.',
+    icon: '03',
+    title: 'Level Up',
+    text: 'Earn XP with every session. Watch your level grow over time.',
   },
 ];
 
 export default function HomePage() {
   const { isMobile, isTablet, scale } = useResponsive();
 
-  const contentMaxWidth = isMobile ? 420 : isTablet ? 920 : 1200;
-
-  const gridColumns = isMobile ? '1fr' : 'minmax(0, 1fr) minmax(0, 1fr)';
-
-  const ctaStyle: CSSProperties = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: s(52, scale),
-    padding: `0 ${s(20, scale)}px`,
-    borderRadius: s(18, scale),
-    border: `1px solid ${colors.border}`,
-    textDecoration: 'none',
-    fontSize: s(fontSizes.button, scale),
-    fontWeight: 700,
-    transition: 'transform .2s ease',
-  };
+  const contentMaxWidth = isMobile ? 420 : isTablet ? 720 : 960;
 
   return (
-    <>
-      <main
+    <main
+      style={{
+        minHeight: '100dvh',
+        background:
+          'linear-gradient(180deg, rgba(48,209,88,.06) 0%, transparent 40%)',
+        padding: s(isMobile ? 24 : 48, scale),
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <div
         style={{
-          minHeight: '100dvh',
-          backgroundImage:
-            'linear-gradient(180deg, rgba(48,209,88,.08), rgba(11,12,12,0) 35%)',
-          backgroundColor: 'transparent',
-          padding: s(isMobile ? 20 : 40, scale),
+          width: '100%',
+          maxWidth: contentMaxWidth,
           display: 'flex',
-          justifyContent: 'center',
+          flexDirection: 'column',
           alignItems: 'center',
+          textAlign: 'center',
         }}
       >
-        <section
+        <motion.p
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
           style={{
-            width: '100%',
-            maxWidth: contentMaxWidth,
-            display: 'grid',
-            gridTemplateColumns: gridColumns,
-            gap: s(isMobile ? 32 : 64, scale),
-            alignItems: 'center',
+            margin: 0,
+            color: colors.limeGreen,
+            fontSize: s(fontSizes.caption, scale),
+            fontWeight: 800,
+            textTransform: 'uppercase',
+            letterSpacing: 3,
           }}
         >
-          {/* LEFT */}
-          <div>
-            <p
-              style={{
-                margin: 0,
-                color: colors.limeGreen,
-                fontSize: s(fontSizes.caption, scale),
-                fontWeight: 800,
-                textTransform: 'uppercase',
-                letterSpacing: 2,
-              }}
-            >
-              Mooscles
-            </p>
+          Mooscles
+        </motion.p>
 
-            <h1
-              style={{
-                marginTop: s(12, scale),
-                marginBottom: 0,
-                color: colors.text,
-                fontSize: s(
-                  isMobile ? fontSizes.heading1 : fontSizes.display,
-                  scale
-                ),
-                fontWeight: 800,
-                lineHeight: 1.05,
-                maxWidth: 550,
-              }}
-            >
-              Track your training without the clutter.
-            </h1>
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          style={{
+            marginTop: s(16, scale),
+            marginBottom: 0,
+            color: colors.text,
+            fontSize: s(
+              isMobile ? fontSizes.display : 52,
+              scale
+            ),
+            fontWeight: 800,
+            lineHeight: 1.05,
+            maxWidth: 640,
+          }}
+        >
+          Train hard.{' '}
+          <span style={{ color: colors.limeGreen }}>Track smart.</span>
+        </motion.h1>
 
-            <p
-              style={{
-                marginTop: s(20, scale),
-                color: colors.textMuted,
-                fontSize: s(
-                  isMobile ? fontSizes.bodySmall : fontSizes.body,
-                  scale
-                ),
-                lineHeight: 1.6,
-                maxWidth: 520,
-              }}
-            >
-              Mooscles keeps your workouts, weekly movement and progress in one
-              clean place. Spend less time tracking and more time training.
-            </p>
+        <motion.p
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.25 }}
+          style={{
+            marginTop: s(20, scale),
+            color: colors.textMuted,
+            fontSize: s(
+              isMobile ? fontSizes.bodySmall : fontSizes.body,
+              scale
+            ),
+            lineHeight: 1.6,
+            maxWidth: 480,
+          }}
+        >
+          Workouts, weekly movement, and progress — all in one place.
+          Less clutter, more training.
+        </motion.p>
 
-            <div
-              style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: s(14, scale),
-                marginTop: s(28, scale),
-              }}
-            >
-              <Link
-                href="/register"
-                style={{
-                  ...ctaStyle,
-                  background: colors.limeGreen,
-                  color: colors.bg,
-                }}
-              >
-                Create account
-              </Link>
-
-              <Link
-                href="/login"
-                style={{
-                  ...ctaStyle,
-                  color: colors.text,
-                  background: 'transparent',
-                }}
-              >
-                Sign in
-              </Link>
-            </div>
-
-            <div
-              style={{
-                marginTop: s(42, scale),
-                display: 'grid',
-                gap: s(18, scale),
-                maxWidth: 520,
-              }}
-            >
-              {highlights.map((item) => (
-                <div
-                  key={item.title}
-                  style={{
-                    borderTop: `1px solid ${colors.border}`,
-                    paddingTop: s(14, scale),
-                  }}
-                >
-                  <p
-                    style={{
-                      margin: 0,
-                      color: colors.text,
-                      fontWeight: 700,
-                      fontSize: s(fontSizes.bodySmall, scale),
-                    }}
-                  >
-                    {item.title}
-                  </p>
-
-                  <p
-                    style={{
-                      margin: `${s(4, scale)}px 0 0`,
-                      color: colors.textMuted,
-                      lineHeight: 1.5,
-                      fontSize: s(fontSizes.caption, scale),
-                    }}
-                  >
-                    {item.text}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* RIGHT */}
-          <div
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: s(12, scale),
+            marginTop: s(32, scale),
+            justifyContent: 'center',
+          }}
+        >
+          <Link
+            href="/register"
             style={{
-              display: 'flex',
-              justifyContent: 'center',
+              display: 'inline-flex',
               alignItems: 'center',
+              justifyContent: 'center',
+              height: s(52, scale),
+              padding: `0 ${s(28, scale)}px`,
+              borderRadius: s(16, scale),
+              background: colors.limeGreen,
+              color: colors.bg,
+              textDecoration: 'none',
+              fontSize: s(fontSizes.button, scale),
+              fontWeight: 700,
             }}
           >
-            <Image
-              src="/moosclesVector.png"
-              alt="Mooscles"
-              width={700}
-              height={700}
-              priority
+            Get started
+          </Link>
+          <Link
+            href="/login"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              height: s(52, scale),
+              padding: `0 ${s(28, scale)}px`,
+              borderRadius: s(16, scale),
+              border: `1px solid ${colors.border}`,
+              background: colors.componentsBg,
+              color: colors.text,
+              textDecoration: 'none',
+              fontSize: s(fontSizes.button, scale),
+              fontWeight: 600,
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+            }}
+          >
+            Sign in
+          </Link>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.55 }}
+          style={{
+            marginTop: s(isMobile ? 48 : 64, scale),
+            width: '100%',
+            display: 'grid',
+            gridTemplateColumns: isMobile
+              ? '1fr'
+              : 'repeat(3, 1fr)',
+            gap: s(14, scale),
+          }}
+        >
+          {features.map((feat, i) => (
+            <motion.div
+              key={feat.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.6 + i * 0.1 }}
               style={{
-                width: '100%',
-                maxWidth: isMobile ? 320 : isTablet ? 500 : 650,
-                height: 'auto',
-                objectFit: 'contain',
-                filter: 'drop-shadow(0 30px 70px rgba(48,209,88,.25))',
-                animation: 'float 5s ease-in-out infinite',
+                padding: s(20, scale),
+                borderRadius: s(18, scale),
+                border: `1px solid ${colors.border}`,
+                background: colors.componentsBg,
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                textAlign: 'left',
               }}
-            />
-          </div>
-        </section>
-      </main>
-
-      <style jsx global>{`
-        @keyframes float {
-          0%,
-          100% {
-            transform: translateY(0px);
-          }
-
-          50% {
-            transform: translateY(-14px);
-          }
-        }
-      `}</style>
-    </>
+            >
+              <span
+                style={{
+                  display: 'inline-block',
+                  color: colors.limeGreen,
+                  fontSize: s(fontSizes.caption, scale),
+                  fontWeight: 800,
+                  marginBottom: s(10, scale),
+                }}
+              >
+                {feat.icon}
+              </span>
+              <p
+                style={{
+                  margin: 0,
+                  color: colors.text,
+                  fontSize: s(fontSizes.body, scale),
+                  fontWeight: 700,
+                }}
+              >
+                {feat.title}
+              </p>
+              <p
+                style={{
+                  margin: `${s(6, scale)}px 0 0`,
+                  color: colors.textMuted,
+                  fontSize: s(fontSizes.bodySmall, scale),
+                  lineHeight: 1.5,
+                }}
+              >
+                {feat.text}
+              </p>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+    </main>
   );
 }

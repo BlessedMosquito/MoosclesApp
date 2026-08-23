@@ -136,11 +136,11 @@ export default function ProfilePage() {
       });
 
       setIsEditing(false);
+      setShowSuccess(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not save changes.');
     } finally {
       setIsLoading(false);
-      setShowSuccess(true);
     }
   }
 

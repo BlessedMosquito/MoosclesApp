@@ -4,7 +4,7 @@
 import { useEffect, useRef } from 'react';
 import { s, useResponsive } from '@/lib/useResponsive';
 import { colors } from '@/theme/colors';
-import CloseIcon from '../icons/CloseIcon';
+import CloseIcon from '../../icons/CloseIcon';
 import { fontSizes } from '@/theme/typography';
 
 type PopupWindowProps = {

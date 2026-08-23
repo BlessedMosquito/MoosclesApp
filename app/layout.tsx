@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import AppShell from '@/components/AppShell';
+import { ToastProvider } from '@/lib/toast-context';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -14,8 +15,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Mooscles',
-  description: 'Track your activity',
+  title: {
+    template: '%s | Mooscles',
+    default: 'Mooscles — Track Your Training',
+  },
+  description: 'Track your workouts, progress, and weekly goals.',
 };
 
 export default function RootLayout({
@@ -28,7 +32,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AppShell>{children}</AppShell>
+        <ToastProvider>
+          <AppShell>{children}</AppShell>
+        </ToastProvider>
       </body>
     </html>
   );

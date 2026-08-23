@@ -2,13 +2,12 @@
 
 import { useMemo, useState } from 'react';
 import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
-import PopupWindow from '@/components/ui/PopUpWindow';
+import PopupWindow from '@/components/ui/popups/PopUpWindow';
 import { s, useResponsive } from '@/lib/useResponsive';
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
 import { ReturnGetWorkoutsData } from '@/services/workouts';
 import ArrowIcon from '../icons/ArrowIcon';
-import { color } from 'motion';
 import Button from './Button';
 
 const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];

@@ -2,6 +2,7 @@
 
 import CalendarGrid from '@/components/ui/CalendarGrid';
 import ErrorPopUp from '@/components/ui/feedback/ErrorPopUp';
+import QuestionPopUp from '@/components/ui/popups/QuestionPopUp';
 import SectionDivider from '@/components/ui/SectionDivider';
 import WorkoutPreview from '@/components/ui/WorkoutPreview';
 import { s, useResponsive } from '@/lib/useResponsive';
@@ -13,7 +14,11 @@ import {
   getWorkoutMetrics,
   ReturnGetMetricsData,
 } from '@/services/workoutMetrics';
-import { getWorkouts, ReturnGetWorkoutsData } from '@/services/workouts';
+import {
+  getWorkouts,
+  completeWorkout,
+  ReturnGetWorkoutsData,
+} from '@/services/workouts';
 import { getWorkoutTypeGroup, WorkoutTypeGroup } from '@/services/workoutTypes';
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
@@ -43,6 +48,7 @@ export default function CalendarPage() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingPreviewData, setIsLoadingPreviewData] = useState(false);
+  const [showConfirmPopUp, setShowConfirmPopUp] = useState(false);
 
   const contentMaxWidth = isMobile ? '100%' : isTablet ? 760 : 980;
   const selectedWorkoutFromParams = searchParams.get('workoutId');
@@ -139,6 +145,26 @@ export default function CalendarPage() {
     );
   }
 
+  async function handleConfirmWorkout() {
+    if (!selectedWorkout) return;
+
+    try {
+      await completeWorkout({ workoutId: selectedWorkout.id });
+      setSelectedWorkout((prev) =>
+        prev ? { ...prev, completed_at: new Date().toISOString() } : null
+      );
+      setWorkouts((prev) =>
+        prev.map((w) =>
+          w.id === selectedWorkout.id
+            ? { ...w, completed_at: new Date().toISOString() }
+            : w
+        )
+      );
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not confirm workout.');
+    }
+  }
+
   function onWorkoutPreviewClose() {
     setSelectedWorkout(null);
     setSelectedWorkoutGroup(null);
@@ -195,11 +221,23 @@ export default function CalendarPage() {
             metrics={metrics}
             isLoading={isLoadingPreviewData}
             onEdit={goToAddWorkoutData}
+            onConfirm={() => setShowConfirmPopUp(true)}
             onClose={onWorkoutPreviewClose}
             previewRef={previewRef}
           />
         )}
       </div>
+
+      {showConfirmPopUp && (
+        <QuestionPopUp
+          text="Are you sure you want to complete this workout? You won't be able to edit it once completed."
+          onYes={() => {
+            setShowConfirmPopUp(false);
+            handleConfirmWorkout();
+          }}
+          onNo={() => setShowConfirmPopUp(false)}
+        />
+      )}
     </main>
   );
 }

@@ -48,3 +48,14 @@ export async function getExercisesByWorkout(
 
   return data ?? ([] as ReturnGetExercisesData[]);
 }
+
+export async function deleteExercise({ exerciseId }: { exerciseId: string }) {
+  const { error } = await supabase
+    .from('exercises')
+    .delete()
+    .eq('id', exerciseId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}
