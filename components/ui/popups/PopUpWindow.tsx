@@ -38,7 +38,7 @@ export default function PopupWindow({
         zIndex: 99,
         backdropFilter: 'blur(4px)',
         WebkitBackdropFilter: 'blur(4px)',
-        background: 'rgba(0,0,0,0.3)',
+        background: 'rgba(0,0,0,0.5)',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -53,12 +53,12 @@ export default function PopupWindow({
           maxWidth: s(320, scale),
           borderRadius: s(20, scale),
           border: `1px solid ${colors.border}`,
-          background: colors.bg,
+          background: colors.componentsBg,
           boxShadow: '0 16px 48px rgba(0,0,0,0.8)',
           padding: s(16, scale),
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'center', // wyśrodkowuje całą zawartość
+          alignItems: 'center',
         }}
       >
         {title && (

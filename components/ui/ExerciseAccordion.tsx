@@ -11,6 +11,9 @@ import { ReturnGetExercisesData } from '@/services/exercises';
 import { ReturnGetSetsData } from '@/services/sets';
 import { Mode } from '@/types/common';
 import Button from './Button';
+import DeleteIcon from '../icons/DeleteIcon';
+import PopupWindow from './popups/PopUpWindow';
+import { useState } from 'react';
 
 type SetDraft = {
   reps: string;
@@ -31,7 +34,9 @@ type ExerciseAccordionProps = {
     field: keyof SetDraft,
     value: string
   ) => void;
-  onAddSet: (exercise: ReturnGetExercisesData) => void;
+  onAddSet: (exercise: ReturnGetExercisesData) => void | Promise<void>;
+  onDeleteExercise?: () => void;
+  showDeletePopUp?: (setId: string, exerciseId: string) => void;
 };
 
 export default function ExerciseAccordion({
@@ -45,10 +50,29 @@ export default function ExerciseAccordion({
   onToggle,
   onDraftChange,
   onAddSet,
+  onDeleteExercise,
+  showDeletePopUp,
 }: ExerciseAccordionProps) {
   const { scale } = useResponsive();
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
 
   const exerciseId = String(exercise.id);
+
+  function handleAddClick() {
+    setIsPopupOpen(true);
+  }
+
+  async function handleConfirmAdd() {
+    if (isAdding) return;
+    setIsAdding(true);
+    try {
+      await onAddSet(exercise);
+    } finally {
+      setIsAdding(false);
+      setIsPopupOpen(false);
+    }
+  }
 
   return (
     <div
@@ -122,7 +146,7 @@ export default function ExerciseAccordion({
                 key={setItem.id}
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: 'auto 1fr 1fr',
+                  gridTemplateColumns: 'auto 1fr 1fr auto',
                   gap: s(10, scale),
                   alignItems: 'center',
                   padding: s(10, scale),
@@ -135,17 +159,31 @@ export default function ExerciseAccordion({
 
                 <span>{setItem.reps} reps</span>
                 <span>{setItem.weight} kg</span>
+                {mode !== 'PREVIEW' && showDeletePopUp && (
+                  <Button
+                    onClick={() =>
+                      showDeletePopUp(setItem.id.toString(), exerciseId)
+                    }
+                  >
+                    <DeleteIcon />
+                  </Button>
+                )}
               </div>
             ))
           )}
 
           {mode !== 'PREVIEW' && (
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr auto',
-                gap: s(15, scale),
-              }}
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <Button width={'3/4'} onClick={handleAddClick}>
+                {'Add set'}
+              </Button>
+            </div>
+          )}
+
+          {isPopupOpen && (
+            <PopupWindow
+              onClose={() => setIsPopupOpen(false)}
+              title="Add your set data set"
             >
               <input
                 inputMode="numeric"
@@ -155,6 +193,8 @@ export default function ExerciseAccordion({
                   onDraftChange(exerciseId, 'reps', e.target.value)
                 }
                 style={{
+                  width: '100%',
+                  boxSizing: 'border-box',
                   minWidth: 0,
                   padding: s(10, scale),
                   borderRadius: s(12, scale),
@@ -178,6 +218,8 @@ export default function ExerciseAccordion({
                   )
                 }
                 style={{
+                  width: '100%',
+                  boxSizing: 'border-box',
                   minWidth: 0,
                   padding: s(10, scale),
                   borderRadius: s(12, scale),
@@ -189,7 +231,25 @@ export default function ExerciseAccordion({
                 }}
               />
 
-              <Button onClick={() => onAddSet(exercise)}>{'Add'}</Button>
+              <Button
+                onClick={handleConfirmAdd}
+                width="full"
+                disabled={isAdding}
+              >
+                {isAdding ? <LoadingCircle size={18} /> : 'Add'}
+              </Button>
+            </PopupWindow>
+          )}
+
+          {mode !== 'PREVIEW' && isExpanded && onDeleteExercise && (
+            <div style={{ display: 'flex', justifyContent: 'center' }}>
+              <Button
+                onClick={onDeleteExercise}
+                width="3/4"
+                color={colors.red}
+              >
+                Delete exercise
+              </Button>
             </div>
           )}
         </div>

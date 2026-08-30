@@ -21,7 +21,6 @@ export default function LevelTile(userData: ReturnGetUserData) {
   useEffect(() => {
     const response = getLevelProgress(userData.experience);
     setLevelData(response);
-    console.log(userData);
   }, [userData.experience]);
 
   const circleSize = s(isMobile ? 92 : 108, scale);

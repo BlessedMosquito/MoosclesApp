@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { colors } from '@/theme/colors';
 import { s, useResponsive } from '@/lib/useResponsive';
 
@@ -9,7 +9,8 @@ type CircularProgressProps = {
   value: number;
   min: number;
   max: number;
-  unit?: string;
+  displayValue?: string;
+  rangeLabel?: string;
   size?: number;
   strokeWidth?: number;
 };
@@ -19,7 +20,8 @@ export default function CircularProgress({
   value,
   min,
   max,
-  unit = '',
+  displayValue,
+  rangeLabel,
   size,
   strokeWidth,
 }: CircularProgressProps) {
@@ -119,10 +121,8 @@ export default function CircularProgress({
               fontWeight: 700,
             }}
           >
-            {value}
+            {displayValue ?? value}
           </span>
-
-          <span style={{ color: colors.text }}>{unit}</span>
         </div>
       </div>
 
@@ -133,7 +133,7 @@ export default function CircularProgress({
           fontSize: s(12, scale),
         }}
       >
-        {min} – {max} {unit}
+        {rangeLabel ?? `${min} – ${max}`}
       </span>
     </div>
   );

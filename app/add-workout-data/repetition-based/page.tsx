@@ -11,7 +11,12 @@ import {
   getExercisesByWorkout,
   ReturnGetExercisesData,
 } from '@/services/exercises';
-import { addSets, getSetsByExercise, ReturnGetSetsData } from '@/services/sets';
+import {
+  addSets,
+  deleteSet,
+  getSetsByExercise,
+  ReturnGetSetsData,
+} from '@/services/sets';
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
 import { Mode } from '@/types/common';
@@ -53,6 +58,10 @@ export default function AddWorkoutDataRepetitionBased() {
   const [isAddingExercise, setIsAddingExercise] = useState(false);
   const [showDeletePopUp, setShowDeletePopUp] = useState(false);
   const [exerciseToDelete, setExerciseToDelete] = useState<string | null>(null);
+  const [setToDelete, setSetToDelete] = useState<string | null>(null);
+  const [setDeleteExerciseId, setSetDeleteExerciseId] = useState<string | null>(
+    null
+  );
   const [isLoading, setIsLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -126,13 +135,24 @@ export default function AddWorkoutDataRepetitionBased() {
     setIsAddingExercise(false);
   }
 
-  function beforeDeletePopUp(exercise: ReturnGetExercisesData) {
+  function beforeDeletePopUp({
+    exercise,
+    setId,
+    exerciseId,
+  }: {
+    exercise?: ReturnGetExercisesData;
+    setId?: string | null;
+    exerciseId?: string | null;
+  }) {
     setShowDeletePopUp(true);
-    setExerciseToDelete(exercise.id);
+    setExerciseToDelete(exercise ? exercise.id : null);
+    setSetToDelete(setId ?? null);
+    setSetDeleteExerciseId(exerciseId ?? null);
   }
 
   async function handleDeleteExercise() {
     try {
+      setError(null);
       if (!exerciseToDelete)
         throw new Error('No exercise selected for deletion.');
 
@@ -152,6 +172,27 @@ export default function AddWorkoutDataRepetitionBased() {
       setExerciseToDelete(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not delete exercise.');
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function handleDeleteSet() {
+    if (!setToDelete || !setDeleteExerciseId) return;
+
+    try {
+      setError(null);
+      setShowDeletePopUp(false);
+      setIsLoading(true);
+      await deleteSet(setToDelete);
+      setSetsByExercise((c) => ({
+        ...c,
+        [setDeleteExerciseId]: (c[setDeleteExerciseId] ?? []).filter(
+          (s) => s.id !== setToDelete
+        ),
+      }));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not delete set.');
     } finally {
       setIsLoading(false);
     }
@@ -337,17 +378,14 @@ export default function AddWorkoutDataRepetitionBased() {
                         onToggle={toggleExercise}
                         onDraftChange={updateSetDraft}
                         onAddSet={handleAddSet}
+                        onDeleteExercise={() =>
+                          beforeDeletePopUp({ exercise })
+                        }
+                        showDeletePopUp={(setId, exerciseId) =>
+                          beforeDeletePopUp({ setId, exerciseId })
+                        }
                       />
                     </div>
-
-                    {mode !== 'PREVIEW' && (
-                      <Button
-                        onClick={() => beforeDeletePopUp(exercise)}
-                        color={colors.red}
-                      >
-                        <DeleteIcon />
-                      </Button>
-                    )}
                   </div>
                 );
               })}
@@ -420,8 +458,12 @@ export default function AddWorkoutDataRepetitionBased() {
 
       {showDeletePopUp && (
         <QuestionPopUp
-          text="Do you really want to delete selected exercise?"
-          onYes={handleDeleteExercise}
+          text={
+            setToDelete
+              ? 'Do you really want to delete selected set?'
+              : 'Do you really want to delete selected exercise?'
+          }
+          onYes={setToDelete ? handleDeleteSet : handleDeleteExercise}
           onNo={() => setShowDeletePopUp(false)}
         />
       )}

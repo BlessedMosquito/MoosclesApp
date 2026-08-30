@@ -123,10 +123,7 @@ export default function AddWorkoutDataDuration() {
         userId: user.id,
       });
 
-      pendingNavRef.current =
-        workoutGroupType === 'DistanceDuration'
-          ? `/distance?workoutId=${workoutId}`
-          : `/dashboard`;
+      pendingNavRef.current = '/dashboard';
       setShowSuccess(true);
     } catch (saveError) {
       setError(
@@ -188,12 +185,16 @@ export default function AddWorkoutDataDuration() {
           onChange={setTime}
           disabled={false}
         />
-        <SectionDivider label="Distance" />
-        <DistanceInput
-          value={distance}
-          disabled={false}
-          onChange={setDistance}
-        />
+        {workoutGroupType === 'DistanceDuration' && (
+          <>
+            <SectionDivider label="Distance" />
+            <DistanceInput
+              value={distance}
+              disabled={false}
+              onChange={setDistance}
+            />
+          </>
+        )}
         <div style={{ marginTop: s(24, scale) }}>
           <Button
             onClick={handleAddWorkoutData}

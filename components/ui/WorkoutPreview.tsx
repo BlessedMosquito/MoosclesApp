@@ -178,7 +178,7 @@ export default function WorkoutPreview({
             fontSize: s(fontSizes.heading2, scale),
           }}
         >
-          {workout.name}
+          {`Name: ${workout.name}`}
         </h2>
         <button
           type="button"
@@ -205,7 +205,7 @@ export default function WorkoutPreview({
           fontSize: s(fontSizes.caption, scale),
         }}
       >
-        {workout.workout_types?.label ?? 'Workout'}
+        {`Workout type: ${workout.workout_types.label}`}
       </p>
 
       {error && (
@@ -248,7 +248,7 @@ export default function WorkoutPreview({
             <p
               style={{
                 margin: 0,
-                color: colors.textMuted,
+                color: colors.text,
                 fontSize: s(fontSizes.bodySmall, scale),
               }}
             >
@@ -292,7 +292,7 @@ export default function WorkoutPreview({
             <p
               style={{
                 margin: 0,
-                color: colors.textMuted,
+                color: colors.text,
                 fontSize: s(fontSizes.bodySmall, scale),
               }}
             >
@@ -328,7 +328,7 @@ export default function WorkoutPreview({
             <p
               style={{
                 margin: 0,
-                color: colors.textMuted,
+                color: colors.text,
                 fontSize: s(fontSizes.bodySmall, scale),
               }}
             >

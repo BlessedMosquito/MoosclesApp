@@ -8,6 +8,7 @@ import SuccessAnimation from '@/components/ui/feedback/SuccessAnimation';
 import WheelPicker from '@/components/ui/inputs/WheelPicker';
 import { s, useResponsive } from '@/lib/useResponsive';
 import { createWorkout } from '@/services/workouts';
+import { createClient } from '@/lib/supabase/client';
 import {
   getWorkoutTypeGroup,
   getWorkoutTypes,
@@ -22,6 +23,7 @@ import { useEffect, useRef, useState } from 'react';
 
 export default function AddWorkoutPage() {
   const router = useRouter();
+  const supabase = createClient();
   const { isMobile, isTablet, scale } = useResponsive();
 
   const [name, setName] = useState('');
@@ -70,7 +72,17 @@ export default function AddWorkoutPage() {
     setIsSaving(true);
 
     try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        setError('User not authenticated.');
+        return;
+      }
+
       const workout = await createWorkout({
+        userId: user.id,
         name: trimmedName,
         workoutType: selectedType.id,
         date: new Date(),

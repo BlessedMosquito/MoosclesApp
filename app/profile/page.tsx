@@ -48,43 +48,44 @@ export default function ProfilePage() {
   });
 
   useEffect(() => {
-    async function loadData() {
-      setIsLoading(true);
-
-      try {
-        const {
-          data: { user },
-          error,
-        } = await supabase.auth.getUser();
-
-        if (error || !user) {
-          setError(error?.message ?? 'User not found');
-          return;
-        }
-
-        const userData = await getUserData(user.id);
-        const formatedTime = formatDuration(
-          userData.weekly_duration_goal_minutes
-        );
-        setWeeklyDurationGoal({
-          hours: formatedTime.h,
-          minutes: formatedTime.m,
-        });
-        const formatedDistance = formatDistance(
-          userData.weekly_distance_goal_meters
-        );
-        setWeeklyDistanceGoal(formatedDistance);
-        setEmail(user.email ?? '');
-        setLogin(user.user_metadata?.login ?? '');
-      } catch (e) {
-        setError(e instanceof Error ? e.message : 'Could not load data.');
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
     loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [supabase.auth]);
+
+  async function loadData() {
+    setIsLoading(true);
+
+    try {
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser();
+
+      if (error || !user) {
+        setError(error?.message ?? 'User not found');
+        return;
+      }
+
+      const userData = await getUserData(user.id);
+      const formatedTime = formatDuration(
+        userData.weekly_duration_goal_minutes
+      );
+      setWeeklyDurationGoal({
+        hours: formatedTime.h,
+        minutes: formatedTime.m,
+      });
+      const formatedDistance = formatDistance(
+        userData.weekly_distance_goal_meters
+      );
+      setWeeklyDistanceGoal(formatedDistance);
+      setEmail(user.email ?? '');
+      setLogin(user.user_metadata?.login ?? '');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not load data.');
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   async function signOut() {
     setIsLoading(true);
@@ -142,6 +143,12 @@ export default function ProfilePage() {
     } finally {
       setIsLoading(false);
     }
+  }
+
+  function handleCancel() {
+    loadData();
+    setIsEditing(false);
+    setError(null);
   }
 
   const inputStyle: CSSProperties = {
@@ -249,8 +256,13 @@ export default function ProfilePage() {
             <input
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              style={inputStyle}
+              style={{
+                ...inputStyle,
+                cursor: 'not-allowed',
+                opacity: 0.75,
+              }}
               disabled={true}
+              readOnly
             />
 
             <SectionDivider label="Weekly Goals" />
@@ -286,10 +298,22 @@ export default function ProfilePage() {
                 {'Edit profile'}
               </Button>
             ) : (
-              <Button onClick={handleSave} width="3/4" align="center">
-                {<SaveIcon />}
-                {'Save changes'}
-              </Button>
+              <div
+                style={{
+                  display: 'flex',
+                  width: '100%',
+                  justifyContent: 'center',
+                  gap: s(12, scale),
+                }}
+              >
+                <Button onClick={handleSave} width="3/4" align="center">
+                  {<SaveIcon />}
+                  {'Save changes'}
+                </Button>
+                <Button onClick={handleCancel} width="3/4" align="center">
+                  {'Cancel'}
+                </Button>
+              </div>
             )}
           </div>
 

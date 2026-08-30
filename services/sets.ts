@@ -34,6 +34,14 @@ export async function addSets(props: AddSetsProperties) {
   return data;
 }
 
+export async function deleteSet(setId: number | string) {
+  const { error } = await supabase.from('sets').delete().eq('id', setId);
+
+  if (error) {
+    throw error;
+  }
+}
+
 export async function getSetsByExercise(
   exerciseId: string
 ): Promise<ReturnGetSetsData[]> {

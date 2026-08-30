@@ -49,25 +49,41 @@ export async function getWorkoutMetrics(
     .from('workout_metrics')
     .select('*')
     .filter('workout_id', 'eq', workoutId)
-    .single();
+    .maybeSingle();
 
   if (error) throw error;
 
   return data as ReturnGetMetricsData;
 }
 
-export async function getWeeklyDataSummary(props: GetWeeklyDataSummaryProps) {
+export async function getWeeklyDataSummary(
+  props: GetWeeklyDataSummaryProps
+): Promise<{ duration_minutes: number; distance_meters: number }> {
   const { start, end } = getWeekRange();
 
   const { data, error } = await supabase
     .from('workout_metrics')
-    .select('*')
+    .select('duration_minutes, distance_meters')
     .eq('user_id', props.userId)
     .gte('created_at', start.toISOString())
-    .lt('created_at', end.toISOString())
-    .maybeSingle();
+    .lt('created_at', end.toISOString());
 
   if (error) throw error;
 
-  return data;
+  if (!data || data.length === 0) {
+    return { duration_minutes: 0, distance_meters: 0 };
+  }
+
+  const rows = (data ?? []) as {
+    duration_minutes: number | null;
+    distance_meters: number | null;
+  }[];
+
+  return rows.reduce<{ duration_minutes: number; distance_meters: number }>(
+    (acc, row) => ({
+      duration_minutes: acc.duration_minutes + (row.duration_minutes ?? 0),
+      distance_meters: acc.distance_meters + (row.distance_meters ?? 0),
+    }),
+    { duration_minutes: 0, distance_meters: 0 }
+  );
 }

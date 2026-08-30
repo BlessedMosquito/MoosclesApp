@@ -59,6 +59,8 @@ export default function ErrorPopUp({ children, onClose }: ErrorPopUpProps) {
             transformOrigin: 'center',
             overflow: 'hidden',
             minHeight: s(48, scale),
+            whiteSpace: 'pre-line',
+            textAlign: 'left',
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between' }}>

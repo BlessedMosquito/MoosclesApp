@@ -70,7 +70,7 @@ export default function DistanceInput({
           onChange={(e) =>
             onChange({
               ...value,
-              km: Math.max(0, Number(e.target.value) || 0),
+              km: Math.min(Math.max(0, Number(e.target.value) || 0), 999),
             })
           }
           onBlur={(e) => {
@@ -111,7 +111,10 @@ export default function DistanceInput({
           value={value.m === 0 ? '' : value.m}
           placeholder="0"
           onChange={(e) => {
-            const meters = Math.max(0, Number(e.target.value) || 0);
+            const meters = Math.min(
+              Math.max(0, Number(e.target.value) || 0),
+              999
+            );
 
             onChange({
               km: value.km + Math.floor(meters / 1000),

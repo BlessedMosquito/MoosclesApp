@@ -7,6 +7,7 @@ import WeeklyWorkoutTile from '@/components/ui/tiles/WeeklyWorkoutTile';
 import { createClient } from '@/lib/supabase/client';
 import { s, useResponsive } from '@/lib/useResponsive';
 import { getUserData, ReturnGetUserData } from '@/services/userData';
+import { getWorkoutDaysForWeek } from '@/services/workouts';
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
 import { useEffect, useState } from 'react';
@@ -20,6 +21,10 @@ export default function DashboardPage() {
     weekly_distance_goal_meters: 0,
     weekly_duration_goal_minutes: 0,
   });
+  const [userId, setUserId] = useState<string | null>(null);
+  const [workoutDays, setWorkoutDays] = useState<Record<string, boolean>>({});
+  const [workoutCount, setWorkoutCount] = useState(0);
+  const [activeWeeks, setActiveWeeks] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [isLoadingUserData, setIsLoadingUserData] = useState(true);
 
@@ -49,8 +54,19 @@ export default function DashboardPage() {
         return;
       }
 
-      const data = await getUserData(user.id);
+      setUserId(user.id);
+
+      const [data, weekData] = await Promise.all([
+        getUserData(user.id),
+        getWorkoutDaysForWeek(user.id),
+      ]);
       setUserData(data);
+
+      const mapped: Record<string, boolean> = {};
+      for (const d of weekData.workout_days) mapped[d.date] = true;
+      setWorkoutDays(mapped);
+      setWorkoutCount(weekData.workout_count);
+      setActiveWeeks(weekData.active_weeks);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not load data.');
     } finally {
@@ -125,7 +141,13 @@ export default function DashboardPage() {
           }}
         >
           <div style={{ gridColumn: isMobile ? 'auto' : 1 }}>
-            <WeeklyWorkoutDataTile {...userData} />
+            {userId && (
+              <WeeklyWorkoutDataTile
+                weekly_distance_goal_meters={userData.weekly_distance_goal_meters}
+                weekly_duration_goal_minutes={userData.weekly_duration_goal_minutes}
+                userId={userId}
+              />
+            )}
           </div>
           <div style={{ gridColumn: isMobile ? 'auto' : 2 }}>
             <LevelTile {...userData} />
@@ -136,7 +158,11 @@ export default function DashboardPage() {
               justifySelf: isMobile ? 'stretch' : 'start',
             }}
           >
-            <WeeklyWorkoutTile workoutDays={{}} />
+            <WeeklyWorkoutTile
+              workoutDays={workoutDays}
+              workoutsThisWeek={workoutCount}
+              activeWeeks={activeWeeks}
+            />
           </div>
         </div>
       )}

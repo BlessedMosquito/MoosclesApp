@@ -31,7 +31,7 @@ export default function TimeInput({
     }
 
     if (key === 'hours') {
-      numberValue = Math.max(numberValue, 0);
+      numberValue = Math.min(Math.max(numberValue, 0), 23);
     }
 
     onChange({

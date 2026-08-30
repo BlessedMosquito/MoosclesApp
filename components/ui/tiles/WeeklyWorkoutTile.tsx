@@ -5,13 +5,17 @@ import { s, useResponsive } from '@/lib/useResponsive';
 import Tile from './Tile';
 
 type Props = {
-  workoutDays: Record<string, boolean>; // "YYYY-MM-DD": true
+  workoutDays: Record<string, boolean>;
   workoutsThisWeek?: number;
-  weekDates?: Date[]; // 7 dni tygodnia
+  activeWeeks?: number;
+  weekDates?: Date[];
 };
 
 function toKey(date: Date) {
-  return date.toISOString().split('T')[0];
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
 }
 
 function getCurrentWeekDates() {
@@ -34,6 +38,7 @@ const weekdays = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 export default function WeeklyStreakTile({
   workoutDays,
   workoutsThisWeek = Object.values(workoutDays).filter(Boolean).length,
+  activeWeeks = 0,
   weekDates = getCurrentWeekDates(),
 }: Props) {
   const { isMobile, scale } = useResponsive();
@@ -132,6 +137,22 @@ export default function WeeklyStreakTile({
           );
         })}
       </div>
+
+      <p
+        style={{
+          margin: 0,
+          fontSize: s(isMobile ? 9 : 11, scale),
+          color: colors.textMuted,
+          textAlign: 'center',
+          marginTop: s(8, scale),
+        }}
+      >
+        You have{' '}
+        <span style={{ color: colors.limeGreen, fontWeight: 700 }}>
+          {activeWeeks} {activeWeeks === 1 ? 'week' : 'weeks'}
+        </span>{' '}
+        streak with at least one day spent working out
+      </p>
     </Tile>
   );
 }

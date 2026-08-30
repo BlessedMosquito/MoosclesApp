@@ -18,13 +18,17 @@ import {
   getWorkouts,
   completeWorkout,
   ReturnGetWorkoutsData,
+  CompleteWorkoutResult,
 } from '@/services/workouts';
+import { getUserData, ReturnGetUserData } from '@/services/userData';
+import ExperienceSummaryPopUp from '@/components/ui/popups/ExperienceSummaryPopUp';
 import { getWorkoutTypeGroup, WorkoutTypeGroup } from '@/services/workoutTypes';
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
 import { Mode } from '@/types/common';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
 
 function getWorkoutDateKey(workoutDate: string) {
   if (/^\d{4}-\d{2}-\d{2}$/.test(workoutDate)) return workoutDate;
@@ -37,6 +41,7 @@ export default function CalendarPage() {
   const searchParams = useSearchParams();
   const { isMobile, isTablet, scale } = useResponsive();
   const previewRef = useRef<HTMLElement>(null);
+  const supabase = createClient();
 
   const [workouts, setWorkouts] = useState<ReturnGetWorkoutsData[]>([]);
   const [selectedWorkout, setSelectedWorkout] =
@@ -49,6 +54,10 @@ export default function CalendarPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingPreviewData, setIsLoadingPreviewData] = useState(false);
   const [showConfirmPopUp, setShowConfirmPopUp] = useState(false);
+  const [userData, setUserData] = useState<ReturnGetUserData | null>(null);
+  const [expResult, setExpResult] = useState<CompleteWorkoutResult | null>(
+    null
+  );
 
   const contentMaxWidth = isMobile ? '100%' : isTablet ? 760 : 980;
   const selectedWorkoutFromParams = searchParams.get('workoutId');
@@ -69,8 +78,17 @@ export default function CalendarPage() {
       setIsLoading(true);
       setError(null);
       try {
-        const data = await getWorkouts();
-        setWorkouts(data as ReturnGetWorkoutsData[]);
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user) {
+          setError('User not authenticated.');
+          return;
+        }
+
+        setUserData(await getUserData(user.id));
+        setWorkouts(await getWorkouts({ userId: user.id }));
       } catch (e) {
         setError(e instanceof Error ? e.message : 'Could not load workouts.');
       } finally {
@@ -149,7 +167,8 @@ export default function CalendarPage() {
     if (!selectedWorkout) return;
 
     try {
-      await completeWorkout({ workoutId: selectedWorkout.id });
+      const result = await completeWorkout({ workoutId: selectedWorkout.id });
+      setExpResult(result);
       setSelectedWorkout((prev) =>
         prev ? { ...prev, completed_at: new Date().toISOString() } : null
       );
@@ -236,6 +255,15 @@ export default function CalendarPage() {
             handleConfirmWorkout();
           }}
           onNo={() => setShowConfirmPopUp(false)}
+        />
+      )}
+
+      {expResult && userData && selectedWorkoutGroup && (
+        <ExperienceSummaryPopUp
+          previousExp={userData.experience}
+          result={expResult}
+          workoutGroup={selectedWorkoutGroup}
+          onClose={() => setExpResult(null)}
         />
       )}
     </main>

@@ -3,6 +3,7 @@
 import { CSSProperties } from 'react';
 import { s, useResponsive } from '@/lib/useResponsive';
 import { colors } from '@/theme/colors';
+import { motion } from 'motion/react';
 
 type LoadingCircleProps = {
   size?: number;
@@ -15,21 +16,43 @@ export default function LoadingCircle({
 }: LoadingCircleProps) {
   const { scale } = useResponsive();
   const scaledSize = s(size, scale);
+  const scaledStroke = Math.max(s(3, scale), 3);
 
   return (
-    <span
+    <motion.span
       aria-label="Loading"
       role="status"
+      initial={{ rotate: 0, opacity: 1 }}
+      animate={{ rotate: 360 }}
+      transition={{ repeat: Infinity, duration: 0.8, ease: 'linear' }}
       style={{
+        position: 'relative',
         width: scaledSize,
         height: scaledSize,
-        borderRadius: '50%',
-        border: `${Math.max(s(2, scale), 2)}px solid ${colors.limeGreen}`,
-        borderTopColor: colors.text,
         display: 'inline-block',
-        animation: 'loading-circle-spin 700ms linear infinite',
         ...style,
       }}
-    />
+    >
+      <motion.span
+        style={{
+          position: 'absolute',
+          inset: 0,
+          borderRadius: '50%',
+          border: `${scaledStroke}px solid ${colors.border}`,
+        }}
+      />
+      <motion.span
+        style={{
+          position: 'absolute',
+          inset: 0,
+          borderRadius: '50%',
+          border: `${scaledStroke}px solid transparent`,
+          borderTopColor: colors.limeGreen,
+          borderRightColor: colors.limeGreen,
+        }}
+        animate={{ rotate: 360 }}
+        transition={{ repeat: Infinity, duration: 0.8, ease: 'linear' }}
+      />
+    </motion.span>
   );
 }
