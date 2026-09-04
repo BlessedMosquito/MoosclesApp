@@ -22,7 +22,6 @@ import { fontSizes } from '@/theme/typography';
 import { Mode } from '@/types/common';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import DeleteIcon from '@/components/icons/DeleteIcon';
 import QuestionPopUp from '@/components/ui/popups/QuestionPopUp';
 import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
 

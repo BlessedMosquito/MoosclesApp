@@ -3,6 +3,7 @@
 import { s, useResponsive } from '@/lib/useResponsive';
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
+import NumericInput from './NumericInput';
 
 type TimeInputProps = {
   hours: number;
@@ -17,40 +18,7 @@ export default function TimeInput({
   disabled,
   onChange,
 }: TimeInputProps) {
-  const { scale, isMobile } = useResponsive();
-
-  function updateValue(key: 'hours' | 'minutes', value: string) {
-    let numberValue = Number(value);
-
-    if (Number.isNaN(numberValue)) {
-      numberValue = 0;
-    }
-
-    if (key === 'minutes') {
-      numberValue = Math.min(Math.max(numberValue, 0), 59);
-    }
-
-    if (key === 'hours') {
-      numberValue = Math.min(Math.max(numberValue, 0), 23);
-    }
-
-    onChange({
-      hours: key === 'hours' ? numberValue : hours,
-      minutes: key === 'minutes' ? numberValue : minutes,
-    });
-  }
-
-  const inputStyle = {
-    width: s(isMobile ? 70 : 100, scale),
-    padding: s(12, scale),
-    textAlign: 'center' as const,
-    borderRadius: s(14, scale),
-    border: `1px solid ${colors.border}`,
-    background: colors.componentsBg,
-    color: colors.text,
-    fontSize: Math.max(s(fontSizes.input, scale), 16),
-    outline: 'none',
-  };
+  const { scale } = useResponsive();
 
   return (
     <div
@@ -58,39 +26,21 @@ export default function TimeInput({
         display: 'flex',
         alignItems: 'flex-end',
         justifyContent: 'center',
-        gap: s(8, scale),
+        gap: 8,
       }}
     >
-      {/* HOURS */}
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: s(6, scale),
-        }}
-      >
-        <span
-          style={{
-            color: colors.text,
-            fontSize: s(fontSizes.caption, scale),
-            fontWeight: 700,
-          }}
-        >
-          Hours
-        </span>
+      <NumericInput
+        label="Hours"
+        value={hours}
+        min={0}
+        max={23}
+        placeholder="0"
+        width={100}
+        mobileWidth={70}
+        disabled={disabled}
+        onChange={(h) => onChange({ hours: h, minutes })}
+      />
 
-        <input
-          inputMode="numeric"
-          min={0}
-          value={String(hours).padStart(1, '0')}
-          onChange={(e) => updateValue('hours', e.target.value)}
-          style={inputStyle}
-          disabled={disabled}
-        />
-      </div>
-
-      {/* COLON */}
       <span
         style={{
           color: colors.text,
@@ -102,35 +52,17 @@ export default function TimeInput({
         :
       </span>
 
-      {/* MINUTES */}
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: s(6, scale),
-        }}
-      >
-        <span
-          style={{
-            color: colors.text,
-            fontSize: s(fontSizes.caption, scale),
-            fontWeight: 700,
-          }}
-        >
-          Minutes
-        </span>
-
-        <input
-          inputMode="numeric"
-          min={0}
-          max={59}
-          value={String(minutes).padStart(1, '0')}
-          onChange={(e) => updateValue('minutes', e.target.value)}
-          style={inputStyle}
-          disabled={disabled}
-        />
-      </div>
+      <NumericInput
+        label="Minutes"
+        value={minutes}
+        min={0}
+        max={59}
+        placeholder="0"
+        width={100}
+        mobileWidth={70}
+        disabled={disabled}
+        onChange={(m) => onChange({ hours, minutes: m })}
+      />
     </div>
   );
 }

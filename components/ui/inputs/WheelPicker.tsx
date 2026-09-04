@@ -55,7 +55,7 @@ export default function WheelPicker({
   }, [value, length]);
 
   // drag state
-  const dragging = useRef(false);
+  const [dragging, setDragging] = useState(false);
   const startY = useRef(0);
   const startOffset = useRef(0);
   const lastY = useRef(0);
@@ -120,7 +120,7 @@ export default function WheelPicker({
   function onPointerDown(e: React.PointerEvent) {
     cancelAnimationFrame(rafId.current);
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-    dragging.current = true;
+    setDragging(true);
     startY.current = e.clientY;
     startOffset.current = offsetRef.current;
     lastY.current = e.clientY;
@@ -129,7 +129,7 @@ export default function WheelPicker({
   }
 
   function onPointerMove(e: React.PointerEvent) {
-    if (!dragging.current) return;
+    if (!dragging) return;
     const now = performance.now();
     const dt = now - lastT.current;
     const dyStep = (lastY.current - e.clientY) / ITEM_H;
@@ -148,8 +148,8 @@ export default function WheelPicker({
   }
 
   function onPointerUp() {
-    if (!dragging.current) return;
-    dragging.current = false;
+    if (!dragging) return;
+    setDragging(false);
 
     // przelicz velocity na "kroki / klatkę" (60fps ~ 16.6ms)
     const v = velocity.current * 16;
@@ -182,10 +182,8 @@ export default function WheelPicker({
 
     el.addEventListener('wheel', handleWheel, { passive: false });
     return () => el.removeEventListener('wheel', handleWheel);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [length]);
-
-  const displayValue = mod(Math.round(renderOffset), length);
-  const fraction = renderOffset - Math.round(renderOffset); // -0.5..0.5 dla płynnego highlightu pozycji
 
   // zbuduj okno widocznych elementów (center ± visibleRows) niezależnie od length — daje pętlę
   const halfVisible = Math.ceil(visibleRows / 2) + 1;
@@ -244,7 +242,7 @@ export default function WheelPicker({
           overflow: 'hidden',
           userSelect: 'none',
           touchAction: 'none',
-          cursor: dragging.current ? 'grabbing' : 'grab',
+          cursor: dragging ? 'grabbing' : 'grab',
         }}
       >
         {/* highlight */}

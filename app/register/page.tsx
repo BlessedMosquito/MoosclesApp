@@ -29,9 +29,10 @@ export default function RegisterPage() {
       }
     }
     checkSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
 
-  const [username, setUsername] = useState('');
+  const [firstName, setFirstName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [repeatedPassword, setRepeatedPassword] = useState('');
@@ -52,16 +53,12 @@ export default function RegisterPage() {
     }
   }
 
-  function onBlurUsername() {
-    //
-  }
-
   async function signUp() {
     setAuthError(null);
-    const trimmedUsername = username.trim();
+    const trimmedFirstName = firstName.trim();
 
-    if (!trimmedUsername) {
-      setAuthError('Username is required.');
+    if (!trimmedFirstName) {
+      setAuthError('First name is required.');
       return;
     }
 
@@ -97,7 +94,7 @@ export default function RegisterPage() {
       password,
       options: {
         data: {
-          username: trimmedUsername,
+          first_name: trimmedFirstName,
         },
       },
     });
@@ -117,10 +114,10 @@ export default function RegisterPage() {
 
       <input
         type="text"
-        autoComplete="username"
-        placeholder="Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
+        autoComplete="given-name"
+        placeholder="First name"
+        value={firstName}
+        onChange={(e) => setFirstName(e.target.value)}
         disabled={isLoading}
         style={{
           padding: 12,

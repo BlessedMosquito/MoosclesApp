@@ -4,6 +4,7 @@ import { KeyboardEvent, ReactNode, useRef } from 'react';
 import { s, useResponsive } from '@/lib/useResponsive';
 import { fontSizes } from '@/theme/typography';
 import { colors } from '@/theme/colors';
+import { motion } from 'motion/react';
 
 type TileProps = {
   title?: string;
@@ -39,12 +40,22 @@ export default function Tile({
   }
 
   return (
-    <div
+    <motion.div
       ref={tileRef}
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
       onClick={onClick}
       onKeyDown={handleKeyDown}
+      whileHover={{
+        scale: 0.97,
+      }}
+      whileTap={{
+        scale: 0.95,
+      }}
+      transition={{
+        duration: 0.2,
+        ease: [0.4, 0, 0.2, 1],
+      }}
       style={{
         width: finalWidth,
         height: finalHeight,
@@ -109,6 +120,6 @@ export default function Tile({
       >
         {children}
       </div>
-    </div>
+    </motion.div>
   );
 }

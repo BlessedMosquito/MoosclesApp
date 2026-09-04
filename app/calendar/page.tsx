@@ -96,6 +96,7 @@ export default function CalendarPage() {
       }
     }
     loadWorkouts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -226,7 +227,6 @@ export default function CalendarPage() {
 
         <CalendarGrid
           workoutsByDay={workoutsByDay}
-          selectedWorkout={selectedWorkout}
           isLoading={isLoading}
           onSelectWorkout={openWorkout}
           onClosePreview={onWorkoutPreviewClose}

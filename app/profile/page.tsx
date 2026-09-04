@@ -37,7 +37,7 @@ export default function ProfilePage() {
   const [error, setError] = useState<string | null>(null);
 
   const [email, setEmail] = useState('');
-  const [login, setLogin] = useState('');
+  const [firstName, setFirstName] = useState('');
   const [weeklyDurationGoal, setWeeklyDurationGoal] = useState({
     hours: 0,
     minutes: 0,
@@ -79,7 +79,7 @@ export default function ProfilePage() {
       );
       setWeeklyDistanceGoal(formatedDistance);
       setEmail(user.email ?? '');
-      setLogin(user.user_metadata?.login ?? '');
+      setFirstName(user.user_metadata?.first_name ?? '');
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not load data.');
     } finally {
@@ -118,7 +118,7 @@ export default function ProfilePage() {
         return;
       }
       const { error } = await supabase.auth.updateUser({
-        data: { login },
+        data: { first_name: firstName },
       });
 
       if (error) {
@@ -242,11 +242,11 @@ export default function ProfilePage() {
               fontSize: s(fontSizes.caption, scale),
             }}
           >
-            <SectionDivider label="Login" />
+            <SectionDivider label="Name" />
 
             <input
-              value={login}
-              onChange={(e) => setLogin(e.target.value)}
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
               style={inputStyle}
               disabled={!isEditing}
             />

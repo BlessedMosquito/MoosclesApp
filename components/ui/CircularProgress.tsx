@@ -27,10 +27,10 @@ export default function CircularProgress({
 }: CircularProgressProps) {
   const { scale, isMobile, isTablet } = useResponsive();
 
-  const defaultSize = isMobile ? 90 : isTablet ? 180 : 220;
+  const defaultSize = isMobile ? 100 : isTablet ? 180 : 220;
 
   const finalSize = s(size ?? defaultSize, scale);
-  const finalStrokeWidth = s(strokeWidth ?? 10, scale);
+  const finalStrokeWidth = s(strokeWidth ?? 6, scale);
 
   const radius = (finalSize - finalStrokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
@@ -46,7 +46,7 @@ export default function CircularProgress({
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: s(10, scale),
+        gap: s(6, scale),
       }}
     >
       {/* TITLE */}

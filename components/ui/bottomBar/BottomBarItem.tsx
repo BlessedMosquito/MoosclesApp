@@ -2,7 +2,6 @@
 
 import { motion, AnimatePresence } from 'motion/react';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
 import { colors } from '@/theme/colors';
 
 type BottomBarItemProps = {
@@ -18,13 +17,7 @@ export default function BottomBarItem({
 }: BottomBarItemProps) {
   const pathname = usePathname();
 
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const isActive = mounted && pathname === activePath;
+  const isActive = pathname === activePath;
 
   return (
     <motion.button

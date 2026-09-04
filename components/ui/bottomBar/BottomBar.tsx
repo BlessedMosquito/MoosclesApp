@@ -1,6 +1,3 @@
-import { colors } from '@/theme/colors';
-import { motion } from 'motion/react';
-
 export default function BottomBar({ children }: { children: React.ReactNode }) {
   return (
     <nav

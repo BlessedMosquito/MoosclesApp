@@ -4,6 +4,7 @@ import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
 import LevelTile from '@/components/ui/tiles/LevelTile';
 import WeeklyWorkoutDataTile from '@/components/ui/tiles/WeeklyWorkoutDataTile';
 import WeeklyWorkoutTile from '@/components/ui/tiles/WeeklyWorkoutTile';
+import ErrorPopUp from '@/components/ui/feedback/ErrorPopUp';
 import { createClient } from '@/lib/supabase/client';
 import { s, useResponsive } from '@/lib/useResponsive';
 import { getUserData, ReturnGetUserData } from '@/services/userData';
@@ -27,6 +28,7 @@ export default function DashboardPage() {
   const [activeWeeks, setActiveWeeks] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [isLoadingUserData, setIsLoadingUserData] = useState(true);
+  const [firstName, setFirstName] = useState<string | null>(null);
 
   const gridGap = s(isMobile ? 14 : 24, scale);
   const leftColumnWidth = s(600, scale);
@@ -38,10 +40,6 @@ export default function DashboardPage() {
   const gridColumns = isMobile
     ? '1fr'
     : `${leftColumnWidth}px ${rightColumnWidth}px`;
-
-  useEffect(() => {
-    loadUserData();
-  }, []);
 
   async function loadUserData() {
     try {
@@ -55,6 +53,7 @@ export default function DashboardPage() {
       }
 
       setUserId(user.id);
+      setFirstName(user.user_metadata?.first_name ?? null);
 
       const [data, weekData] = await Promise.all([
         getUserData(user.id),
@@ -73,6 +72,12 @@ export default function DashboardPage() {
       setIsLoadingUserData(false);
     }
   }
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadUserData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <main
@@ -111,9 +116,11 @@ export default function DashboardPage() {
             fontWeight: 700,
           }}
         >
-          Welcome back
+          {`Welcome back ${firstName ?? ''}`}
         </h1>
       </div>
+
+      {error && <ErrorPopUp onClose={() => setError(null)}>{error}</ErrorPopUp>}
 
       {/* GRID */}
       {isLoadingUserData ? (
@@ -143,8 +150,12 @@ export default function DashboardPage() {
           <div style={{ gridColumn: isMobile ? 'auto' : 1 }}>
             {userId && (
               <WeeklyWorkoutDataTile
-                weekly_distance_goal_meters={userData.weekly_distance_goal_meters}
-                weekly_duration_goal_minutes={userData.weekly_duration_goal_minutes}
+                weekly_distance_goal_meters={
+                  userData.weekly_distance_goal_meters
+                }
+                weekly_duration_goal_minutes={
+                  userData.weekly_duration_goal_minutes
+                }
                 userId={userId}
               />
             )}

@@ -1,8 +1,6 @@
 'use client';
 
-import { s, useResponsive } from '@/lib/useResponsive';
-import { colors } from '@/theme/colors';
-import { fontSizes } from '@/theme/typography';
+import NumericInput from './NumericInput';
 
 type Distance = {
   km: number;
@@ -20,119 +18,38 @@ export default function DistanceInput({
   disabled,
   onChange,
 }: DistanceInputProps) {
-  const { scale, isMobile } = useResponsive();
-
-  const inputStyle = {
-    width: s(isMobile ? 90 : 120, scale),
-    padding: s(12, scale),
-    textAlign: 'center' as const,
-    borderRadius: s(14, scale),
-    border: `1px solid ${colors.border}`,
-    background: colors.componentsBg,
-    color: colors.text,
-    fontSize: Math.max(s(fontSizes.input, scale), 16),
-    outline: 'none',
-  };
-
   return (
     <div
       style={{
         display: 'flex',
         alignItems: 'flex-end',
         justifyContent: 'center',
-        gap: s(16, scale),
+        gap: 16,
       }}
     >
-      {/* Kilometers */}
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: s(6, scale),
-        }}
-      >
-        <span
-          style={{
-            color: colors.text,
-            fontSize: s(fontSizes.caption, scale),
-            fontWeight: 700,
-          }}
-        >
-          Kilometers
-        </span>
+      <NumericInput
+        label="Kilometers"
+        value={value.km}
+        min={0}
+        max={999}
+        placeholder="0"
+        width={120}
+        mobileWidth={90}
+        disabled={disabled}
+        onChange={(km) => onChange({ ...value, km })}
+      />
 
-        <input
-          inputMode="numeric"
-          min={0}
-          value={value.km === 0 ? '' : value.km}
-          placeholder="0"
-          onChange={(e) =>
-            onChange({
-              ...value,
-              km: Math.min(Math.max(0, Number(e.target.value) || 0), 999),
-            })
-          }
-          onBlur={(e) => {
-            if (e.target.value === '') {
-              onChange({
-                ...value,
-                km: 0,
-              });
-            }
-          }}
-          style={inputStyle}
-          disabled={disabled}
-        />
-      </div>
-
-      {/* Meters */}
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: s(6, scale),
-        }}
-      >
-        <span
-          style={{
-            color: colors.text,
-            fontSize: s(fontSizes.caption, scale),
-            fontWeight: 700,
-          }}
-        >
-          Meters
-        </span>
-
-        <input
-          inputMode="numeric"
-          min={0}
-          value={value.m === 0 ? '' : value.m}
-          placeholder="0"
-          onChange={(e) => {
-            const meters = Math.min(
-              Math.max(0, Number(e.target.value) || 0),
-              999
-            );
-
-            onChange({
-              km: value.km + Math.floor(meters / 1000),
-              m: meters % 1000,
-            });
-          }}
-          onBlur={(e) => {
-            if (e.target.value === '') {
-              onChange({
-                ...value,
-                m: 0,
-              });
-            }
-          }}
-          style={inputStyle}
-          disabled={disabled}
-        />
-      </div>
+      <NumericInput
+        label="Meters"
+        value={value.m}
+        min={0}
+        max={999}
+        placeholder="0"
+        width={120}
+        mobileWidth={90}
+        disabled={disabled}
+        onChange={(m) => onChange({ ...value, m })}
+      />
     </div>
   );
 }

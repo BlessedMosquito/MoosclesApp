@@ -1,7 +1,6 @@
 'use client';
 
 import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
-import AddIcon from '@/components/icons/AddIcon';
 import CloseIcon from '@/components/icons/CloseIcon';
 import DropDownIcon from '@/components/icons/DropDownIcon';
 import { s, useResponsive } from '@/lib/useResponsive';
@@ -13,6 +12,7 @@ import { Mode } from '@/types/common';
 import Button from './Button';
 import DeleteIcon from '../icons/DeleteIcon';
 import PopupWindow from './popups/PopUpWindow';
+import NumericInput from './inputs/NumericInput';
 import { useState } from 'react';
 
 type SetDraft = {
@@ -183,27 +183,16 @@ export default function ExerciseAccordion({
           {isPopupOpen && (
             <PopupWindow
               onClose={() => setIsPopupOpen(false)}
-              title="Add your set data set"
+              title="Add data to your set"
             >
-              <input
-                inputMode="numeric"
+              <NumericInput
+                value={Number(setDraft.reps) || 0}
+                min={0}
+                max={999}
                 placeholder="Reps"
-                value={setDraft.reps}
-                onChange={(e) =>
-                  onDraftChange(exerciseId, 'reps', e.target.value)
+                onChange={(value) =>
+                  onDraftChange(exerciseId, 'reps', String(value))
                 }
-                style={{
-                  width: '100%',
-                  boxSizing: 'border-box',
-                  minWidth: 0,
-                  padding: s(10, scale),
-                  borderRadius: s(12, scale),
-                  border: `1px solid ${colors.border}`,
-                  background: colors.componentsBg,
-                  color: colors.text,
-                  fontSize: fontSizes.body,
-                  outline: 'none',
-                }}
               />
 
               <input
@@ -243,11 +232,7 @@ export default function ExerciseAccordion({
 
           {mode !== 'PREVIEW' && isExpanded && onDeleteExercise && (
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <Button
-                onClick={onDeleteExercise}
-                width="3/4"
-                color={colors.red}
-              >
+              <Button onClick={onDeleteExercise} width="3/4" color={colors.red}>
                 Delete exercise
               </Button>
             </div>

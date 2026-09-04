@@ -4,7 +4,7 @@ import {
 } from '@/app/constants/iconsConstants';
 import { IconProps } from '@/types/common';
 
-export default function ({
+export default function ArrowIcon({
   size = commonIconSize,
   color = commmonIconColor,
 }: IconProps) {

@@ -4,25 +4,12 @@ import { colors } from '@/theme/colors';
 import ProgressBar from '../ProgressBar';
 import { fontSizes } from '@/theme/typography';
 import { ReturnGetUserData } from '@/services/userData';
-import { useEffect, useState } from 'react';
-import { getLevelProgress, GetLevelProgressType } from '@/lib/helpers';
+import { getLevelProgress } from '@/lib/helpers';
 
 export default function LevelTile(userData: ReturnGetUserData) {
   const { isMobile, scale } = useResponsive();
 
-  const [levelData, setLevelData] = useState<GetLevelProgressType>({
-    level: 0,
-    currentExp: 0,
-    currentLevelExp: 0,
-    nextLevelExp: 0,
-    progress: 0,
-  });
-
-  useEffect(() => {
-    const response = getLevelProgress(userData.experience);
-    setLevelData(response);
-  }, [userData.experience]);
-
+  const levelData = getLevelProgress(userData.experience);
   const circleSize = s(isMobile ? 92 : 108, scale);
 
   return (

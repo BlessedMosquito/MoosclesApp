@@ -34,9 +34,49 @@ function getMonthDays(monthDate: Date) {
   return days;
 }
 
+type NavButtonProps = {
+  onClickFunction: () => void;
+  children: React.ReactNode;
+  rotation: number;
+  disabled: boolean;
+  scale: number;
+  isMobile: boolean;
+};
+
+function NavButton({
+  onClickFunction,
+  children,
+  rotation,
+  disabled,
+  scale,
+  isMobile,
+}: NavButtonProps) {
+  return (
+    <button
+      type="button"
+      onClick={onClickFunction}
+      disabled={disabled}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        border: `1px solid ${colors.text}`,
+        borderRadius: s(12, scale),
+        background: colors.limeGreen,
+        color: colors.bg,
+        width: s(isMobile ? 32 : 38, scale),
+        height: s(isMobile ? 52 : 58, scale),
+        cursor: 'pointer',
+        transform: `rotate(${rotation}deg)`,
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
 type CalendarGridProps = {
   workoutsByDay: Record<string, ReturnGetWorkoutsData[]>;
-  selectedWorkout: ReturnGetWorkoutsData | null;
   isLoading: boolean;
   onSelectWorkout: (workout: ReturnGetWorkoutsData) => void;
   onClosePreview: () => void;
@@ -44,12 +84,11 @@ type CalendarGridProps = {
 
 export default function CalendarGrid({
   workoutsByDay,
-  selectedWorkout,
   isLoading,
   onSelectWorkout,
   onClosePreview,
 }: CalendarGridProps) {
-  const { isMobile, isTablet, scale } = useResponsive();
+  const { isMobile, scale } = useResponsive();
   const [visibleMonth, setVisibleMonth] = useState(new Date());
   const [isYearPickerOpen, setIsYearPickerOpen] = useState(false);
   const [popupDay, setPopupDay] = useState<string | null>(null);
@@ -62,39 +101,6 @@ export default function CalendarGrid({
     month: 'long',
   });
   const visibleYear = visibleMonth.getFullYear();
-
-  function NavButton({
-    onClickFunction,
-    children,
-    rotation,
-  }: {
-    onClickFunction: () => void;
-    children: React.ReactNode;
-    rotation: number;
-  }) {
-    return (
-      <button
-        type="button"
-        onClick={onClickFunction}
-        disabled={isLoading}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          border: `1px solid ${colors.text}`,
-          borderRadius: s(12, scale),
-          background: colors.limeGreen,
-          color: colors.bg,
-          width: s(isMobile ? 32 : 38, scale),
-          height: s(isMobile ? 52 : 58, scale),
-          cursor: 'pointer',
-          transform: `rotate(${rotation}deg)`,
-        }}
-      >
-        {children}
-      </button>
-    );
-  }
 
   function changeMonth(offset: number) {
     setVisibleMonth((c) => new Date(c.getFullYear(), c.getMonth() + offset, 1));
@@ -128,7 +134,13 @@ export default function CalendarGrid({
           marginRight: 10,
         }}
       >
-        <NavButton onClickFunction={() => changeMonth(-1)} rotation={-90}>
+        <NavButton
+          onClickFunction={() => changeMonth(-1)}
+          rotation={-90}
+          disabled={isLoading}
+          scale={scale}
+          isMobile={isMobile}
+        >
           <ArrowIcon />
         </NavButton>
         <div
@@ -170,7 +182,13 @@ export default function CalendarGrid({
             {monthLabel}
           </h2>
         </div>
-        <NavButton onClickFunction={() => changeMonth(1)} rotation={90}>
+        <NavButton
+          onClickFunction={() => changeMonth(1)}
+          rotation={90}
+          disabled={isLoading}
+          scale={scale}
+          isMobile={isMobile}
+        >
           <ArrowIcon />
         </NavButton>
       </div>
@@ -277,6 +295,12 @@ export default function CalendarGrid({
                       e.preventDefault();
                       onSelectWorkout(dayWorkouts[0]);
                     }
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'scale(0.97)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'scale(1)';
                   }}
                   style={{
                     minHeight: s(isMobile ? 54 : 112, scale),

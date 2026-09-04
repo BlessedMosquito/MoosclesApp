@@ -26,6 +26,7 @@ export default function LoginPage() {
       }
     }
     checkSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
 
   const [email, setEmail] = useState('');

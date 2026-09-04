@@ -6,7 +6,10 @@ import { s, useResponsive } from '@/lib/useResponsive';
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
 import { getLevelProgress, GetLevelProgressType } from '@/lib/helpers';
-import { CompleteWorkoutResult, ExperienceBreakdownItem } from '@/services/workouts';
+import {
+  CompleteWorkoutResult,
+  ExperienceBreakdownItem,
+} from '@/services/workouts';
 import { WorkoutTypeGroup } from '@/services/workoutTypes';
 import Button from '../Button';
 import ProgressBar from '../ProgressBar';
@@ -27,22 +30,13 @@ const BREAKDOWN_TYPES_BY_GROUP: Record<
   RepetitionBased: ['workout', 'sets', 'reps'],
 };
 
-const ICONS: Record<ExperienceBreakdownItem['type'], string> = {
-  workout: '🏋️',
-  exercises: '📋',
-  sets: '🔢',
-  reps: '💪',
-  duration: '⏱️',
-  distance: '📏',
-};
-
 export default function ExperienceSummaryPopup({
   previousExp,
   result,
   workoutGroup,
   onClose,
 }: ExperienceSummaryPopupProps) {
-  const { isMobile, scale } = useResponsive();
+  const { scale } = useResponsive();
 
   const allowedTypes = BREAKDOWN_TYPES_BY_GROUP[workoutGroup];
   const filteredBreakdown = result.breakdown.filter((item) =>
@@ -70,14 +64,10 @@ export default function ExperienceSummaryPopup({
   useEffect(() => {
     if (!showBreakdown) return;
     if (visibleItems >= filteredBreakdown.length) return;
-    const t = setTimeout(
-      () => setVisibleItems((v) => v + 1),
-      350
-    );
+    const t = setTimeout(() => setVisibleItems((v) => v + 1), 350);
     return () => clearTimeout(t);
   }, [showBreakdown, visibleItems, filteredBreakdown.length]);
 
-  const circleSize = s(isMobile ? 80 : 96, scale);
   const levelUp = newLevelData.level > oldLevelData.level;
 
   return (
@@ -282,9 +272,6 @@ export default function ExperienceSummaryPopup({
                     gap: s(10, scale),
                   }}
                 >
-                  <span style={{ fontSize: s(18, scale) }}>
-                    {ICONS[item.type]}
-                  </span>
                   <div
                     style={{
                       display: 'flex',

@@ -4,7 +4,6 @@
 import { useEffect, useRef } from 'react';
 import { s, useResponsive } from '@/lib/useResponsive';
 import { colors } from '@/theme/colors';
-import CloseIcon from '../../icons/CloseIcon';
 import { fontSizes } from '@/theme/typography';
 
 type PopupWindowProps = {
@@ -38,7 +37,7 @@ export default function PopupWindow({
         zIndex: 99,
         backdropFilter: 'blur(4px)',
         WebkitBackdropFilter: 'blur(4px)',
-        background: 'rgba(0,0,0,0.5)',
+        background: 'rgba(0,0,0,0.75)',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
