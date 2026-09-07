@@ -2,7 +2,7 @@
 
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
-import Button from '@/components/ui/Button';
+import Button from '@/components/ui/buttons/Button';
 
 type ErrorFallbackProps = {
   error: Error;

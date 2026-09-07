@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import Button from '@/components/ui/Button';
+import Button from '@/components/ui/buttons/Button';
 import AuthLayout from '@/components/layout/AuthLayout';
 import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
 import { fontSizes } from '@/theme/typography';

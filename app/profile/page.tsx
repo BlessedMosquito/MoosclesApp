@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import LogoutIcon from '@/components/icons/LogoutIcon';
 import EditIcon from '@/components/icons/EditIcon';
 
-import Button from '@/components/ui/Button';
+import Button from '@/components/ui/buttons/Button';
 import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
 import SectionDivider from '@/components/ui/SectionDivider';
 

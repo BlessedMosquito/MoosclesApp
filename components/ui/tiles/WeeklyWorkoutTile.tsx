@@ -108,7 +108,7 @@ export default function WeeklyStreakTile({
                   ? `1px solid ${colors.text}`
                   : `1px solid ${colors.border}`,
 
-                color: hasWorkout ? '#30D158' : colors.textMuted,
+                color: hasWorkout ? '#30D158' : colors.text,
                 marginTop: s(10, scale),
               }}
             >
@@ -142,7 +142,7 @@ export default function WeeklyStreakTile({
         style={{
           margin: 0,
           fontSize: s(isMobile ? 9 : 11, scale),
-          color: colors.textMuted,
+          color: colors.text,
           textAlign: 'center',
           marginTop: s(8, scale),
         }}

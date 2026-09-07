@@ -67,7 +67,7 @@ export default function LevelTile(userData: ReturnGetUserData) {
           style={{
             margin: 0,
             fontSize: s(fontSizes.caption, scale),
-            color: colors.textMuted,
+            color: colors.text,
           }}
         >
           {levelData.currentExp} / {levelData.nextLevelExp} XP

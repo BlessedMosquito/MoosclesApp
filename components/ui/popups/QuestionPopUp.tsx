@@ -3,7 +3,7 @@
 import { s, useResponsive } from '@/lib/useResponsive';
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
-import Button from '../Button';
+import Button from '../buttons/Button';
 
 type QuestionPopUpProps = {
   text: string;

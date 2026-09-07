@@ -11,7 +11,7 @@ import {
   ExperienceBreakdownItem,
 } from '@/services/workouts';
 import { WorkoutTypeGroup } from '@/services/workoutTypes';
-import Button from '../Button';
+import Button from '../buttons/Button';
 import ProgressBar from '../ProgressBar';
 
 type ExperienceSummaryPopupProps = {

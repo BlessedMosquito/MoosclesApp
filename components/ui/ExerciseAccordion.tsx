@@ -9,7 +9,7 @@ import { fontSizes } from '@/theme/typography';
 import { ReturnGetExercisesData } from '@/services/exercises';
 import { ReturnGetSetsData } from '@/services/sets';
 import { Mode } from '@/types/common';
-import Button from './Button';
+import Button from './buttons/Button';
 import DeleteIcon from '../icons/DeleteIcon';
 import PopupWindow from './popups/PopUpWindow';
 import NumericInput from './inputs/NumericInput';

@@ -5,6 +5,7 @@ import LevelTile from '@/components/ui/tiles/LevelTile';
 import WeeklyWorkoutDataTile from '@/components/ui/tiles/WeeklyWorkoutDataTile';
 import WeeklyWorkoutTile from '@/components/ui/tiles/WeeklyWorkoutTile';
 import ErrorPopUp from '@/components/ui/feedback/ErrorPopUp';
+import WorkoutCardStack from '@/components/ui/cards/WorkoutCardStack';
 import { createClient } from '@/lib/supabase/client';
 import { s, useResponsive } from '@/lib/useResponsive';
 import { getUserData, ReturnGetUserData } from '@/services/userData';
@@ -147,34 +148,71 @@ export default function DashboardPage() {
             maxWidth: contentMaxWidth,
           }}
         >
-          <div style={{ gridColumn: isMobile ? 'auto' : 1 }}>
-            {userId && (
-              <WeeklyWorkoutDataTile
-                weekly_distance_goal_meters={
-                  userData.weekly_distance_goal_meters
-                }
-                weekly_duration_goal_minutes={
-                  userData.weekly_duration_goal_minutes
-                }
-                userId={userId}
-              />
-            )}
-          </div>
-          <div style={{ gridColumn: isMobile ? 'auto' : 2 }}>
-            <LevelTile {...userData} />
-          </div>
           <div
             style={{
               gridColumn: isMobile ? 'auto' : 1,
-              justifySelf: isMobile ? 'stretch' : 'start',
+              justifySelf: isMobile ? 'center' : undefined,
             }}
           >
-            <WeeklyWorkoutTile
-              workoutDays={workoutDays}
-              workoutsThisWeek={workoutCount}
-              activeWeeks={activeWeeks}
-            />
+            {isMobile ? (
+              <WorkoutCardStack
+                backTile={
+                  userId && (
+                    <WeeklyWorkoutDataTile
+                      weekly_distance_goal_meters={
+                        userData.weekly_distance_goal_meters
+                      }
+                      weekly_duration_goal_minutes={
+                        userData.weekly_duration_goal_minutes
+                      }
+                      userId={userId}
+                    />
+                  )
+                }
+                frontTile={
+                  <WeeklyWorkoutTile
+                    workoutDays={workoutDays}
+                    workoutsThisWeek={workoutCount}
+                    activeWeeks={activeWeeks}
+                  />
+                }
+              />
+            ) : (
+              userId && (
+                <WeeklyWorkoutDataTile
+                  weekly_distance_goal_meters={
+                    userData.weekly_distance_goal_meters
+                  }
+                  weekly_duration_goal_minutes={
+                    userData.weekly_duration_goal_minutes
+                  }
+                  userId={userId}
+                />
+              )
+            )}
           </div>
+          <div
+            style={{
+              gridColumn: isMobile ? 'auto' : 2,
+              justifySelf: isMobile ? 'center' : undefined,
+            }}
+          >
+            <LevelTile {...userData} />
+          </div>
+          {!isMobile && (
+            <div
+              style={{
+                gridColumn: 1,
+                justifySelf: isMobile ? 'stretch' : 'start',
+              }}
+            >
+              <WeeklyWorkoutTile
+                workoutDays={workoutDays}
+                workoutsThisWeek={workoutCount}
+                activeWeeks={activeWeeks}
+              />
+            </div>
+          )}
         </div>
       )}
     </main>

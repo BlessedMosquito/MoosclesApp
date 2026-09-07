@@ -129,7 +129,7 @@ export default function CircularProgress({
       {/* RANGE BELOW */}
       <span
         style={{
-          color: colors.textMuted,
+          color: colors.text,
           fontSize: s(12, scale),
         }}
       >

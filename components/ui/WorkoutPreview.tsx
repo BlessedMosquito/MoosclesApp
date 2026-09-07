@@ -11,8 +11,9 @@ import { ReturnGetExercisesData } from '@/services/exercises';
 import { ReturnGetMetricsData } from '@/services/workoutMetrics';
 import { ReturnGetWorkoutsData } from '@/services/workouts';
 import CloseIcon from '../icons/CloseIcon';
-import Button from './Button';
+import Button from './buttons/Button';
 import { formatDuration, formatDistance, formatPace } from '@/lib/format';
+import { iconBasedOnRange } from '@/lib/helpers';
 import ExerciseAccordion from './ExerciseAccordion';
 
 export function formatDurationToString(seconds: number | null): string {
@@ -153,6 +154,52 @@ export default function WorkoutPreview({
     );
   }
 
+  function renderWellBeing(well_being: number | null) {
+    return (
+      <div
+        style={{
+          padding: s(14, scale),
+          borderRadius: s(12, scale),
+          border: `1px solid ${colors.border}`,
+          background: colors.componentsBg,
+          display: 'flex',
+        }}
+      >
+        <p
+          style={{
+            margin: 0,
+            color: colors.text,
+            fontSize: s(fontSizes.bodySmall, scale),
+            paddingRight: 10,
+          }}
+        >
+          Well-being during workout:
+        </p>
+
+        {well_being !== null && (
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: s(8, scale),
+            }}
+          >
+            <p
+              style={{
+                margin: 0,
+                fontWeight: 700,
+                fontSize: s(fontSizes.body, scale),
+              }}
+            >
+              {well_being}
+            </p>
+            {iconBasedOnRange({ value: well_being, min: 1, max: 10 })}
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <section
       ref={previewRef as React.RefObject<HTMLElement>}
@@ -278,15 +325,24 @@ export default function WorkoutPreview({
           metrics ? (
             <div
               style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr',
+                display: 'flex',
+                flexDirection: 'column',
                 gap: s(8, scale),
               }}
             >
-              {renderMetricCard(
-                'Time',
-                formatDurationToString(metrics.duration_minutes)
-              )}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr',
+                  gap: s(8, scale),
+                }}
+              >
+                {renderMetricCard(
+                  'Time',
+                  formatDurationToString(metrics.duration_minutes)
+                )}
+              </div>
+              {renderWellBeing(metrics.well_being)}
             </div>
           ) : (
             <p
@@ -303,26 +359,35 @@ export default function WorkoutPreview({
           metrics ? (
             <div
               style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(3, 1fr)',
+                display: 'flex',
+                flexDirection: 'column',
                 gap: s(8, scale),
               }}
             >
-              {renderMetricCard(
-                'Time',
-                formatDurationToString(metrics.duration_minutes)
-              )}
-              {renderMetricCard(
-                'Distance',
-                formatDistanceToString(metrics.distance_meters)
-              )}
-              {renderMetricCard(
-                'Pace',
-                formatPaceToString(
-                  metrics.duration_minutes,
-                  metrics.distance_meters
-                )
-              )}
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gap: s(8, scale),
+                }}
+              >
+                {renderMetricCard(
+                  'Time',
+                  formatDurationToString(metrics.duration_minutes)
+                )}
+                {renderMetricCard(
+                  'Distance',
+                  formatDistanceToString(metrics.distance_meters)
+                )}
+                {renderMetricCard(
+                  'Pace',
+                  formatPaceToString(
+                    metrics.duration_minutes,
+                    metrics.distance_meters
+                  )
+                )}
+              </div>
+              {renderWellBeing(metrics.well_being)}
             </div>
           ) : (
             <p

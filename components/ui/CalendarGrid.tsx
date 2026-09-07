@@ -8,7 +8,7 @@ import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
 import { ReturnGetWorkoutsData } from '@/services/workouts';
 import ArrowIcon from '../icons/ArrowIcon';
-import Button from './Button';
+import Button from './buttons/Button';
 
 const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const yearOptions = Array.from({ length: 21 }, (_, i) => 2010 + i);

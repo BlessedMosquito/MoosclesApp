@@ -1,6 +1,6 @@
 'use client';
 
-import Button from '@/components/ui/Button';
+import Button from '@/components/ui/buttons/Button';
 import DistanceInput from '@/components/ui/inputs/DistanceInput';
 import ErrorPopUp from '@/components/ui/feedback/ErrorPopUp';
 import SectionDivider from '@/components/ui/SectionDivider';
@@ -19,6 +19,8 @@ import { Mode } from '@/types/common';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import Slider from '@/components/ui/slider/Slider';
+import { iconBasedOnRange } from '@/lib/helpers';
 
 export default function AddWorkoutDataDuration() {
   const supabase = createClient();
@@ -46,6 +48,7 @@ export default function AddWorkoutDataDuration() {
     km: 0,
     m: 0,
   });
+  const [wellBeing, setWellBeing] = useState(5);
 
   const contentMaxWidth = isMobile ? '100%' : isTablet ? 620 : 760;
 
@@ -85,6 +88,7 @@ export default function AddWorkoutDataDuration() {
         });
         const formatedDistance = formatDistance(data.distance_meters);
         setDistance(formatedDistance);
+        setWellBeing(data.well_being);
       }
     }
     getData();
@@ -119,7 +123,7 @@ export default function AddWorkoutDataDuration() {
         workoutId: workoutId,
         distanceMeters: distanceMeters,
         durationMinutes,
-        wellBeing: 0,
+        wellBeing: wellBeing,
         userId: user.id,
       });
 
@@ -195,6 +199,14 @@ export default function AddWorkoutDataDuration() {
             />
           </>
         )}
+        <SectionDivider label="Well-being" />
+        <Slider
+          label={iconBasedOnRange({ value: wellBeing, min: 1, max: 10 })}
+          value={wellBeing}
+          min={1}
+          max={10}
+          onChange={setWellBeing}
+        />
         <div style={{ marginTop: s(24, scale) }}>
           <Button
             onClick={handleAddWorkoutData}

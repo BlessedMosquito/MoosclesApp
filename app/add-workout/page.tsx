@@ -1,6 +1,6 @@
 'use client';
 
-import Button from '@/components/ui/Button';
+import Button from '@/components/ui/buttons/Button';
 import ErrorPopUp from '@/components/ui/feedback/ErrorPopUp';
 import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
 import SectionDivider from '@/components/ui/SectionDivider';

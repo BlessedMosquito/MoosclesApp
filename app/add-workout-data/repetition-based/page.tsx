@@ -1,6 +1,6 @@
 'use client';
 
-import Button from '@/components/ui/Button';
+import Button from '@/components/ui/buttons/Button';
 import ErrorPopUp from '@/components/ui/feedback/ErrorPopUp';
 import ExerciseAccordion from '@/components/ui/ExerciseAccordion';
 import SectionDivider from '@/components/ui/SectionDivider';
@@ -377,9 +377,7 @@ export default function AddWorkoutDataRepetitionBased() {
                         onToggle={toggleExercise}
                         onDraftChange={updateSetDraft}
                         onAddSet={handleAddSet}
-                        onDeleteExercise={() =>
-                          beforeDeletePopUp({ exercise })
-                        }
+                        onDeleteExercise={() => beforeDeletePopUp({ exercise })}
                         showDeletePopUp={(setId, exerciseId) =>
                           beforeDeletePopUp({ setId, exerciseId })
                         }
