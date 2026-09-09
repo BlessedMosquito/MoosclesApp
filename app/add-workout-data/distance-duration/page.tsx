@@ -21,6 +21,7 @@ import { useEffect, useRef, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import Slider from '@/components/ui/slider/Slider';
 import { iconBasedOnRange } from '@/lib/helpers';
+import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
 
 export default function AddWorkoutDataDuration() {
   const supabase = createClient();
@@ -164,7 +165,7 @@ export default function AddWorkoutDataDuration() {
               fontWeight: 700,
             }}
           >
-            {workoutName}
+            {`Workout name: ${workoutName}`}
           </h1>
           <p
             style={{
@@ -174,7 +175,7 @@ export default function AddWorkoutDataDuration() {
               lineHeight: 1.5,
             }}
           >
-            Add data to your {workoutType} session.
+            {`Workout type: ${workoutType}`}
           </p>
         </section>
 
@@ -214,14 +215,14 @@ export default function AddWorkoutDataDuration() {
             width="3/4"
             align="center"
           >
-            {isSaving ? 'Saving...' : 'Save'}
+            {isSaving ? <LoadingCircle size={18} /> : 'Save'}
           </Button>
         </div>
       </div>
 
       {showSuccess && (
         <SuccessAnimation
-          message="Data successfully added!"
+          message="Data saved successfully"
           onDone={() => {
             setShowSuccess(false);
             if (pendingNavRef.current) router.push(pendingNavRef.current);

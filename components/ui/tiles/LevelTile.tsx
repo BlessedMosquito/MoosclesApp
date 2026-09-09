@@ -66,11 +66,11 @@ export default function LevelTile(userData: ReturnGetUserData) {
         <p
           style={{
             margin: 0,
-            fontSize: s(fontSizes.caption, scale),
+            fontSize: s(fontSizes.bodySmall, scale),
             color: colors.text,
           }}
         >
-          {levelData.currentExp} / {levelData.nextLevelExp} XP
+          {Math.round(levelData.progress * 100)}%
         </p>
 
         {/* progress bar */}
@@ -83,6 +83,19 @@ export default function LevelTile(userData: ReturnGetUserData) {
             labelRight={''}
             showLabels={false}
           />
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              marginTop: s(6, scale),
+              fontSize: s(fontSizes.caption, scale),
+              fontWeight: 700,
+              color: colors.text,
+            }}
+          >
+            <span>lvl {levelData.level}</span>
+            <span>lvl {levelData.level + 1}</span>
+          </div>
         </div>
       </div>
     </Tile>
