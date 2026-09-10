@@ -250,13 +250,16 @@ export default function AddWorkoutDataRepetitionBased() {
     const draft = setDrafts[exerciseId] ?? { reps: '', weight: '' };
     const reps = Number(draft.reps);
     const normalizedWeight = draft.weight.replace(',', '.');
-    const weight = Number(normalizedWeight);
+    const weight = draft.weight.trim() === '' ? 0 : Number(normalizedWeight);
 
     if (!Number.isFinite(reps) || reps <= 0) {
       setError('Reps must be greater than 0.');
       return;
     }
-    if (!decimalWeightPattern.test(draft.weight) || !Number.isFinite(weight)) {
+    if (
+      draft.weight.trim() !== '' &&
+      (!decimalWeightPattern.test(draft.weight) || !Number.isFinite(weight))
+    ) {
       setError('Weight must have up to 2 decimal places.');
       return;
     }

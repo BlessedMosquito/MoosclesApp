@@ -5,16 +5,17 @@ import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
 
 type NumericInputProps = {
-  value: number;
+  value: number | string;
   min: number;
   max: number;
   placeholder: string;
-  onChange: (value: number) => void;
+  onChange: (value: number | string) => void;
   disabled?: boolean;
   label?: string;
   width?: number;
   mobileWidth?: number;
   textAlign?: 'center' | 'right';
+  decimal?: boolean;
 };
 
 export default function NumericInput({
@@ -28,8 +29,46 @@ export default function NumericInput({
   width,
   mobileWidth,
   textAlign = 'center',
+  decimal = false,
 }: NumericInputProps) {
   const { scale, isMobile } = useResponsive();
+
+  const cleanPattern = decimal ? /[^0-9.,]/g : /[^0-9]/g;
+
+  function sanitize(raw: string): string {
+    let cleaned = raw.replace(cleanPattern, '');
+    if (decimal) {
+      const firstSep = cleaned.search(/[.,]/);
+      if (firstSep !== -1) {
+        const head = cleaned.slice(0, firstSep);
+        const sep = cleaned[firstSep];
+        const tail = cleaned.slice(firstSep + 1).replace(/[.,]/g, '');
+        cleaned = head + sep + tail;
+      }
+    }
+    return cleaned;
+  }
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const raw = sanitize(e.target.value);
+
+    if (typeof value === 'string') {
+      onChange(raw);
+      return;
+    }
+
+    const parsed = Number(raw);
+    const num = Number.isNaN(parsed) ? 0 : Math.floor(parsed);
+    onChange(Math.min(Math.max(min, num), max));
+  }
+
+  function handleBlur(e: React.FocusEvent<HTMLInputElement>) {
+    if (typeof value === 'string') {
+      if (e.target.value === '') onChange('');
+      return;
+    }
+    if (e.target.value === '') onChange(0);
+  }
 
   return (
     <div
@@ -38,6 +77,7 @@ export default function NumericInput({
         flexDirection: 'column',
         alignItems: 'center',
         gap: s(6, scale),
+        width: '100%',
       }}
     >
       {label && (
@@ -53,17 +93,11 @@ export default function NumericInput({
       )}
 
       <input
-        inputMode="numeric"
+        inputMode={decimal ? 'decimal' : 'numeric'}
         placeholder={placeholder}
         value={value}
-        onChange={(e) => {
-          let numberValue = Number(e.target.value);
-          if (Number.isNaN(numberValue)) numberValue = 0;
-          onChange(Math.min(Math.max(min, Math.floor(numberValue)), max));
-        }}
-        onBlur={(e) => {
-          if (e.target.value === '') onChange(0);
-        }}
+        onChange={handleChange}
+        onBlur={handleBlur}
         disabled={disabled}
         style={{
           width: width

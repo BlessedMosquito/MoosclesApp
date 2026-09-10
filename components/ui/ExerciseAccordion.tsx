@@ -185,40 +185,36 @@ export default function ExerciseAccordion({
               onClose={() => setIsPopupOpen(false)}
               title="Add data to your set"
             >
-              <NumericInput
-                value={Number(setDraft.reps) || 0}
-                min={0}
-                max={999}
-                placeholder="Reps"
-                onChange={(value) =>
-                  onDraftChange(exerciseId, 'reps', String(value))
-                }
-              />
-
-              <input
-                inputMode="decimal"
-                placeholder="Weight"
-                value={setDraft.weight}
-                onChange={(e) =>
-                  onDraftChange(
-                    exerciseId,
-                    'weight',
-                    e.target.value.replace(/[^0-9.,]/g, '')
-                  )
-                }
+              <div
                 style={{
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1fr',
+                  gap: s(10, scale),
                   width: '100%',
-                  boxSizing: 'border-box',
-                  minWidth: 0,
-                  padding: s(10, scale),
-                  borderRadius: s(12, scale),
-                  border: `1px solid ${colors.border}`,
-                  background: colors.componentsBg,
-                  color: colors.text,
-                  fontSize: fontSizes.body,
-                  outline: 'none',
                 }}
-              />
+              >
+                <NumericInput
+                  value={setDraft.reps}
+                  min={0}
+                  max={999}
+                  decimal={false}
+                  placeholder="Reps"
+                  onChange={(value) =>
+                    onDraftChange(exerciseId, 'reps', String(value))
+                  }
+                />
+
+                <NumericInput
+                  value={setDraft.weight}
+                  min={0}
+                  max={999}
+                  decimal
+                  placeholder="Weight"
+                  onChange={(value) =>
+                    onDraftChange(exerciseId, 'weight', String(value))
+                  }
+                />
+              </div>
 
               <Button
                 onClick={handleConfirmAdd}

@@ -36,7 +36,7 @@ export default function DistanceInput({
         width={120}
         mobileWidth={90}
         disabled={disabled}
-        onChange={(km) => onChange({ ...value, km })}
+        onChange={(km) => onChange({ ...value, km: Number(km) })}
       />
 
       <NumericInput
@@ -48,7 +48,7 @@ export default function DistanceInput({
         width={120}
         mobileWidth={90}
         disabled={disabled}
-        onChange={(m) => onChange({ ...value, m })}
+        onChange={(m) => onChange({ ...value, m: Number(m) })}
       />
     </div>
   );

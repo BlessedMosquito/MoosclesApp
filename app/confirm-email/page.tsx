@@ -1,95 +1,153 @@
 'use client';
 
-import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
+import Button from '@/components/ui/buttons/Button';
 import AuthLayout from '@/components/layout/AuthLayout';
-import { colors } from '@/theme/colors';
-import { fontSizes } from '@/theme/typography';
+import Link from 'next/link';
 import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
+import { fontSizes } from '@/theme/typography';
+import { colors } from '@/theme/colors';
 
-function ConfirmEmailContent() {
+export default function ConfirmEmailPage() {
+  const supabase = createClient();
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const email = searchParams.get('email');
+  const initialEmail = searchParams.get('email') ?? '';
+
+  useEffect(() => {
+    async function checkSession() {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (session) {
+        router.push('/dashboard');
+      }
+    }
+    checkSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [router]);
+
+  const [email, setEmail] = useState(initialEmail);
+  const [code, setCode] = useState('');
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  async function verifyCode() {
+    setAuthError(null);
+
+    if (!email.trim()) {
+      setAuthError('Email is required.');
+      return;
+    }
+
+    if (!code.trim()) {
+      setAuthError('Enter the code from the email.');
+      return;
+    }
+
+    setIsLoading(true);
+
+    const { error } = await supabase.auth.verifyOtp({
+      email,
+      token: code.trim(),
+      type: 'signup',
+    });
+
+    if (error) {
+      setAuthError(error.message);
+      setIsLoading(false);
+      return;
+    }
+
+    router.push('/dashboard');
+  }
+
+  async function resendCode() {
+    setAuthError(null);
+
+    if (!email.trim()) {
+      setAuthError('Email is required.');
+      return;
+    }
+
+    setIsLoading(true);
+
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+      options: {
+        emailRedirectTo: window.location.origin + '/confirm-email',
+      },
+    });
+
+    setIsLoading(false);
+
+    if (error) {
+      setAuthError(error.message);
+    }
+  }
 
   return (
-    <AuthLayout>
-      <h1 style={{ color: colors.text, fontSize: fontSizes.heading1 }}>
-        MOOSCLES
-      </h1>
+    <AuthLayout error={authError} onDismissError={() => setAuthError(null)}>
+      <h1 style={{ color: 'white', fontSize: fontSizes.heading1 }}>MOOSCLES</h1>
 
-      <div
+      <p style={{ margin: 0, fontSize: fontSizes.caption, color: '#888' }}>
+        We sent a confirmation code to your email.
+      </p>
+
+      <input
+        type="email"
+        autoComplete="email"
+        placeholder="Email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        disabled={isLoading}
         style={{
-          padding: 18,
-          borderRadius: 16,
-          border: `1px solid ${colors.border}`,
-          background: colors.componentsBg,
+          padding: 12,
+          borderRadius: 10,
+          color: 'white',
+          fontSize: fontSizes.input,
+        }}
+      />
+
+      <input
+        type="text"
+        inputMode="numeric"
+        autoComplete="one-time-code"
+        placeholder="Confirmation code"
+        value={code}
+        onChange={(e) => setCode(e.target.value)}
+        disabled={isLoading}
+        style={{
+          padding: 12,
+          borderRadius: 10,
+          color: 'white',
+          fontSize: fontSizes.input,
+          letterSpacing: 4,
           textAlign: 'center',
         }}
-      >
-        <h2
-          style={{
-            margin: 0,
-            color: colors.text,
-            fontSize: fontSizes.heading2,
-          }}
-        >
-          Check your email
-        </h2>
+      />
 
-        <p
-          style={{
-            margin: '12px 0 0',
-            color: colors.text,
-            fontSize: fontSizes.bodySmall,
-            lineHeight: 1.5,
-          }}
-        >
-          We sent a confirmation link to{' '}
-          <span style={{ color: colors.text }}>
-            {email || 'your email address'}
-          </span>
-          .
-        </p>
-      </div>
+      <Button onClick={verifyCode} disabled={isLoading}>
+        {isLoading ? <LoadingCircle size={18} /> : 'Confirm email'}
+      </Button>
 
-      <p style={{ fontSize: fontSizes.caption, color: colors.text }}>
-        Already confirmed?{' '}
+      <p style={{ fontSize: fontSizes.caption, color: '#888' }}>
+        Didn&apos;t get the code?{' '}
         <Link
-          style={{ color: colors.text, textDecoration: 'none' }}
-          href="/login"
-          onMouseEnter={(e) => {
-            e.currentTarget.style.textDecoration = 'underline';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.textDecoration = 'none';
+          style={{ color: colors.limeGreen, textDecoration: 'none' }}
+          href=""
+          onClick={(e) => {
+            e.preventDefault();
+            resendCode();
           }}
         >
-          Sign In
+          Resend
         </Link>
       </p>
     </AuthLayout>
-  );
-}
-
-export default function ConfirmEmailPage() {
-  return (
-    <Suspense
-      fallback={
-        <main
-          style={{
-            minHeight: '100dvh',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            background: 'transparent',
-          }}
-        >
-          <LoadingCircle />
-        </main>
-      }
-    >
-      <ConfirmEmailContent />
-    </Suspense>
   );
 }

@@ -38,7 +38,7 @@ export default function TimeInput({
         width={100}
         mobileWidth={70}
         disabled={disabled}
-        onChange={(h) => onChange({ hours: h, minutes })}
+        onChange={(h) => onChange({ hours: Number(h), minutes })}
       />
 
       <span
@@ -61,7 +61,7 @@ export default function TimeInput({
         width={100}
         mobileWidth={70}
         disabled={disabled}
-        onChange={(m) => onChange({ hours, minutes: m })}
+        onChange={(m) => onChange({ hours, minutes: Number(m) })}
       />
     </div>
   );
