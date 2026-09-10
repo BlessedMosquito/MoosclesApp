@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import Button from '@/components/ui/buttons/Button';
@@ -10,7 +10,7 @@ import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
 import { fontSizes } from '@/theme/typography';
 import { colors } from '@/theme/colors';
 
-export default function ConfirmEmailPage() {
+function ConfirmEmailForm() {
   const supabase = createClient();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -149,5 +149,26 @@ export default function ConfirmEmailPage() {
         </Link>
       </p>
     </AuthLayout>
+  );
+}
+
+export default function ConfirmEmailPage() {
+  return (
+    <Suspense
+      fallback={
+        <div
+          style={{
+            minHeight: '100dvh',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <LoadingCircle />
+        </div>
+      }
+    >
+      <ConfirmEmailForm />
+    </Suspense>
   );
 }
