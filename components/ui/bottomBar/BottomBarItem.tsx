@@ -56,7 +56,7 @@ export default function BottomBarItem({
               backdropFilter: 'blur(18px)',
               WebkitBackdropFilter: 'blur(18px)',
 
-              border: `1px solid ${colors.limeGreen}`,
+              border: `1px solid ${colors.accent}`,
               boxShadow: '0 6px 25px rgba(0,0,0,0.35)',
               zIndex: 0,
             }}

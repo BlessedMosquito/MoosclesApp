@@ -262,9 +262,9 @@ export default function WorkoutPreview({
             marginTop: s(10, scale),
             padding: s(10, scale),
             borderRadius: s(10, scale),
-            border: `1px solid ${colors.errorBorder}`,
+            border: `1px solid ${colors.errorSurface}`,
             background: colors.errorSurface,
-            color: colors.errorMuted,
+            color: colors.errorSurface,
             fontSize: s(fontSizes.caption, scale),
           }}
         >
@@ -418,9 +418,9 @@ export default function WorkoutPreview({
               justifyContent: 'center',
               padding: s(12, scale),
               borderRadius: s(14, scale),
-              border: `1px solid ${colors.limeGreen}`,
-              background: 'rgba(48,209,88,0.12)',
-              color: colors.limeGreen,
+              border: `1px solid ${colors.accentBorder}`,
+              background: colors.accentSurface,
+              color: colors.accentLight,
               fontSize: s(fontSizes.bodySmall, scale),
               fontWeight: 700,
             }}

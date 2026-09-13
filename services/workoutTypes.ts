@@ -39,3 +39,15 @@ export async function getWorkoutTypeGroup(id: string): Promise<string> {
 
   return data.workout_group;
 }
+
+export async function getWorkoutTypesSubGroups() {
+  const { data, error } = await supabase
+    .from('workout_types')
+    .select('workout_subgroup');
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}

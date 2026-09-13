@@ -27,8 +27,8 @@ export default function Tile({
 }: TileProps) {
   const { isMobile, scale } = useResponsive();
 
-  const finalWidth = isMobile ? 350 : (width ?? 500);
-  const finalHeight = isMobile ? 180 : (height ?? 300);
+  const finalWidth = width ?? (isMobile ? 350 : 500);
+  const finalHeight = height ?? (isMobile ? 180 : 300);
 
   const tileRef = useRef<HTMLDivElement>(null);
 

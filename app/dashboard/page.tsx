@@ -2,10 +2,10 @@
 
 import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
 import LevelTile from '@/components/ui/tiles/LevelTile';
-import WeeklyWorkoutDataTile from '@/components/ui/tiles/WeeklyWorkoutDataTile';
+import DurationTile from '@/components/ui/tiles/DurationTile';
+import DistanceTile from '@/components/ui/tiles/DistanceTile';
 import WeeklyWorkoutTile from '@/components/ui/tiles/WeeklyWorkoutTile';
 import ErrorPopUp from '@/components/ui/feedback/ErrorPopUp';
-import WorkoutCardStack from '@/components/ui/cards/WorkoutCardStack';
 import { createClient } from '@/lib/supabase/client';
 import { s, useResponsive } from '@/lib/useResponsive';
 import { getUserData, ReturnGetUserData } from '@/services/userData';
@@ -13,10 +13,12 @@ import { getWorkoutDaysForWeek } from '@/services/workouts';
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
 import { useEffect, useState } from 'react';
+import AddWorkoutTile from '@/components/ui/tiles/AddWorkoutTile';
+import WaterTile from '@/components/ui/tiles/WaterTile';
 
 export default function DashboardPage() {
   const supabase = createClient();
-  const { isMobile, scale } = useResponsive();
+  const { isMobile, scale, width } = useResponsive();
 
   const [userData, setUserData] = useState<ReturnGetUserData>({
     experience: 0,
@@ -31,16 +33,16 @@ export default function DashboardPage() {
   const [isLoadingUserData, setIsLoadingUserData] = useState(true);
   const [firstName, setFirstName] = useState<string | null>(null);
 
-  const gridGap = s(isMobile ? 14 : 24, scale);
-  const leftColumnWidth = s(600, scale);
-  const rightColumnWidth = s(350, scale);
-  const contentMaxWidth = isMobile
-    ? 420
-    : leftColumnWidth + rightColumnWidth + gridGap;
-
-  const gridColumns = isMobile
-    ? '1fr'
-    : `${leftColumnWidth}px ${rightColumnWidth}px`;
+  const gridGap = s(isMobile ? 12 : 24, scale);
+  const paddingX = s(isMobile ? 18 : 24, scale);
+  const availableWidth = Math.max(0, width - paddingX * 2);
+  const tileWidth = isMobile
+    ? Math.round(availableWidth * 0.48)
+    : Math.min(s(290, scale), Math.floor((availableWidth - gridGap * 2) / 3));
+  const tileHeight = s(isMobile ? 180 : 250, scale);
+  const halfTileHeight = (tileHeight - gridGap) / 2;
+  const contentMaxWidth =
+    tileWidth * (isMobile ? 2 : 3) + gridGap * (isMobile ? 1 : 2);
 
   async function loadUserData() {
     try {
@@ -100,25 +102,36 @@ export default function DashboardPage() {
           zIndex: 10,
           width: '100%',
           maxWidth: contentMaxWidth,
-          padding: `${s(12, scale)}px 0`,
+          padding: `${s(12, scale)}px ${s(16, scale)}px`,
           backdropFilter: 'blur(12px)',
-          background: colors.tileBg,
+          background: colors.componentsBg,
           borderRadius: s(18, scale),
+          border: `1px solid ${colors.accent}`,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
         }}
       >
         <h1
           style={{
-            margin: 10,
+            margin: 0,
             color: 'white',
-            fontSize: s(
-              isMobile ? fontSizes.heading1 : fontSizes.display,
-              scale
-            ),
+            fontSize: s(isMobile ? 22 : 32, scale),
             fontWeight: 700,
           }}
         >
-          {`Welcome back ${firstName ?? ''}`}
+          Mooscles
         </h1>
+        <p
+          style={{
+            margin: 0,
+            color: colors.text,
+            fontSize: s(isMobile ? fontSizes.bodySmall : fontSizes.body, scale),
+            fontWeight: 600,
+          }}
+        >
+          {`Hello, ${firstName ?? ''}`}
+        </p>
       </div>
 
       {error && <ErrorPopUp onClose={() => setError(null)}>{error}</ErrorPopUp>}
@@ -137,82 +150,105 @@ export default function DashboardPage() {
         >
           <LoadingCircle />
         </div>
+      ) : isMobile ? (
+        <div
+          style={{
+            width: '100%',
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            gap: gridGap,
+            maxWidth: contentMaxWidth,
+          }}
+        >
+          <LevelTile
+            {...userData}
+            tileWidth={tileWidth}
+            tileHeight={tileHeight}
+          />
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: gridGap,
+              width: tileWidth,
+            }}
+          >
+            <AddWorkoutTile tileWidth={tileWidth} tileHeight={halfTileHeight} />
+            <WaterTile tileWidth={tileWidth} tileHeight={halfTileHeight} />
+          </div>
+          <DurationTile
+            weekly_duration_goal_minutes={userData.weekly_duration_goal_minutes}
+            userId={userId ?? ''}
+            tileWidth={tileWidth}
+            tileHeight={tileHeight}
+          />
+          <DistanceTile
+            weekly_distance_goal_meters={userData.weekly_distance_goal_meters}
+            userId={userId ?? ''}
+            tileWidth={tileWidth}
+            tileHeight={tileHeight}
+          />
+          <div style={{ width: '100%' }}>
+            <WeeklyWorkoutTile
+              workoutDays={workoutDays}
+              workoutsThisWeek={workoutCount}
+              activeWeeks={activeWeeks}
+              width={contentMaxWidth}
+              height={tileHeight}
+            />
+          </div>
+        </div>
       ) : (
         <div
           style={{
             width: '100%',
             display: 'grid',
-            gridTemplateColumns: gridColumns,
-            alignItems: 'start',
+            gridTemplateColumns: `repeat(3, minmax(0, 1fr))`,
             gap: gridGap,
             maxWidth: contentMaxWidth,
           }}
         >
+          <LevelTile
+            {...userData}
+            tileWidth={tileWidth}
+            tileHeight={tileHeight}
+          />
+          <DurationTile
+            weekly_duration_goal_minutes={userData.weekly_duration_goal_minutes}
+            userId={userId ?? ''}
+            tileWidth={tileWidth}
+            tileHeight={tileHeight}
+          />
+          <DistanceTile
+            weekly_distance_goal_meters={userData.weekly_distance_goal_meters}
+            userId={userId ?? ''}
+            tileWidth={tileWidth}
+            tileHeight={tileHeight}
+          />
           <div
             style={{
-              gridColumn: isMobile ? 'auto' : 1,
-              justifySelf: isMobile ? 'center' : undefined,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: gridGap,
             }}
           >
-            {isMobile ? (
-              <WorkoutCardStack
-                backTile={
-                  userId && (
-                    <WeeklyWorkoutDataTile
-                      weekly_distance_goal_meters={
-                        userData.weekly_distance_goal_meters
-                      }
-                      weekly_duration_goal_minutes={
-                        userData.weekly_duration_goal_minutes
-                      }
-                      userId={userId}
-                    />
-                  )
-                }
-                frontTile={
-                  <WeeklyWorkoutTile
-                    workoutDays={workoutDays}
-                    workoutsThisWeek={workoutCount}
-                    activeWeeks={activeWeeks}
-                  />
-                }
-              />
-            ) : (
-              userId && (
-                <WeeklyWorkoutDataTile
-                  weekly_distance_goal_meters={
-                    userData.weekly_distance_goal_meters
-                  }
-                  weekly_duration_goal_minutes={
-                    userData.weekly_duration_goal_minutes
-                  }
-                  userId={userId}
-                />
-              )
-            )}
+            <AddWorkoutTile tileWidth={tileWidth} tileHeight={halfTileHeight} />
+            <WaterTile tileWidth={tileWidth} tileHeight={halfTileHeight} />
           </div>
           <div
             style={{
-              gridColumn: isMobile ? 'auto' : 2,
-              justifySelf: isMobile ? 'center' : undefined,
+              gridColumn: 'span 2',
             }}
           >
-            <LevelTile {...userData} />
+            <WeeklyWorkoutTile
+              workoutDays={workoutDays}
+              workoutsThisWeek={workoutCount}
+              activeWeeks={activeWeeks}
+              width={tileWidth * 2 + gridGap}
+              height={tileHeight}
+            />
           </div>
-          {!isMobile && (
-            <div
-              style={{
-                gridColumn: 1,
-                justifySelf: isMobile ? 'stretch' : 'start',
-              }}
-            >
-              <WeeklyWorkoutTile
-                workoutDays={workoutDays}
-                workoutsThisWeek={workoutCount}
-                activeWeeks={activeWeeks}
-              />
-            </div>
-          )}
         </div>
       )}
     </main>

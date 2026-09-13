@@ -62,7 +62,7 @@ function NavButton({
         justifyContent: 'center',
         border: `1px solid ${colors.text}`,
         borderRadius: s(12, scale),
-        background: colors.limeGreen,
+        background: colors.accent,
         color: colors.bg,
         width: s(isMobile ? 32 : 38, scale),
         height: s(isMobile ? 52 : 58, scale),
@@ -298,16 +298,22 @@ export default function CalendarGrid({
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'scale(0.97)';
+                    if (hasWorkouts) {
+                      e.currentTarget.style.background = colors.accentLight;
+                    }
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.transform = 'scale(1)';
+                    if (hasWorkouts) {
+                      e.currentTarget.style.background = colors.accent;
+                    }
                   }}
                   style={{
                     minHeight: s(isMobile ? 54 : 112, scale),
                     borderRadius: s(isMobile ? 8 : 12, scale),
                     border: `1px solid ${day ? colors.border : colors.transparent}`,
                     background: hasWorkouts
-                      ? colors.limeGreen
+                      ? colors.accent
                       : day
                         ? colors.componentsBg
                         : colors.transparent,
@@ -336,7 +342,7 @@ export default function CalendarGrid({
                           display: 'flex',
                           flexDirection: 'column',
                           gap: s(isMobile ? 2 : 5, scale),
-                          color: colors.limeGreen,
+                          color: colors.accent,
                         }}
                       ></div>
                     </>

@@ -24,7 +24,7 @@ export default function HomePage() {
       style={{
         minHeight: '100dvh',
         background:
-          'linear-gradient(180deg, rgba(48,209,88,.06) 0%, transparent 40%)',
+          'linear-gradient(180deg, var(--accentSurface) 0%, transparent 40%)',
         padding: s(24, scale),
         display: 'flex',
         flexDirection: 'column',
@@ -89,7 +89,7 @@ export default function HomePage() {
             height: s(52, scale),
             padding: `0 ${s(28, scale)}px`,
             borderRadius: s(16, scale),
-            background: colors.limeGreen,
+            background: colors.accent,
             color: colors.bg,
             textDecoration: 'none',
             fontSize: s(fontSizes.button, scale),

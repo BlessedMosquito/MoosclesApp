@@ -61,8 +61,9 @@ export default function Button({
           ? undefined
           : {
               scale: 1.02,
-              borderColor: 'rgba(255,255,255,0.5)',
-              boxShadow: '0 8px 30px rgba(255,255,255,0.08)',
+              background: color ? colors.redLight : colors.accentLight,
+              borderColor: colors.border,
+              boxShadow: `0 8px 30px ${color ? colors.shadow : colors.shadow}`,
             }
       }
       whileTap={
@@ -81,7 +82,7 @@ export default function Button({
         height: s(height, scale),
         padding: `0 ${s(24, scale)}px`,
         borderRadius: s(20, scale),
-        background: color ? color : colors.limeGreen,
+        background: color ? color : colors.accent,
         color: colors.bg,
         fontSize: s(fontSizes.button, scale),
         fontWeight: 600,

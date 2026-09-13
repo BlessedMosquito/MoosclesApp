@@ -7,6 +7,7 @@ import HomeIcon from './icons/HomeIcon';
 import BottomBar from './ui/bottomBar/BottomBar';
 import BottomBarItem from './ui/bottomBar/BottomBarItem';
 import ProfileIcon from './icons/ProfileIcon';
+import SettingsIcon from './icons/SettingsIcon';
 
 const AUTHENTICATED_PATHS = [
   '/dashboard',
@@ -24,9 +25,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   const iconSize = isMobile ? 16 : isTablet ? 18 : 20;
 
-  const hideSidebar = !AUTHENTICATED_PATHS.some((p) =>
-    pathname.startsWith(p)
-  );
+  const hideSidebar = !AUTHENTICATED_PATHS.some((p) => pathname.startsWith(p));
 
   const BOTTOM_BAR_HEIGHT = 90;
 
@@ -73,7 +72,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <BottomBarItem
             activePath="/profile"
             onClick={() => router.push('/profile')}
-            icon={<ProfileIcon size={iconSize} />}
+            icon={<SettingsIcon size={iconSize} />}
           />
         </BottomBar>
       )}

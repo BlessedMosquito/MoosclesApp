@@ -147,7 +147,7 @@ export default function Slider({
             minWidth: 0,
             height: TRACK_H,
             borderRadius: 999,
-            background: colors.limeGreen,
+            background: colors.accent,
             transition: isDragging ? 'none' : 'width 0.1s ease',
           }}
         />
@@ -162,7 +162,7 @@ export default function Slider({
             width: THUMB,
             height: THUMB,
             borderRadius: '50%',
-            background: colors.limeGreen,
+            background: colors.accent,
             border: `3px solid grey`,
             boxShadow: `0 2px 8px black`,
             pointerEvents: 'none',

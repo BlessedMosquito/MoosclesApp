@@ -163,7 +163,7 @@ export default function ExperienceSummaryPopup({
               transition={{ delay: 1.0, duration: 0.3 }}
               style={{
                 fontSize: s(24, scale),
-                color: colors.limeGreen,
+                color: colors.accent,
               }}
             >
               →
@@ -190,7 +190,7 @@ export default function ExperienceSummaryPopup({
               <motion.span
                 key={displayedLevel.level}
                 initial={
-                  levelUp ? { scale: 1.4, color: colors.limeGreen } : undefined
+                  levelUp ? { scale: 1.4, color: colors.accent } : undefined
                 }
                 animate={{ scale: 1, color: colors.text }}
                 transition={{ duration: 0.4 }}
@@ -210,7 +210,7 @@ export default function ExperienceSummaryPopup({
             <ProgressBar
               value={displayedLevel.currentExp}
               progress={displayedLevel.progress}
-              color={colors.limeGreen}
+              color={colors.accent}
               showLabels={false}
             />
           </div>
@@ -233,7 +233,7 @@ export default function ExperienceSummaryPopup({
           style={{
             fontSize: s(fontSizes.heading2, scale),
             fontWeight: 800,
-            color: colors.limeGreen,
+            color: colors.accent,
           }}
         >
           +{result.total_exp} XP
@@ -303,7 +303,7 @@ export default function ExperienceSummaryPopup({
                   style={{
                     fontSize: s(fontSizes.body, scale),
                     fontWeight: 700,
-                    color: colors.limeGreen,
+                    color: colors.accent,
                   }}
                 >
                   +{item.amount}

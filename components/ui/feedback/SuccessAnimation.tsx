@@ -100,7 +100,7 @@ export default function SuccessAnimation({
             cy={SIZE / 2}
             r={RADIUS}
             fill="none"
-            stroke={phase === 'success' ? colors.limeGreen : colors.text}
+            stroke={phase === 'success' ? colors.accent : colors.text}
             strokeWidth={STROKE}
             strokeLinecap="round"
             strokeDasharray={CIRCUMFERENCE}
@@ -134,7 +134,7 @@ export default function SuccessAnimation({
             <polyline
               points={`${SIZE * 0.28},${SIZE * 0.52} ${SIZE * 0.44},${SIZE * 0.68} ${SIZE * 0.72},${SIZE * 0.36}`}
               fill="none"
-              stroke={colors.limeGreen}
+              stroke={colors.accent}
               strokeWidth={STROKE}
               strokeLinecap="round"
               strokeLinejoin="round"

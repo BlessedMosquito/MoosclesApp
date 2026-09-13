@@ -47,8 +47,8 @@ export default function LoadingCircle({
           inset: 0,
           borderRadius: '50%',
           border: `${scaledStroke}px solid transparent`,
-          borderTopColor: colors.limeGreen,
-          borderRightColor: colors.limeGreen,
+          borderTopColor: colors.accent,
+          borderRightColor: colors.accent,
         }}
         animate={{ rotate: 360 }}
         transition={{ repeat: Infinity, duration: 0.8, ease: 'linear' }}

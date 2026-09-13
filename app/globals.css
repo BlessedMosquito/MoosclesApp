@@ -1,19 +1,35 @@
 @import 'tailwindcss';
 
 :root {
-  --bg: #0b0c0c;
-  --componentsBg: rgba(141, 141, 141, 0.15);
-  --tileBg: rgba(141, 141, 141, 0.15);
+  --bg: #171717;
+  --componentsBg: #212121;
+  --tileBg: #1c1c1c;
+
+  --accentDark: #0a6345;
+  --accent: #34d399;
+  --accentLight: #6ee7b7;
+
+  --accentSurface: rgba(16, 185, 129, 0.12);
+  --accentBorder: rgba(16, 185, 129, 0.4);
+
+  --errorDark: #dc2626;
+  --error: #ef4444;
+  --errorLight: #f87171;
+
+  --red: var(--error);
+  --redDark: var(--errorDark);
+  --redLight: var(--errorLight);
+
+  --error-muted: #ffffff;
+  --error-surface: var(--error);
+  --error-border: rgba(239, 68, 68, 0.4);
+  --errorBorder: var(--error-border);
+
   --border: rgba(255, 255, 255, 0.505);
   --text: #eaeaea;
   --text-muted: #848484;
   --shadow: rgba(0, 0, 0, 0.6);
-  --error-muted: #ffb4ae;
-  --error-surface: rgba(255, 69, 58, 0.12);
-  --error-border: rgba(255, 69, 58, 0.28);
-  --lime-green: #30d158;
-  --red: #d73c33;
-  --white: #dddddd;
+
   --transparent: transparent;
 }
 
@@ -49,8 +65,7 @@ body::before {
   bottom: -20%;
   z-index: -1;
   pointer-events: none;
-  background: url('/background3.jpg') center / cover no-repeat;
-  background-color: #8d8d8d;
+  background-color: var(--bg);
 }
 
 body > div {
