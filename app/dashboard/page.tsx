@@ -10,14 +10,16 @@ import { createClient } from '@/lib/supabase/client';
 import { s, useResponsive } from '@/lib/useResponsive';
 import { getUserData, ReturnGetUserData } from '@/services/userData';
 import { getWorkoutDaysForWeek } from '@/services/workouts';
-import { colors } from '@/theme/colors';
-import { fontSizes } from '@/theme/typography';
 import { useEffect, useState } from 'react';
-import AddWorkoutTile from '@/components/ui/tiles/AddWorkoutTile';
 import WaterTile from '@/components/ui/tiles/WaterTile';
+import Button from '@/components/ui/buttons/Button';
+import TopBar from '@/components/ui/topBar/TopBar';
+import AddIcon from '@/components/icons/AddIcon';
+import { useRouter } from 'next/navigation';
 
 export default function DashboardPage() {
   const supabase = createClient();
+  const router = useRouter();
   const { isMobile, scale, width } = useResponsive();
 
   const [userData, setUserData] = useState<ReturnGetUserData>({
@@ -95,44 +97,22 @@ export default function DashboardPage() {
       }}
     >
       {/* STICKY HEADER */}
-      <div
-        style={{
-          position: 'sticky',
-          top: 0,
-          zIndex: 10,
-          width: '100%',
-          maxWidth: contentMaxWidth,
-          padding: `${s(12, scale)}px ${s(16, scale)}px`,
-          backdropFilter: 'blur(12px)',
-          background: colors.componentsBg,
-          borderRadius: s(18, scale),
-          border: `1px solid ${colors.accent}`,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        }}
-      >
-        <h1
-          style={{
-            margin: 0,
-            color: 'white',
-            fontSize: s(isMobile ? 22 : 32, scale),
-            fontWeight: 700,
-          }}
-        >
-          Mooscles
-        </h1>
-        <p
-          style={{
-            margin: 0,
-            color: colors.text,
-            fontSize: s(isMobile ? fontSizes.bodySmall : fontSizes.body, scale),
-            fontWeight: 600,
-          }}
-        >
-          {`Hello, ${firstName ?? ''}`}
-        </p>
-      </div>
+      <TopBar
+        width={contentMaxWidth}
+        left={
+          <h1
+            style={{
+              margin: 0,
+              color: 'white',
+              fontSize: s(isMobile ? 22 : 32, scale),
+              fontWeight: 700,
+            }}
+          >
+            Mooscles
+          </h1>
+        }
+        right={`Hello, ${firstName ?? ''}`}
+      />
 
       {error && <ErrorPopUp onClose={() => setError(null)}>{error}</ErrorPopUp>}
 
@@ -174,7 +154,16 @@ export default function DashboardPage() {
               width: tileWidth,
             }}
           >
-            <AddWorkoutTile tileWidth={tileWidth} tileHeight={halfTileHeight} />
+            <div style={{ width: '100%', height: halfTileHeight }}>
+              <Button
+                width="full"
+                height={halfTileHeight * 1.2}
+                onClick={() => router.push('/workout/new/subgroup')}
+              >
+                <AddIcon />
+                {'Add workout'}
+              </Button>
+            </div>
             <WaterTile tileWidth={tileWidth} tileHeight={halfTileHeight} />
           </div>
           <DurationTile
@@ -233,7 +222,16 @@ export default function DashboardPage() {
               gap: gridGap,
             }}
           >
-            <AddWorkoutTile tileWidth={tileWidth} tileHeight={halfTileHeight} />
+            <div style={{ width: '100%' }}>
+              <Button
+                width="full"
+                height={halfTileHeight}
+                onClick={() => router.push('/workout/new/subgroup')}
+              >
+                <AddIcon />
+                {'Add workout'}
+              </Button>
+            </div>
             <WaterTile tileWidth={tileWidth} tileHeight={halfTileHeight} />
           </div>
           <div

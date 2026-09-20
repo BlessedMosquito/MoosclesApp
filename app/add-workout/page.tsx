@@ -42,7 +42,7 @@ export default function AddWorkoutPage() {
   useEffect(() => {
     async function loadWorkoutTypes() {
       try {
-        const types = await getWorkoutTypes();
+        const types = await getWorkoutTypes({ subgroup: '' });
         setWorkoutTypes(types);
       } catch (loadError) {
         setError(

@@ -14,6 +14,9 @@ type TileProps = {
   width?: number | string;
   height?: number | string;
   aspectRatio?: string;
+  titleAlign?: 'left' | 'center';
+  titleVAlign?: 'top' | 'center';
+  titleSize?: number;
 };
 
 export default function Tile({
@@ -24,6 +27,9 @@ export default function Tile({
   width,
   height,
   aspectRatio = '1 / 1',
+  titleAlign = 'left',
+  titleVAlign = 'top',
+  titleSize,
 }: TileProps) {
   const { isMobile, scale } = useResponsive();
 
@@ -78,18 +84,22 @@ export default function Tile({
       {(title || subtitle) && (
         <div
           style={{
+            flex: titleVAlign === 'center' ? 1 : undefined,
             display: 'flex',
             flexDirection: 'column',
+            justifyContent: titleVAlign === 'center' ? 'center' : undefined,
             gap: s(4, scale),
+            alignItems: titleAlign === 'center' ? 'center' : 'flex-start',
           }}
         >
           {title && (
             <p
               style={{
                 margin: 0,
-                fontSize: s(fontSizes.bodySmall, scale),
+                fontSize: s(titleSize ?? fontSizes.bodySmall, scale),
                 fontWeight: 800,
                 color: colors.text,
+                textAlign: titleAlign,
               }}
             >
               {title}
@@ -102,6 +112,7 @@ export default function Tile({
                 margin: 0,
                 fontSize: s(fontSizes.caption, scale),
                 color: colors.text,
+                textAlign: titleAlign,
               }}
             >
               {subtitle}
