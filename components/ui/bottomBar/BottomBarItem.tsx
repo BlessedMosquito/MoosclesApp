@@ -33,6 +33,7 @@ export default function BottomBarItem({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        cursor: 'pointer',
       }}
     >
       <AnimatePresence initial={false}>

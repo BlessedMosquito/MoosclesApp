@@ -8,6 +8,7 @@ import { getWorkoutTypesSubGroups } from '@/services/workoutTypes';
 import { useSetBackRoute, useSetText, useStartLeave } from '../layout';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { motion } from 'motion/react';
 
 export default function SelectSubgroupPage() {
   const { isMobile, scale } = useResponsive();
@@ -78,28 +79,37 @@ export default function SelectSubgroupPage() {
           }}
         >
           {subgroups?.map((subgroup) => (
-            <Tile
+            <motion.div
               key={subgroup}
-              title={subgroup}
-              titleVAlign="center"
-              titleSize={isMobile ? 24 : 32}
-              width="100%"
-              height={100}
-              onClick={() => {
-                if (!isMobile) {
-                  router.push(
-                    `/workout/new/name?subgroup=${encodeURIComponent(subgroup)}`
-                  );
-                  return;
-                }
-                startLeave();
-                setTimeout(() => {
-                  router.push(
-                    `/workout/new/name?subgroup=${encodeURIComponent(subgroup)}`
-                  );
-                }, 450);
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{
+                duration: 0.4,
+                scale: { type: 'spring', visualDuration: 0.4, bounce: 0.3 },
               }}
-            />
+            >
+              <Tile
+                title={subgroup}
+                titleVAlign="center"
+                titleSize={isMobile ? 24 : 32}
+                width="100%"
+                height={100}
+                onClick={() => {
+                  if (!isMobile) {
+                    router.push(
+                      `/workout/new/name?subgroup=${encodeURIComponent(subgroup)}`
+                    );
+                    return;
+                  }
+                  startLeave();
+                  setTimeout(() => {
+                    router.push(
+                      `/workout/new/name?subgroup=${encodeURIComponent(subgroup)}`
+                    );
+                  }, 450);
+                }}
+              />
+            </motion.div>
           ))}
         </div>
       )}

@@ -7,9 +7,12 @@ export type UpsertUserDataProps = {
 };
 
 export type ReturnGetUserData = {
+  user_id: string;
   experience: number;
   weekly_distance_goal_meters: number;
   weekly_duration_goal_minutes: number;
+  created_at: string | null;
+  updated_at: string | null;
 };
 
 const supabase = createClient();
@@ -18,16 +21,19 @@ export async function getUserData(userId: string) {
   const { data } = await supabase
     .from('user_data')
     .select(
-      'experience, weekly_distance_goal_meters, weekly_duration_goal_minutes'
+      'user_id, experience, weekly_distance_goal_meters, weekly_duration_goal_minutes, created_at, updated_at'
     )
     .eq('user_id', userId)
     .maybeSingle();
 
   return (
     (data as ReturnGetUserData) ?? {
+      user_id: userId,
       experience: 0,
       weekly_duration_goal_minutes: 0,
       weekly_distance_goal_meters: 0,
+      created_at: null,
+      updated_at: null,
     }
   );
 }

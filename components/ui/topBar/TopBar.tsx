@@ -37,9 +37,9 @@ export default function TopBar({
     borderRadius: s(18, scale),
     border: `1px solid ${colors.accent}`,
     color: colors.text,
-    display: 'flex',
+    display: 'grid',
+    gridTemplateColumns: '1fr auto 1fr',
     alignItems: 'center',
-    justifyContent: 'space-between',
     gap: s(8, scale),
     boxSizing: 'border-box',
   };
@@ -47,8 +47,7 @@ export default function TopBar({
   function renderSlot(slot: TopBarItem, align: 'left' | 'right') {
     if (slot === undefined || slot === null) return null;
 
-    const hasText =
-      typeof slot === 'string' || typeof slot === 'number';
+    const hasText = typeof slot === 'string' || typeof slot === 'number';
 
     return (
       <div
@@ -57,10 +56,7 @@ export default function TopBar({
           display: 'flex',
           alignItems: 'center',
           justifyContent: align === 'right' ? 'flex-end' : 'flex-start',
-          fontSize: s(
-            isMobile ? fontSizes.bodySmall : fontSizes.body,
-            scale
-          ),
+          fontSize: s(isMobile ? fontSizes.bodySmall : fontSizes.body, scale),
           fontWeight: 600,
           color: colors.text,
           whiteSpace: 'nowrap',
@@ -76,7 +72,6 @@ export default function TopBar({
       {renderSlot(left, 'left')}
       <div
         style={{
-          flex: '1 1 0',
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',

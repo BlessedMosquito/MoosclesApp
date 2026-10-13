@@ -7,8 +7,9 @@ import { s, useResponsive } from '@/lib/useResponsive';
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
 import { ReturnGetWorkoutsData } from '@/services/workouts';
-import ArrowIcon from '../icons/ArrowIcon';
 import Button from './buttons/Button';
+import ChevronIcon from '../icons/ChevronIcon';
+import { motion } from 'motion/react';
 
 const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const yearOptions = Array.from({ length: 21 }, (_, i) => 2010 + i);
@@ -32,47 +33,6 @@ function getMonthDays(monthDate: Date) {
     days.push(new Date(year, month, d));
   while (days.length % 7 !== 0) days.push(null);
   return days;
-}
-
-type NavButtonProps = {
-  onClickFunction: () => void;
-  children: React.ReactNode;
-  rotation: number;
-  disabled: boolean;
-  scale: number;
-  isMobile: boolean;
-};
-
-function NavButton({
-  onClickFunction,
-  children,
-  rotation,
-  disabled,
-  scale,
-  isMobile,
-}: NavButtonProps) {
-  return (
-    <button
-      type="button"
-      onClick={onClickFunction}
-      disabled={disabled}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        border: `1px solid ${colors.text}`,
-        borderRadius: s(12, scale),
-        background: colors.accent,
-        color: colors.bg,
-        width: s(isMobile ? 32 : 38, scale),
-        height: s(isMobile ? 52 : 58, scale),
-        cursor: 'pointer',
-        transform: `rotate(${rotation}deg)`,
-      }}
-    >
-      {children}
-    </button>
-  );
 }
 
 type CalendarGridProps = {
@@ -117,10 +77,6 @@ export default function CalendarGrid({
     <section
       style={{
         marginTop: s(isMobile ? 16 : 24, scale),
-        border: `1px solid ${colors.border}`,
-        borderRadius: s(isMobile ? 16 : 20, scale),
-        background: colors.componentsBg,
-        padding: s(isMobile ? 8 : 18, scale),
       }}
     >
       {/* nawigacja */}
@@ -134,15 +90,15 @@ export default function CalendarGrid({
           marginRight: 10,
         }}
       >
-        <NavButton
-          onClickFunction={() => changeMonth(-1)}
-          rotation={-90}
-          disabled={isLoading}
-          scale={scale}
-          isMobile={isMobile}
+        <button
+          style={{
+            rotate: '-180deg',
+            cursor: 'pointer',
+          }}
+          onClick={() => changeMonth(-1)}
         >
-          <ArrowIcon />
-        </NavButton>
+          <ChevronIcon />
+        </button>
         <div
           style={{
             display: 'flex',
@@ -182,15 +138,13 @@ export default function CalendarGrid({
             {monthLabel}
           </h2>
         </div>
-        <NavButton
-          onClickFunction={() => changeMonth(1)}
-          rotation={90}
+        <button
+          style={{ cursor: 'pointer' }}
+          onClick={() => changeMonth(1)}
           disabled={isLoading}
-          scale={scale}
-          isMobile={isMobile}
         >
-          <ArrowIcon />
-        </NavButton>
+          <ChevronIcon />
+        </button>
       </div>
       {isYearPickerOpen ? (
         <div
@@ -274,10 +228,11 @@ export default function CalendarGrid({
                 : [];
               const hasWorkouts = dayWorkouts.length > 0;
               return (
-                <div
+                <motion.button
                   key={key}
                   role={hasWorkouts ? 'button' : undefined}
                   tabIndex={hasWorkouts ? 0 : undefined}
+                  whileTap={{ scale: 0.9 }}
                   onClick={() => {
                     if (hasWorkouts) {
                       if (dayWorkouts.length === 1) {
@@ -296,18 +251,6 @@ export default function CalendarGrid({
                       onSelectWorkout(dayWorkouts[0]);
                     }
                   }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'scale(0.97)';
-                    if (hasWorkouts) {
-                      e.currentTarget.style.background = colors.accentLight;
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'scale(1)';
-                    if (hasWorkouts) {
-                      e.currentTarget.style.background = colors.accent;
-                    }
-                  }}
                   style={{
                     minHeight: s(isMobile ? 54 : 112, scale),
                     borderRadius: s(isMobile ? 8 : 12, scale),
@@ -320,19 +263,26 @@ export default function CalendarGrid({
                     padding: s(isMobile ? 3 : 6, scale),
                     overflow: 'hidden',
                     cursor: hasWorkouts ? 'pointer' : 'default',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'flex-start',
+                    justifyContent: 'flex-start',
+                    textAlign: 'left',
+                    fontFamily: 'inherit',
                   }}
                 >
                   {day && (
                     <>
                       <p
-                        style={{
-                          margin: 0,
-                          color: hasWorkouts ? 'black' : colors.text,
-                          fontSize: s(
-                            isMobile ? fontSizes.bodySmall : fontSizes.body,
-                            scale
-                          ),
-                        }}
+style={{
+                    margin: 0,
+                    color: hasWorkouts ? 'black' : colors.text,
+                    fontSize: s(
+                      isMobile ? fontSizes.bodySmall : fontSizes.body,
+                      scale
+                    ),
+                    alignSelf: 'flex-start',
+                  }}
                       >
                         {day.getDate()}
                       </p>
@@ -347,7 +297,7 @@ export default function CalendarGrid({
                       ></div>
                     </>
                   )}
-                </div>
+                </motion.button>
               );
             })}
           </div>

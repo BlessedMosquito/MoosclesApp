@@ -1,9 +1,8 @@
 'use client';
 
 import Button from '@/components/ui/buttons/Button';
+import TextInput from '@/components/ui/inputs/TextInput';
 import { s, useResponsive } from '@/lib/useResponsive';
-import { colors } from '@/theme/colors';
-import { fontSizes } from '@/theme/typography';
 import { useSetBackRoute, useSetText, useStartLeave } from '../layout';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
@@ -84,21 +83,10 @@ function NameContent() {
         {error && (
           <ErrorPopUp onClose={() => setError(null)}>{error}</ErrorPopUp>
         )}
-        <input
+<TextInput
           placeholder="eg. Push day"
           value={workoutName}
-          onChange={(event) => setWorkoutName(event.target.value)}
-          style={{
-            width: '100%',
-            boxSizing: 'border-box',
-            padding: s(14, scale),
-            borderRadius: s(14, scale),
-            border: `1px solid ${colors.border}`,
-            background: colors.componentsBg,
-            color: colors.text,
-            fontSize: Math.max(s(fontSizes.input, scale), 16),
-            outline: 'none',
-          }}
+          onChange={setWorkoutName}
         />
 
         <Button onClick={handleContinue} width="full">

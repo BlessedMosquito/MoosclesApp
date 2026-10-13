@@ -8,9 +8,12 @@ type AddSetsProperties = {
 };
 
 export type ReturnGetSetsData = {
-  id: number | string;
+  id: string;
+  created_at: string | null;
+  exercise_id: string;
   reps: number;
-  weight: number;
+  weight: number | null;
+  set_order: number;
 };
 
 const supabase = createClient();

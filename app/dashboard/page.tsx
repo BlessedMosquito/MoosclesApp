@@ -23,9 +23,12 @@ export default function DashboardPage() {
   const { isMobile, scale, width } = useResponsive();
 
   const [userData, setUserData] = useState<ReturnGetUserData>({
+    user_id: '',
     experience: 0,
     weekly_distance_goal_meters: 0,
     weekly_duration_goal_minutes: 0,
+    created_at: null,
+    updated_at: null,
   });
   const [userId, setUserId] = useState<string | null>(null);
   const [workoutDays, setWorkoutDays] = useState<Record<string, boolean>>({});

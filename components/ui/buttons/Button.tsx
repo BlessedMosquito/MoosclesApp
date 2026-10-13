@@ -60,7 +60,7 @@ export default function Button({
         disabled
           ? undefined
           : {
-              scale: 1.02,
+              scale: 1.05,
               background: color ? colors.redLight : colors.accentLight,
               borderColor: colors.border,
               boxShadow: `0 8px 30px ${color ? colors.shadow : colors.shadow}`,
@@ -70,7 +70,7 @@ export default function Button({
         disabled
           ? undefined
           : {
-              scale: 0.97,
+              scale: 0.9,
             }
       }
       transition={{

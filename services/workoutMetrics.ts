@@ -14,8 +14,9 @@ export type ReturnGetMetricsData = {
   duration_minutes: number | null;
   distance_meters: number | null;
   average_pace: number | null;
-  created_at: string;
-  well_being: number;
+  created_at: string | null;
+  well_being: number | null;
+  user_id: string;
 };
 
 type GetWeeklyDataSummaryProps = {

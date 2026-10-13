@@ -3,7 +3,6 @@
 import CalendarGrid from '@/components/ui/CalendarGrid';
 import ErrorPopUp from '@/components/ui/feedback/ErrorPopUp';
 import QuestionPopUp from '@/components/ui/popups/QuestionPopUp';
-import SectionDivider from '@/components/ui/SectionDivider';
 import WorkoutPreview from '@/components/ui/WorkoutPreview';
 import { s, useResponsive } from '@/lib/useResponsive';
 import {
@@ -24,7 +23,6 @@ import { getUserData, ReturnGetUserData } from '@/services/userData';
 import ExperienceSummaryPopUp from '@/components/ui/popups/ExperienceSummaryPopUp';
 import { getWorkoutTypeGroup, WorkoutTypeGroup } from '@/services/workoutTypes';
 import { colors } from '@/theme/colors';
-import { fontSizes } from '@/theme/typography';
 import { Mode } from '@/types/common';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -59,7 +57,7 @@ export default function CalendarPage() {
     null
   );
 
-  const contentMaxWidth = isMobile ? '100%' : isTablet ? 760 : 980;
+  const contentMaxWidth = isMobile ? '100%' : isTablet ? 700 : 880;
   const selectedWorkoutFromParams = searchParams.get('workoutId');
 
   const workoutsByDay = useMemo(() => {
@@ -147,9 +145,6 @@ export default function CalendarPage() {
 
     const params = new URLSearchParams({
       workoutId: String(selectedWorkout.id),
-      workoutGroupType: selectedWorkoutGroup,
-      workoutType: selectedWorkout.workout_types.label,
-      name: selectedWorkout.name,
       mode: 'EDIT' as Mode,
     });
 
@@ -159,9 +154,9 @@ export default function CalendarPage() {
       RepetitionBased: '/repetition-based',
     };
 
-    router.push(
-      `add-workout-data${workoutDataView[selectedWorkoutGroup]}?${params.toString()}`
-    );
+    const path = workoutDataView[selectedWorkoutGroup];
+
+    router.push(`add-workout-data${path}?${params.toString()}`);
   }
 
   async function handleConfirmWorkout() {
@@ -197,30 +192,13 @@ export default function CalendarPage() {
       style={{
         minHeight: '100dvh',
         background: 'transparent',
-        padding: s(isMobile ? 18 : 24, scale),
         color: colors.text,
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        marginTop: 20,
       }}
     >
       <div style={{ width: '100%', maxWidth: contentMaxWidth }}>
-        <header style={{ marginTop: s(isMobile ? 20 : 28, scale) }}>
-          <h1
-            style={{
-              margin: 0,
-              fontSize: s(
-                isMobile ? fontSizes.heading1 : fontSizes.display,
-                scale
-              ),
-              fontWeight: 700,
-            }}
-          >
-            <SectionDivider label="Calendar" />
-          </h1>
-        </header>
-
         {error && (
           <ErrorPopUp onClose={() => setError(null)}>{error}</ErrorPopUp>
         )}

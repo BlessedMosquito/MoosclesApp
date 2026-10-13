@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
 import { s, useResponsive } from '@/lib/useResponsive';
 import { colors } from '@/theme/colors';
 
@@ -35,7 +36,10 @@ export default function SuccessAnimation({
   const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
       style={{
         position: 'fixed',
         inset: 0,
@@ -50,41 +54,21 @@ export default function SuccessAnimation({
         WebkitBackdropFilter: 'blur(4px)',
       }}
     >
-      <style>{`
-        @keyframes spin {
-          to { transform: rotate(360deg); }
+      <motion.div
+        style={{ position: 'relative', width: SIZE, height: SIZE }}
+        animate={{ rotate: phase === 'spinning' ? 360 : 0 }}
+        transition={
+          phase === 'spinning'
+            ? { rotate: { duration: 1, repeat: Infinity, ease: 'linear' } }
+            : { duration: 0.3, ease: 'easeOut' }
         }
-        @keyframes draw-circle {
-          from { stroke-dashoffset: ${CIRCUMFERENCE}; }
-          to   { stroke-dashoffset: 0; }
-        }
-        @keyframes draw-check {
-          from { stroke-dashoffset: 60; }
-          to   { stroke-dashoffset: 0; }
-        }
-        @keyframes fade-scale-in {
-          from { opacity: 0; transform: scale(0.85); }
-          to   { opacity: 1; transform: scale(1); }
-        }
-        @keyframes fade-in {
-          from { opacity: 0; transform: translateY(6px); }
-          to   { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
-
-      <div style={{ position: 'relative', width: SIZE, height: SIZE }}>
+      >
         <svg
           width={SIZE}
           height={SIZE}
           viewBox={`0 0 ${SIZE} ${SIZE}`}
-          style={{
-            transform: 'rotate(-90deg)',
-            animation:
-              phase === 'spinning' ? 'spin 1s linear infinite' : undefined,
-            transition: 'animation 0.3s',
-          }}
+          style={{ transform: 'rotate(-90deg)' }}
         >
-          {/* track */}
           <circle
             cx={SIZE / 2}
             cy={SIZE / 2}
@@ -94,8 +78,7 @@ export default function SuccessAnimation({
             strokeWidth={STROKE}
           />
 
-          {/* progress arc */}
-          <circle
+          <motion.circle
             cx={SIZE / 2}
             cy={SIZE / 2}
             r={RADIUS}
@@ -104,63 +87,61 @@ export default function SuccessAnimation({
             strokeWidth={STROKE}
             strokeLinecap="round"
             strokeDasharray={CIRCUMFERENCE}
-            strokeDashoffset={phase === 'spinning' ? CIRCUMFERENCE * 0.75 : 0}
-            style={{
-              transition:
-                phase === 'success'
-                  ? 'stroke-dashoffset 0.5s ease-out, stroke 0.3s ease'
-                  : undefined,
-              animation:
-                phase === 'success'
-                  ? 'draw-circle 0.5s ease-out forwards'
-                  : undefined,
+            initial={{ strokeDashoffset: CIRCUMFERENCE * 0.75 }}
+            animate={{
+              strokeDashoffset: phase === 'spinning' ? CIRCUMFERENCE * 0.75 : 0,
             }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
           />
         </svg>
 
-        {/* check */}
+        <AnimatePresence>
+          {phase === 'success' && (
+            <motion.svg
+              initial={{ opacity: 0, scale: 0.85 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3, ease: 'easeOut' }}
+              width={SIZE}
+              height={SIZE}
+              viewBox={`0 0 ${SIZE} ${SIZE}`}
+              style={{ position: 'absolute', top: 0, left: 0 }}
+            >
+              <motion.polyline
+                points={`${SIZE * 0.28},${SIZE * 0.52} ${SIZE * 0.44},${SIZE * 0.68} ${SIZE * 0.72},${SIZE * 0.36}`}
+                fill="none"
+                stroke={colors.accent}
+                strokeWidth={STROKE}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeDasharray={60}
+                initial={{ strokeDashoffset: 60 }}
+                animate={{ strokeDashoffset: 0 }}
+                transition={{ duration: 0.35, ease: 'easeOut', delay: 0.1 }}
+              />
+            </motion.svg>
+          )}
+        </AnimatePresence>
+      </motion.div>
+
+      <AnimatePresence>
         {phase === 'success' && (
-          <svg
-            width={SIZE}
-            height={SIZE}
-            viewBox={`0 0 ${SIZE} ${SIZE}`}
+          <motion.p
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
             style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              animation: 'fade-scale-in 0.3s ease-out forwards',
+              margin: 0,
+              color: colors.text,
+              fontSize: s(16, scale),
+              fontWeight: 600,
             }}
           >
-            <polyline
-              points={`${SIZE * 0.28},${SIZE * 0.52} ${SIZE * 0.44},${SIZE * 0.68} ${SIZE * 0.72},${SIZE * 0.36}`}
-              fill="none"
-              stroke={colors.accent}
-              strokeWidth={STROKE}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeDasharray={60}
-              strokeDashoffset={60}
-              style={{
-                animation: 'draw-check 0.35s ease-out 0.1s forwards',
-              }}
-            />
-          </svg>
+            {message}
+          </motion.p>
         )}
-      </div>
-
-      {phase === 'success' && (
-        <p
-          style={{
-            margin: 0,
-            color: colors.text,
-            fontSize: s(16, scale),
-            fontWeight: 600,
-            animation: 'fade-in 0.4s ease-out forwards',
-          }}
-        >
-          {message}
-        </p>
-      )}
-    </div>
+      </AnimatePresence>
+    </motion.div>
   );
 }

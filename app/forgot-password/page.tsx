@@ -5,9 +5,9 @@ import { useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import Button from '@/components/ui/buttons/Button';
 import AuthLayout from '@/components/layout/AuthLayout';
+import TextInput from '@/components/ui/inputs/TextInput';
 import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
 import { fontSizes } from '@/theme/typography';
-import { colors } from '@/theme/colors';
 
 function ForgotPasswordForm() {
   const supabase = createClient();
@@ -67,19 +67,13 @@ function ForgotPasswordForm() {
             password.
           </p>
 
-          <input
+          <TextInput
             type="email"
             autoComplete="email"
             placeholder="Email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={setEmail}
             disabled={isLoading}
-            style={{
-              padding: 12,
-              borderRadius: 10,
-              color: colors.text,
-              fontSize: fontSizes.input,
-            }}
           />
 
           <Button onClick={sendReset} disabled={isLoading}>

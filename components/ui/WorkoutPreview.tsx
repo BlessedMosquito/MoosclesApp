@@ -252,7 +252,7 @@ export default function WorkoutPreview({
           fontSize: s(fontSizes.caption, scale),
         }}
       >
-        {`Workout type: ${workout.workout_types.label}`}
+        {`Workout type: ${workout.workout_types.name}`}
       </p>
 
       {error && (

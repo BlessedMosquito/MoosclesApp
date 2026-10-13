@@ -3,7 +3,8 @@ import { createClient } from '@/lib/supabase/client';
 export type ReturnGetWorkoutTypeData = {
   id: string;
   name: string;
-  label: string;
+  workout_group: string;
+  workout_subgroup: string | null;
 };
 
 export type WorkoutTypeGroup =

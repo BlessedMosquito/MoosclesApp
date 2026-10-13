@@ -27,7 +27,7 @@ export default function ErrorFallback({ error, reset }: ErrorFallbackProps) {
           width: '100%',
           padding: 32,
           borderRadius: 20,
-          border: `1px solid ${colors.errorBorder}`,
+          border: `1px solid ${colors.text}`,
           background: colors.errorSurface,
           textAlign: 'center',
           display: 'flex',

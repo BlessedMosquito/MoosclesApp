@@ -12,6 +12,7 @@ type SliderProps = {
   onChange: (value: number) => void;
   scale?: number;
   disabled?: boolean;
+  blockSlider?: boolean;
   width?: number | string;
 };
 
@@ -23,12 +24,15 @@ export default function Slider({
   onChange,
   scale,
   disabled,
+  blockSlider = false,
   width = '100%',
 }: SliderProps) {
   const { scale: resScale } = useResponsive();
   const trackRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef(false);
   const [isDragging, setIsDragging] = useState(false);
+
+  const isBlocked = disabled || blockSlider;
 
   const range = max - min;
   const sections =
@@ -49,6 +53,7 @@ export default function Slider({
   const PAD = THUMB / 2;
 
   function updateFromClientX(clientX: number) {
+    if (blockSlider) return;
     const el = trackRef.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
@@ -67,7 +72,7 @@ export default function Slider({
   }
 
   function handlePointerDown(e: React.PointerEvent) {
-    if (disabled) return;
+    if (isBlocked) return;
     e.currentTarget.setPointerCapture(e.pointerId);
     draggingRef.current = true;
     setIsDragging(true);
@@ -116,7 +121,7 @@ export default function Slider({
           position: 'relative',
           width: '100%',
           height: THUMB,
-          cursor: disabled ? 'not-allowed' : isDragging ? 'grabbing' : 'grab',
+          cursor: isBlocked ? 'not-allowed' : isDragging ? 'grabbing' : 'grab',
           touchAction: 'pan-y',
           opacity: disabled ? 0.5 : 1,
         }}

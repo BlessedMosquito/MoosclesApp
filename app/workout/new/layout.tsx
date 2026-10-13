@@ -2,9 +2,10 @@
 
 import ArrowIcon from '@/components/icons/ArrowIcon';
 import TopBar from '@/components/ui/topBar/TopBar';
+import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
 import { s, useResponsive } from '@/lib/useResponsive';
 import { colors } from '@/theme/colors';
-import { motion } from 'motion/react';
+import { AnimatePresence, motion } from 'motion/react';
 import { usePathname, useRouter } from 'next/navigation';
 import {
   createContext,
@@ -13,6 +14,7 @@ import {
   useEffect,
   useState,
 } from 'react';
+import ChevronIcon from '@/components/icons/ChevronIcon';
 
 const BackRouteContext = createContext<(route: string) => void>(() => {});
 
@@ -48,7 +50,9 @@ export default function NewWorkoutLayout({
     ? 2
     : pathname.endsWith('/type')
       ? 3
-      : 1;
+      : pathname.endsWith('/preview')
+        ? 4
+        : 1;
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -91,14 +95,15 @@ export default function NewWorkoutLayout({
                   left={
                     <button
                       style={{
-                        rotate: '-90deg',
+                        rotate: '-180deg',
+                        cursor: 'pointer',
                       }}
                       onClick={() => router.push(currentBackRoute)}
                     >
-                      <ArrowIcon />
+                      <ChevronIcon />
                     </button>
                   }
-                  center={`Step ${step} of 3`}
+                  center={`Step ${step} of 4`}
                 />
               </div>
               {text ? (
@@ -117,6 +122,28 @@ export default function NewWorkoutLayout({
 
               {children}
             </motion.div>
+
+            <AnimatePresence>
+              {isLeaving && isMobile && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15, ease: 'easeOut' }}
+                  style={{
+                    position: 'fixed',
+                    inset: 0,
+                    zIndex: 500,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    pointerEvents: 'none',
+                  }}
+                >
+                  <LoadingCircle size={44} />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </main>
         </LeaveContext.Provider>
       </TextContext.Provider>
