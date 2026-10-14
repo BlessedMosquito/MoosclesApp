@@ -6,14 +6,18 @@ import { fontSizes } from '@/theme/typography';
 import { ReturnGetUserData } from '@/services/userData';
 import { getLevelProgress } from '@/lib/helpers';
 
-export default function LevelTile(userData: ReturnGetUserData) {
+export default function LevelTile({
+  experience,
+  tileWidth,
+  tileHeight,
+}: ReturnGetUserData & { tileWidth: number; tileHeight: number }) {
   const { isMobile, scale } = useResponsive();
 
-  const levelData = getLevelProgress(userData.experience);
-  const circleSize = s(isMobile ? 92 : 108, scale);
+  const levelData = getLevelProgress(experience);
+  const circleSize = s(isMobile ? 60 : 90, scale);
 
   return (
-    <Tile width={350} height={250}>
+    <Tile width={tileWidth} height={tileHeight}>
       <div
         style={{
           display: 'flex',
@@ -24,13 +28,22 @@ export default function LevelTile(userData: ReturnGetUserData) {
           gap: s(12, scale),
         }}
       >
+        <p
+          style={{
+            margin: 0,
+            color: colors.text,
+            fontWeight: 700,
+          }}
+        >
+          Level
+        </p>
         {/* kółko z levelem */}
         <div
           style={{
             width: circleSize,
             height: circleSize,
             borderRadius: '50%',
-            border: `2px solid ${colors.border}`,
+            border: `2px solid ${colors.accentDark}`,
             background: colors.transparent,
             display: 'flex',
             flexDirection: 'column',
@@ -41,24 +54,13 @@ export default function LevelTile(userData: ReturnGetUserData) {
         >
           <span
             style={{
-              fontSize: s(isMobile ? 28 : 36, scale),
+              fontSize: s(isMobile ? 20 : 26, scale),
               fontWeight: 800,
-              color: colors.limeGreen,
+              color: colors.text,
               lineHeight: 1,
             }}
           >
             {levelData.level}
-          </span>
-          <span
-            style={{
-              fontSize: s(fontSizes.caption, scale),
-              color: colors.textMuted,
-              fontWeight: 600,
-              letterSpacing: '0.04em',
-              textTransform: 'uppercase' as const,
-            }}
-          >
-            level
           </span>
         </div>
 
@@ -74,11 +76,11 @@ export default function LevelTile(userData: ReturnGetUserData) {
         </p>
 
         {/* progress bar */}
-        <div style={{ width: 350 * 0.8 }}>
+        <div style={{ width: tileWidth * 0.8 }}>
           <ProgressBar
             value={levelData.currentExp}
             progress={levelData.progress}
-            color={colors.limeGreen}
+            color={colors.accent}
             labelLeft={''}
             labelRight={''}
             showLabels={false}

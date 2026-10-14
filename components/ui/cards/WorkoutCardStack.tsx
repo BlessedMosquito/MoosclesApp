@@ -101,7 +101,7 @@ export default function WorkoutCardStack({ backTile, frontTile }: DeckProps) {
               width: index === i ? s(16, scale) : s(6, scale),
               height: s(6, scale),
               borderRadius: 999,
-              background: index === i ? colors.limeGreen : colors.border,
+              background: index === i ? colors.accent : colors.border,
               transition: 'width 0.25s ease, background 0.25s ease',
               cursor: 'pointer',
             }}

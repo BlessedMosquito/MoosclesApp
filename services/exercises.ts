@@ -3,13 +3,17 @@ import { createClient } from '@/lib/supabase/client';
 type AddExerciseProperties = {
   workoutId: number | string;
   name: string;
-  exerciseLibraryId?: string | null;
+  exerciseListId?: string | null;
   order: number;
 };
 
 export type ReturnGetExercisesData = {
   id: string;
+  created_at: string | null;
+  workout_id: string;
+  exercise_list_id: string | null;
   name: string;
+  exercise_order: number;
 };
 
 const supabase = createClient();
@@ -20,7 +24,7 @@ export async function addExercise(props: AddExerciseProperties) {
     .insert({
       workout_id: props.workoutId,
       name: props.name,
-      exercise_library_id: props.exerciseLibraryId,
+      exercise_list_id: props.exerciseListId,
       exercise_order: props.order,
     })
     .select()

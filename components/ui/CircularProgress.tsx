@@ -21,7 +21,6 @@ export default function CircularProgress({
   min,
   max,
   displayValue,
-  rangeLabel,
   size,
   strokeWidth,
 }: CircularProgressProps) {
@@ -32,13 +31,39 @@ export default function CircularProgress({
   const finalSize = s(size ?? defaultSize, scale);
   const finalStrokeWidth = s(strokeWidth ?? 6, scale);
 
-  const radius = (finalSize - finalStrokeWidth) / 2;
-  const circumference = 2 * Math.PI * radius;
+  const cx = finalSize / 2;
+  const cy = finalSize / 2;
+  const radius = finalSize * 0.42;
 
   const safeRange = max - min === 0 ? 1 : max - min;
   const progress = Math.min(Math.max((value - min) / safeRange, 0), 1);
 
-  const dashOffset = circumference * (1 - progress);
+  const GAP_DEG = 40;
+  const startAngle = 90 + GAP_DEG / 2;
+  const endAngle = 90 - GAP_DEG / 2;
+
+  function pointOnCircle(angleDeg: number, r: number) {
+    const rad = (angleDeg * Math.PI) / 180;
+    return {
+      x: cx + r * Math.cos(rad),
+      y: cy + r * Math.sin(rad),
+    };
+  }
+
+  const start = pointOnCircle(startAngle, radius);
+  const end = pointOnCircle(endAngle, radius);
+
+  const arc = `M ${start.x} ${start.y} A ${radius} ${radius} 0 1 1 ${end.x} ${end.y}`;
+
+  const minPoint = pointOnCircle(startAngle, radius + finalStrokeWidth * 2);
+  const maxPoint = pointOnCircle(endAngle, radius + finalStrokeWidth * 2);
+
+  const labelStyle: React.CSSProperties = {
+    position: 'absolute',
+    color: colors.text,
+    fontSize: s(12, scale),
+    fontWeight: 600,
+  };
 
   return (
     <div
@@ -47,6 +72,7 @@ export default function CircularProgress({
         flexDirection: 'column',
         alignItems: 'center',
         gap: s(6, scale),
+        width: '100%',
       }}
     >
       {/* TITLE */}
@@ -60,7 +86,7 @@ export default function CircularProgress({
         {title}
       </p>
 
-      {/* CIRCLE */}
+      {/* ARC */}
       <div
         style={{
           position: 'relative',
@@ -68,39 +94,58 @@ export default function CircularProgress({
           height: finalSize,
         }}
       >
-        <svg
-          width={finalSize}
-          height={finalSize}
-          style={{ transform: 'rotate(-90deg)' }}
-        >
-          {/* background ring */}
-          <circle
-            cx={finalSize / 2}
-            cy={finalSize / 2}
-            r={radius}
+        <svg width={finalSize} height={finalSize}>
+          {/* background arc */}
+          <path
+            d={arc}
             fill="none"
-            stroke={colors.border}
-            strokeWidth={finalStrokeWidth}
-          />
-
-          {/* progress ring */}
-          <motion.circle
-            cx={finalSize / 2}
-            cy={finalSize / 2}
-            r={radius}
-            fill="none"
-            stroke={colors.limeGreen}
+            stroke={colors.accentDark}
             strokeWidth={finalStrokeWidth}
             strokeLinecap="round"
-            strokeDasharray={circumference}
-            initial={{ strokeDashoffset: circumference }}
-            animate={{ strokeDashoffset: dashOffset }}
+            pathLength={1}
+          />
+
+          {/* progress arc */}
+          <motion.path
+            d={arc}
+            fill="none"
+            stroke={colors.accent}
+            strokeWidth={finalStrokeWidth}
+            strokeLinecap="round"
+            pathLength={1}
+            strokeDasharray="1"
+            initial={{ strokeDashoffset: 1 }}
+            animate={{ strokeDashoffset: 1 - progress }}
             transition={{
               duration: 1,
               ease: 'easeOut',
             }}
           />
         </svg>
+
+        {/* MIN on left end */}
+        <span
+          style={{
+            ...labelStyle,
+            left: minPoint.x - s(4, scale),
+            top: minPoint.y - s(10, scale),
+            textAlign: 'right',
+          }}
+        >
+          {min}
+        </span>
+
+        {/* MAX on right end */}
+        <span
+          style={{
+            ...labelStyle,
+            left: maxPoint.x + s(4, scale),
+            top: maxPoint.y - s(10, scale),
+            textAlign: 'left',
+          }}
+        >
+          {max}
+        </span>
 
         {/* CENTER VALUE */}
         <div
@@ -125,16 +170,6 @@ export default function CircularProgress({
           </span>
         </div>
       </div>
-
-      {/* RANGE BELOW */}
-      <span
-        style={{
-          color: colors.text,
-          fontSize: s(12, scale),
-        }}
-      >
-        {rangeLabel ?? `${min} – ${max}`}
-      </span>
     </div>
   );
 }

@@ -122,9 +122,9 @@ function ToastItem({
       style={{
         padding: '12px 16px',
         borderRadius: 12,
-        border: `1px solid ${isError ? 'var(--error-border)' : 'var(--lime-green)'}`,
-        background: isError ? 'var(--error-surface)' : 'rgba(48,209,88,0.12)',
-        color: isError ? 'var(--error-muted)' : 'var(--lime-green)',
+        border: `1px solid ${isError ? 'var(--error-border)' : 'var(--accentBorder)'}`,
+        background: isError ? 'var(--error-surface)' : 'var(--accentSurface)',
+        color: isError ? 'var(--error-muted)' : 'var(--accentLight)',
         fontSize: 14,
         display: 'flex',
         justifyContent: 'space-between',

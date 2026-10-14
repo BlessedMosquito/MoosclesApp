@@ -17,8 +17,11 @@ type GetWorkoutsProperties = {
 
 export type ReturnGetWorkoutsData = {
   id: string;
+  created_at: string | null;
+  user_id: string;
   name: string;
   workout_date: string;
+  workout_type_id: string | null;
   completed_at: string | null;
   workout_types: ReturnGetWorkoutTypeData;
 };
@@ -64,11 +67,7 @@ export async function getWorkouts(
     .select(
       `
         *,
-        workout_types (
-          id,
-          name,
-          label
-        )
+        workout_types (*)
       `
     )
     .eq('user_id', filters.userId);
@@ -94,6 +93,27 @@ export async function getWorkouts(
   }
 
   return data as ReturnGetWorkoutsData[];
+}
+
+export async function getWorkoutById(
+  workoutId: string
+): Promise<ReturnGetWorkoutsData | null> {
+  const { data, error } = await supabase
+    .from('workouts')
+    .select(
+      `
+        *,
+        workout_types (*)
+      `
+    )
+    .eq('id', workoutId)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data as ReturnGetWorkoutsData | null;
 }
 
 export async function completeWorkout({ workoutId }: { workoutId: string }) {

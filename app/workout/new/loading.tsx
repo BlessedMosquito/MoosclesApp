@@ -2,16 +2,17 @@ import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
 
 export default function Loading() {
   return (
-    <main
+    <div
       style={{
-        minHeight: '100dvh',
+        flex: 1,
+        width: '100%',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        background: 'transparent',
+        padding: 24,
       }}
     >
       <LoadingCircle />
-    </main>
+    </div>
   );
 }

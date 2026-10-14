@@ -9,6 +9,8 @@ type Props = {
   workoutsThisWeek?: number;
   activeWeeks?: number;
   weekDates?: Date[];
+  width?: number;
+  height?: number;
 };
 
 function toKey(date: Date) {
@@ -40,13 +42,15 @@ export default function WeeklyStreakTile({
   workoutsThisWeek = Object.values(workoutDays).filter(Boolean).length,
   activeWeeks = 0,
   weekDates = getCurrentWeekDates(),
+  width = 350,
+  height = 180,
 }: Props) {
   const { isMobile, scale } = useResponsive();
 
   const todayKey = toKey(new Date());
 
   return (
-    <Tile width={350} height={180}>
+    <Tile width={width} height={height}>
       {/* HEADER */}
       <div style={{ marginBottom: s(10, scale) }}>
         <p
@@ -102,7 +106,7 @@ export default function WeeklyStreakTile({
                 justifyContent: 'center',
                 gap: s(3, scale),
 
-                background: hasWorkout ? colors.limeGreen : colors.componentsBg,
+                background: hasWorkout ? colors.accent : colors.componentsBg,
 
                 border: isToday
                   ? `1px solid ${colors.text}`
@@ -148,7 +152,7 @@ export default function WeeklyStreakTile({
         }}
       >
         You have{' '}
-        <span style={{ color: colors.limeGreen, fontWeight: 700 }}>
+        <span style={{ color: colors.accent, fontWeight: 700 }}>
           {activeWeeks} {activeWeeks === 1 ? 'week' : 'weeks'}
         </span>{' '}
         streak with at least one day spent working out

@@ -3,15 +3,25 @@ export const colors = {
   componentsBg: 'var(--componentsBg)',
   tileBg: 'var(--tileBg)',
   border: 'var(--border)',
-  limeGreen: 'var(--lime-green)',
+
+  accent: 'var(--accent)',
+  accentDark: 'var(--accentDark)',
+  accentLight: 'var(--accentLight)',
+  accentSurface: 'var(--accentSurface)',
+  accentBorder: 'var(--accentBorder)',
+
   text: 'var(--text)',
   textMuted: 'var(--text-muted)',
+
   red: 'var(--red)',
+  redDark: 'var(--redDark)',
+  redLight: 'var(--redLight)',
+
   shadow: 'var(--shadow)',
 
+  errorSurface: 'var(--error)',
   errorMuted: 'var(--error-muted)',
-  errorSurface: 'var(--error-surface)',
-  errorBorder: 'var(--error-border)',
+  errorBorder: 'var(--errorBorder)',
 
   transparent: 'var(--transparent)',
 };

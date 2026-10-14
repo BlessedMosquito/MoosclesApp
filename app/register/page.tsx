@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import Button from '@/components/ui/buttons/Button';
 import AuthLayout from '@/components/layout/AuthLayout';
+import TextInput from '@/components/ui/inputs/TextInput';
 import Link from 'next/link';
 import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
 import { fontSizes } from '@/theme/typography';
@@ -112,67 +113,43 @@ export default function RegisterPage() {
     <AuthLayout error={authError} onDismissError={() => setAuthError(null)}>
       <h1 style={{ color: 'white', fontSize: fontSizes.heading1 }}>MOOSCLES</h1>
 
-      <input
+      <TextInput
         type="text"
         autoComplete="given-name"
         placeholder="First name"
         value={firstName}
-        onChange={(e) => setFirstName(e.target.value)}
+        onChange={setFirstName}
         disabled={isLoading}
-        style={{
-          padding: 12,
-          borderRadius: 10,
-          color: 'white',
-          fontSize: fontSizes.input,
-        }}
       />
 
-      <input
+      <TextInput
         type="email"
         autoComplete="email"
         placeholder="Email"
         value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        onChange={setEmail}
         onBlur={onBlurEmail}
         disabled={isLoading}
-        style={{
-          padding: 12,
-          borderRadius: 10,
-          color: 'white',
-          fontSize: fontSizes.input,
-        }}
       />
 
-      <input
+      <TextInput
         type="password"
         autoComplete="new-password"
         placeholder="Password"
         value={password}
-        onChange={(e) => setPassword(e.target.value)}
+        onChange={setPassword}
         onBlur={() => onBlurPassword(password)}
         disabled={isLoading}
-        style={{
-          padding: 12,
-          borderRadius: 10,
-          color: 'white',
-          fontSize: fontSizes.input,
-        }}
       />
 
-      <input
+      <TextInput
         type="password"
         autoComplete="new-password"
         placeholder="Repeat Password"
         value={repeatedPassword}
-        onChange={(e) => setRepeatedPassword(e.target.value)}
+        onChange={setRepeatedPassword}
         onBlur={() => onBlurPassword(repeatedPassword)}
         disabled={isLoading}
-        style={{
-          padding: 12,
-          borderRadius: 10,
-          color: 'white',
-          fontSize: fontSizes.input,
-        }}
       />
 
       <Button onClick={signUp} disabled={isLoading}>

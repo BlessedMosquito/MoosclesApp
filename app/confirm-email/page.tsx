@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import Button from '@/components/ui/buttons/Button';
 import AuthLayout from '@/components/layout/AuthLayout';
+import TextInput from '@/components/ui/inputs/TextInput';
 import Link from 'next/link';
 import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
 import { fontSizes } from '@/theme/typography';
@@ -98,37 +99,24 @@ function ConfirmEmailForm() {
         We sent a confirmation code to your email.
       </p>
 
-      <input
+      <TextInput
         type="email"
         autoComplete="email"
         placeholder="Email"
         value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        onChange={setEmail}
         disabled={isLoading}
-        style={{
-          padding: 12,
-          borderRadius: 10,
-          color: 'white',
-          fontSize: fontSizes.input,
-        }}
       />
 
-      <input
+      <TextInput
         type="text"
         inputMode="numeric"
         autoComplete="one-time-code"
         placeholder="Confirmation code"
         value={code}
-        onChange={(e) => setCode(e.target.value)}
+        onChange={setCode}
         disabled={isLoading}
-        style={{
-          padding: 12,
-          borderRadius: 10,
-          color: 'white',
-          fontSize: fontSizes.input,
-          letterSpacing: 4,
-          textAlign: 'center',
-        }}
+        style={{ letterSpacing: 4, textAlign: 'center' }}
       />
 
       <Button onClick={verifyCode} disabled={isLoading}>
@@ -138,7 +126,7 @@ function ConfirmEmailForm() {
       <p style={{ fontSize: fontSizes.caption, color: '#888' }}>
         Didn&apos;t get the code?{' '}
         <Link
-          style={{ color: colors.limeGreen, textDecoration: 'none' }}
+          style={{ color: colors.accent, textDecoration: 'none' }}
           href=""
           onClick={(e) => {
             e.preventDefault();

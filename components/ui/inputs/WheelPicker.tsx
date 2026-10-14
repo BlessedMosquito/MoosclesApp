@@ -256,7 +256,7 @@ export default function WheelPicker({
             height: ITEM_H,
             transform: 'translateY(-50%)',
             borderRadius: s(10, scale),
-            background: colors.componentsBg,
+            background: 'transparent',
             pointerEvents: 'none',
             zIndex: 1,
           }}

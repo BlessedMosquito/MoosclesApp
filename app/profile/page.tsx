@@ -16,6 +16,7 @@ import { s, useResponsive } from '@/lib/useResponsive';
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
 import TimeInput from '@/components/ui/inputs/TimeInput';
+import TextInput from '@/components/ui/inputs/TextInput';
 import { getUserData, upsertUserData } from '@/services/userData';
 import { formatDistance, formatDuration } from '@/lib/format';
 import ErrorPopUp from '@/components/ui/feedback/ErrorPopUp';
@@ -153,14 +154,6 @@ export default function ProfilePage() {
 
   const inputStyle: CSSProperties = {
     flex: 1,
-    boxSizing: 'border-box',
-    padding: s(14, scale),
-    borderRadius: s(14, scale),
-    border: `1px solid ${colors.border}`,
-    background: colors.componentsBg,
-    color: colors.text,
-    fontSize: Math.max(s(fontSizes.input, scale), 16),
-    outline: 'none',
     cursor: isEditing ? 'text' : 'default',
     opacity: isEditing ? 1 : 0.75,
   };
@@ -244,18 +237,18 @@ export default function ProfilePage() {
           >
             <SectionDivider label="Name" />
 
-            <input
+            <TextInput
               value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
+              onChange={setFirstName}
               style={inputStyle}
               disabled={!isEditing}
             />
 
             <SectionDivider label="Email" />
 
-            <input
+            <TextInput
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={setEmail}
               style={{
                 ...inputStyle,
                 cursor: 'not-allowed',

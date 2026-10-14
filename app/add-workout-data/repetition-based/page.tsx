@@ -3,10 +3,8 @@
 import Button from '@/components/ui/buttons/Button';
 import ErrorPopUp from '@/components/ui/feedback/ErrorPopUp';
 import ExerciseAccordion from '@/components/ui/ExerciseAccordion';
-import SectionDivider from '@/components/ui/SectionDivider';
 import { s, useResponsive } from '@/lib/useResponsive';
 import {
-  addExercise,
   deleteExercise,
   getExercisesByWorkout,
   ReturnGetExercisesData,
@@ -17,13 +15,19 @@ import {
   getSetsByExercise,
   ReturnGetSetsData,
 } from '@/services/sets';
+import { getWorkoutById } from '@/services/workouts';
 import { colors } from '@/theme/colors';
-import { fontSizes } from '@/theme/typography';
 import { Mode } from '@/types/common';
-import { useSearchParams } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import QuestionPopUp from '@/components/ui/popups/QuestionPopUp';
 import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
+import TopBar from '@/components/ui/topBar/TopBar';
+import ChevronIcon from '@/components/icons/ChevronIcon';
+import {
+  EXERCISE_RETURN_PATH_KEY,
+  PENDING_EXERCISE_WORKOUT_ID_KEY,
+} from '@/app/constants/storageConstants';
 
 type SetDraft = {
   reps: string;
@@ -33,15 +37,17 @@ type SetDraft = {
 const decimalWeightPattern = /^\d+(?:[.,]\d{1,2})?$/;
 
 export default function AddWorkoutDataRepetitionBased() {
+  const router = useRouter();
+  const pathname = usePathname();
+
   const searchParams = useSearchParams();
   const { isMobile, isTablet, scale } = useResponsive();
 
   const workoutId = searchParams.get('workoutId');
-  const workoutName = searchParams.get('name') ?? 'Workout';
-  const workoutType = searchParams.get('workoutType')?.toLowerCase();
   const mode = searchParams.get('mode') as Mode;
 
-  const [exerciseName, setExerciseName] = useState('');
+  const [workoutName, setWorkoutName] = useState('Workout');
+  const [workoutType, setWorkoutType] = useState('');
   const [exercises, setExercises] = useState<ReturnGetExercisesData[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [expandedExerciseId, setExpandedExerciseId] = useState<string | null>(
@@ -54,7 +60,6 @@ export default function AddWorkoutDataRepetitionBased() {
   const [loadingSetsByExercise, setLoadingSetsByExercise] = useState<
     Record<string, boolean>
   >({});
-  const [isAddingExercise, setIsAddingExercise] = useState(false);
   const [showDeletePopUp, setShowDeletePopUp] = useState(false);
   const [exerciseToDelete, setExerciseToDelete] = useState<string | null>(null);
   const [setToDelete, setSetToDelete] = useState<string | null>(null);
@@ -62,9 +67,22 @@ export default function AddWorkoutDataRepetitionBased() {
     null
   );
   const [isLoading, setIsLoading] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const contentMaxWidth = isMobile ? '100%' : isTablet ? 620 : 760;
+
+  useEffect(() => {
+    async function getWorkoutData() {
+      if (!workoutId) return;
+
+      const workout = await getWorkoutById(workoutId);
+      if (workout) {
+        setWorkoutName(workout.name);
+        setWorkoutType(workout.workout_types.name?.toLowerCase() ?? '');
+      }
+    }
+    getWorkoutData();
+  }, [workoutId]);
 
   useEffect(() => {
     async function loadExercises() {
@@ -88,50 +106,29 @@ export default function AddWorkoutDataRepetitionBased() {
       }
     }
     loadExercises();
-  }, [workoutId]);
+  }, [workoutId, refreshKey]);
 
   useEffect(() => {
-    if (isAddingExercise) {
-      setTimeout(() => inputRef.current?.focus(), 50);
+    function handleReturn() {
+      setRefreshKey((current) => current + 1);
     }
-  }, [isAddingExercise]);
+    window.addEventListener('popstate', handleReturn);
+    return () => window.removeEventListener('popstate', handleReturn);
+  }, []);
 
-  async function handleAddExercise() {
-    setError(null);
-    const trimmedExerciseName = exerciseName.trim();
-
+  async function handleOpenExercisePicker() {
     if (!workoutId) {
       setError('Missing workout id.');
       return;
     }
-    if (!trimmedExerciseName) {
-      setError('Exercise name is required.');
-      return;
-    }
 
-    try {
-      const exercise = await addExercise({
-        workoutId,
-        name: trimmedExerciseName,
-        order: exercises.length + 1,
-      });
-      const newExercise = exercise as ReturnGetExercisesData;
-      setExercises((c) => [...c, newExercise]);
-      setExpandedExerciseId(String(newExercise.id));
-      setExerciseName('');
-      setIsAddingExercise(false);
-    } catch (saveError) {
-      setError(
-        saveError instanceof Error
-          ? saveError.message
-          : 'Could not add exercise.'
-      );
-    }
-  }
-
-  function handleCancelAdd() {
-    setExerciseName('');
-    setIsAddingExercise(false);
+    setError(null);
+    window.sessionStorage.setItem(PENDING_EXERCISE_WORKOUT_ID_KEY, workoutId);
+    window.sessionStorage.setItem(
+      EXERCISE_RETURN_PATH_KEY,
+      `${pathname}?${searchParams.toString()}`
+    );
+    router.push('/add-workout-data/repetition-based/add-exercise');
   }
 
   function beforeDeletePopUp({
@@ -293,7 +290,6 @@ export default function AddWorkoutDataRepetitionBased() {
   return (
     <main
       style={{
-        minHeight: '100dvh',
         background: 'transparent',
         padding: s(isMobile ? 18 : 28, scale),
         color: colors.text,
@@ -303,36 +299,40 @@ export default function AddWorkoutDataRepetitionBased() {
       }}
     >
       <div style={{ width: '100%', maxWidth: contentMaxWidth }}>
-        <section style={{ marginTop: s(28, scale) }}>
-          <h1
-            style={{
-              margin: `${s(8, scale)}px 0 0`,
-              fontSize: s(
-                isMobile ? fontSizes.heading1 : fontSizes.display,
-                scale
-              ),
-              fontWeight: 700,
-            }}
-          >
-            {workoutName}
-          </h1>
-          <p
-            style={{
-              margin: `${s(10, scale)}px 0 0`,
-              color: colors.text,
-              fontSize: s(fontSizes.body, scale),
-              lineHeight: 1.5,
-            }}
-          >
-            Add exercises to your {workoutType} session.
-          </p>
-        </section>
+        <TopBar
+          left={
+            <button
+              style={{
+                rotate: '-180deg',
+                cursor: 'pointer',
+              }}
+              onClick={() =>
+                mode === 'PREVIEW' ? router.back() : router.push('/calendar')
+              }
+            >
+              <ChevronIcon />
+            </button>
+          }
+          center={workoutName}
+        />
 
         {error && (
           <ErrorPopUp onClose={() => setError(null)}>{error}</ErrorPopUp>
         )}
 
-        <SectionDivider label="Exercise list" />
+        <p
+          style={{
+            margin: `${s(32, scale)}px 0`,
+            color: colors.text,
+            fontSize: s(isMobile ? 20 : 32, scale),
+            fontWeight: 700,
+            textAlign: 'center',
+          }}
+        >
+          {mode === 'PREVIEW'
+            ? ''
+            : `Add exercises to your ${workoutType} session`}
+        </p>
 
         <section
           style={{
@@ -389,67 +389,13 @@ export default function AddWorkoutDataRepetitionBased() {
                   </div>
                 );
               })}
-
-              {isAddingExercise && (
-                <div
-                  style={{
-                    padding: s(14, scale),
-                    borderRadius: s(14, scale),
-                    border: `1px solid ${colors.border}`,
-                    background: colors.componentsBg,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: s(10, scale),
-                  }}
-                >
-                  <p
-                    style={{
-                      margin: 0,
-                      fontSize: s(fontSizes.caption, scale),
-                      color: colors.text,
-                      fontWeight: 600,
-                    }}
-                  >
-                    Exercise {exercises.length + 1}
-                  </p>
-                  <input
-                    ref={inputRef}
-                    placeholder="Exercise name"
-                    value={exerciseName}
-                    onChange={(e) => setExerciseName(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleAddExercise();
-                      if (e.key === 'Escape') handleCancelAdd();
-                    }}
-                    style={{
-                      width: '100%',
-                      boxSizing: 'border-box',
-                      padding: s(12, scale),
-                      borderRadius: s(12, scale),
-                      border: `1px solid ${colors.border}`,
-                      background: colors.componentsBg,
-                      color: colors.text,
-                      fontSize: Math.max(s(fontSizes.input, scale), 16),
-                      outline: 'none',
-                    }}
-                  />
-                  <div style={{ display: 'flex', gap: s(8, scale) }}>
-                    <Button onClick={handleAddExercise} width="full">
-                      Add
-                    </Button>
-                    <Button onClick={handleCancelAdd} width="full">
-                      Cancel
-                    </Button>
-                  </div>
-                </div>
-              )}
             </>
           )}
         </section>
 
-        {!isLoading && !isAddingExercise && (
+        {!isLoading && mode !== 'PREVIEW' && (
           <div style={{ marginTop: s(16, scale) }}>
-            <Button onClick={() => setIsAddingExercise(true)} width="full">
+            <Button onClick={handleOpenExercisePicker} width="full">
               + Add exercise
             </Button>
           </div>

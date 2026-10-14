@@ -1,27 +1,33 @@
 'use client';
 
 import Button from '@/components/ui/buttons/Button';
-import DistanceInput from '@/components/ui/inputs/DistanceInput';
 import ErrorPopUp from '@/components/ui/feedback/ErrorPopUp';
-import SectionDivider from '@/components/ui/SectionDivider';
 import SuccessAnimation from '@/components/ui/feedback/SuccessAnimation';
-import TimeInput from '@/components/ui/inputs/TimeInput';
 import { formatDistance, formatDuration } from '@/lib/format';
 import { s, useResponsive } from '@/lib/useResponsive';
 import {
   getWorkoutMetrics,
   upsertWorkoutMetrics,
 } from '@/services/workoutMetrics';
+import { getWorkoutById } from '@/services/workouts';
 import { WorkoutTypeGroup } from '@/services/workoutTypes';
 import { colors } from '@/theme/colors';
 import { fontSizes } from '@/theme/typography';
 import { Mode } from '@/types/common';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import type { CSSProperties } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import Slider from '@/components/ui/slider/Slider';
 import { iconBasedOnRange } from '@/lib/helpers';
 import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
+import ChevronIcon from '@/components/icons/ChevronIcon';
+import TopBar from '@/components/ui/topBar/TopBar';
+import TextInput from '@/components/ui/inputs/TextInput';
+import TimeInput from '@/components/ui/inputs/TimeInput';
+import DistanceInput from '@/components/ui/inputs/DistanceInput';
+import PopupWindow from '@/components/ui/popups/PopUpWindow';
+import CompletedSection from '@/components/ui/CompletedSection';
 
 export default function AddWorkoutDataDuration() {
   const supabase = createClient();
@@ -30,33 +36,82 @@ export default function AddWorkoutDataDuration() {
   const { isMobile, isTablet, scale } = useResponsive();
 
   const workoutId = searchParams.get('workoutId');
-  const workoutName = searchParams.get('name') ?? 'Workout';
-  const workoutGroupType = searchParams.get(
-    'workoutGroupType'
-  ) as WorkoutTypeGroup;
-  const workoutType = searchParams.get('workoutType')?.toLowerCase();
   const mode = searchParams.get('mode') as Mode;
   const pendingNavRef = useRef<string | null>(null);
 
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [time, setTime] = useState({
-    hours: 0,
-    minutes: 0,
-  });
-  const [distance, setDistance] = useState({
-    km: 0,
-    m: 0,
-  });
+  const [workoutName, setWorkoutName] = useState('Workout');
+  const [workoutType, setWorkoutType] = useState('');
+  const [workoutGroupType, setWorkoutGroupType] =
+    useState<WorkoutTypeGroup | null>(null);
+  const [timeText, setTimeText] = useState('');
+  const [distanceText, setDistanceText] = useState('');
   const [wellBeing, setWellBeing] = useState(5);
+  const [timePopupOpen, setTimePopupOpen] = useState(false);
+  const [distancePopupOpen, setDistancePopupOpen] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const contentMaxWidth = isMobile ? '100%' : isTablet ? 620 : 760;
 
-  function validateTime(time: { hours: number; minutes: number }) {
-    setError(null);
+  const isPreview = mode === 'PREVIEW';
+  const canEdit = mode === 'EDIT' || mode === 'NEW';
 
-    const totalMinutes = time.hours * 60 + time.minutes;
+  const fieldStyle: CSSProperties = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: s(8, scale),
+    width: '100%',
+  };
+
+  const labelStyle: CSSProperties = {
+    fontSize: s(fontSizes.heading2, scale),
+    fontWeight: 600,
+    color: colors.text,
+  };
+
+  function parseTimeText(text: string) {
+    const [h = '', m = ''] = text.split(':');
+    return {
+      hours: Math.max(0, Math.floor(Number(h) || 0)),
+      minutes: Math.min(59, Math.max(0, Math.floor(Number(m) || 0))),
+    };
+  }
+
+  function parseDistanceText(text: string) {
+    const [km = '', m = ''] = text.split(':');
+    return {
+      kilometers: Math.max(0, Math.floor(Number(km) || 0)),
+      meters: Math.min(999, Math.max(0, Math.floor(Number(m) || 0))),
+    };
+  }
+
+  function maskColonInput(raw: string) {
+    const cleaned = raw.replace(/[^0-9:]/g, '');
+    const parts = cleaned.split(':');
+    const head = parts[0].slice(0, 3);
+    if (parts.length === 1) {
+      return head;
+    }
+    return `${head}:${parts.slice(1).join('').slice(0, 2)}`;
+  }
+
+  function normalizeTime(text: string) {
+    if (text === '') return '';
+    const { hours, minutes } = parseTimeText(text);
+    return `${hours}:${String(minutes).padStart(2, '0')}`;
+  }
+
+  function normalizeDistance(text: string) {
+    if (text === '') return '';
+    const { kilometers, meters } = parseDistanceText(text);
+    return `${kilometers}:${String(meters).padStart(2, '0')}`;
+  }
+
+  function validateTime(totalMinutes: number) {
+    setError(null);
 
     if (isNaN(totalMinutes)) {
       setError('Time must be a number.');
@@ -73,23 +128,43 @@ export default function AddWorkoutDataDuration() {
 
   useEffect(() => {
     async function getData() {
-      if (mode === 'NEW') {
-        return;
-      }
       if (!workoutId) {
         setError('Something went wrong.');
         return;
       }
+
+      const workout = await getWorkoutById(workoutId);
+      if (workout) {
+        setWorkoutName(workout.name);
+        setWorkoutType(
+          workout.workout_types.name
+            ? workout.workout_types.name.charAt(0).toUpperCase() +
+                workout.workout_types.name.slice(1)
+            : ''
+        );
+        setWorkoutGroupType(
+          workout.workout_types.workout_group as WorkoutTypeGroup
+        );
+        setIsCompleted(workout.completed_at !== null);
+      }
+
+      if (mode === 'NEW') {
+        return;
+      }
+
       const data = await getWorkoutMetrics(workoutId);
       if (data) {
         const formatedTime = formatDuration(data.duration_minutes);
-        setTime({
-          hours: formatedTime.h,
-          minutes: formatedTime.m,
-        });
+        setTimeText(
+          `${formatedTime.h}:${String(formatedTime.m).padStart(2, '0')}`
+        );
         const formatedDistance = formatDistance(data.distance_meters);
-        setDistance(formatedDistance);
-        setWellBeing(data.well_being);
+        setDistanceText(
+          `${Math.floor(formatedDistance.km)}:${String(
+            formatedDistance.m
+          ).padStart(2, '0')}`
+        );
+        setWellBeing(data.well_being ?? 5);
       }
     }
     getData();
@@ -100,17 +175,20 @@ export default function AddWorkoutDataDuration() {
 
     if (!workoutId) {
       setError('Missing workout id.');
-      return;
+      return false;
     }
 
-    if (!validateTime(time)) {
-      return;
+    const { hours, minutes } = parseTimeText(timeText);
+
+    if (!validateTime(hours * 60 + minutes)) {
+      return false;
     }
 
     setIsSaving(true);
 
-    const durationMinutes = time.hours * 60 + time.minutes;
-    const distanceMeters = distance.km * 1000 + distance.m;
+    const durationMinutes = hours * 60 + minutes;
+    const { kilometers, meters } = parseDistanceText(distanceText);
+    const distanceMeters = kilometers * 1000 + meters;
 
     try {
       const {
@@ -118,7 +196,7 @@ export default function AddWorkoutDataDuration() {
       } = await supabase.auth.getUser();
       if (!user) {
         setError('Not authenticated.');
-        return;
+        return false;
       }
       await upsertWorkoutMetrics({
         workoutId: workoutId,
@@ -130,21 +208,44 @@ export default function AddWorkoutDataDuration() {
 
       pendingNavRef.current = '/dashboard';
       setShowSuccess(true);
+      return true;
     } catch (saveError) {
       setError(
         saveError instanceof Error
           ? saveError.message
           : 'Could not add time to workout.'
       );
+      return false;
     } finally {
       setIsSaving(false);
     }
   }
 
+  function renderButton() {
+    const buttonText = isEditing ? 'Save' : 'Edit';
+    const onClick = async () => {
+      if (isEditing) {
+        const saved = await handleAddWorkoutData();
+        if (saved) setIsEditing(false);
+        return;
+      }
+      setIsEditing(true);
+    };
+    return (
+      <Button
+        onClick={onClick}
+        disabled={isSaving || isCompleted}
+        width="3/4"
+        align="center"
+      >
+        {isSaving ? <LoadingCircle size={18} /> : buttonText}
+      </Button>
+    );
+  }
+
   return (
     <main
       style={{
-        minHeight: '100dvh',
         background: 'transparent',
         padding: s(isMobile ? 18 : 28, scale),
         color: colors.text,
@@ -154,71 +255,160 @@ export default function AddWorkoutDataDuration() {
       }}
     >
       <div style={{ width: '100%', maxWidth: contentMaxWidth }}>
-        <section style={{ marginTop: s(28, scale) }}>
-          <h1
-            style={{
-              margin: `${s(8, scale)}px 0 0`,
-              fontSize: s(
-                isMobile ? fontSizes.heading1 : fontSizes.display,
-                scale
-              ),
-              fontWeight: 700,
-            }}
-          >
-            {`Workout name: ${workoutName}`}
-          </h1>
-          <p
-            style={{
-              margin: `${s(10, scale)}px 0 0`,
-              color: colors.text,
-              fontSize: s(fontSizes.body, scale),
-              lineHeight: 1.5,
-            }}
-          >
-            {`Workout type: ${workoutType}`}
-          </p>
-        </section>
+        <TopBar
+          left={
+            <button
+              style={{
+                rotate: '-180deg',
+                cursor: 'pointer',
+              }}
+              onClick={() =>
+                mode === 'PREVIEW' ? router.back() : router.push('/calendar')
+              }
+            >
+              <ChevronIcon />
+            </button>
+          }
+          center={workoutName}
+        />
 
         {error && (
           <ErrorPopUp onClose={() => setError(null)}>{error}</ErrorPopUp>
         )}
 
-        <SectionDivider label="Time" />
-        <TimeInput
-          hours={time.hours}
-          minutes={time.minutes}
-          onChange={setTime}
-          disabled={false}
-        />
-        {workoutGroupType === 'DistanceDuration' && (
-          <>
-            <SectionDivider label="Distance" />
-            <DistanceInput
-              value={distance}
-              disabled={false}
-              onChange={setDistance}
-            />
-          </>
-        )}
-        <SectionDivider label="Well-being" />
-        <Slider
-          label={iconBasedOnRange({ value: wellBeing, min: 1, max: 10 })}
-          value={wellBeing}
-          min={1}
-          max={10}
-          onChange={setWellBeing}
-        />
-        <div style={{ marginTop: s(24, scale) }}>
-          <Button
-            onClick={handleAddWorkoutData}
-            disabled={isSaving}
-            width="3/4"
-            align="center"
-          >
-            {isSaving ? <LoadingCircle size={18} /> : 'Save'}
-          </Button>
+        <div
+          style={{
+            marginTop: s(24, scale),
+            display: 'flex',
+            flexDirection: 'column',
+            gap: s(20, scale),
+          }}
+        >
+          {workoutType && (
+            <div style={fieldStyle}>
+              <span style={labelStyle}>Workout type</span>
+              <TextInput value={workoutType} readOnly onChange={() => {}} />
+            </div>
+          )}
+
+          <div style={fieldStyle}>
+            <span style={labelStyle}>Time</span>
+            {isEditing ? (
+              <TimeInput
+                hours={parseTimeText(timeText).hours}
+                minutes={parseTimeText(timeText).minutes}
+                disabled={false}
+                onChange={({ hours, minutes }) =>
+                  setTimeText(`${hours}:${String(minutes).padStart(2, '0')}`)
+                }
+              />
+            ) : canEdit && timeText === '' ? (
+              <Button onClick={() => setTimePopupOpen(true)}>Add time</Button>
+            ) : (
+              <TextInput
+                value={timeText}
+                onChange={(value) => setTimeText(maskColonInput(value))}
+                onBlur={() => setTimeText((value) => normalizeTime(value))}
+                placeholder="hh:mm"
+                inputMode="numeric"
+                disabled={isPreview}
+              />
+            )}
+          </div>
+
+          {workoutGroupType === 'DistanceDuration' && (
+            <div style={fieldStyle}>
+              <span style={labelStyle}>Distance</span>
+              {isEditing ? (
+                <DistanceInput
+                  value={{
+                    km: parseDistanceText(distanceText).kilometers,
+                    m: parseDistanceText(distanceText).meters,
+                  }}
+                  disabled={false}
+                  onChange={({ km, m }) =>
+                    setDistanceText(`${km}:${String(m).padStart(2, '0')}`)
+                  }
+                />
+              ) : canEdit && distanceText === '' ? (
+                <Button onClick={() => setDistancePopupOpen(true)}>
+                  Add distance
+                </Button>
+              ) : (
+                <TextInput
+                  value={distanceText}
+                  onChange={(value) => setDistanceText(maskColonInput(value))}
+                  onBlur={() =>
+                    setDistanceText((value) => normalizeDistance(value))
+                  }
+                  placeholder="km:mm"
+                  inputMode="numeric"
+                  disabled={isPreview}
+                />
+              )}
+            </div>
+          )}
+
+          <div style={fieldStyle}>
+            <span style={labelStyle}>Well-being</span>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: s(8, scale),
+                width: '100%',
+              }}
+            >
+              <Slider
+                label={iconBasedOnRange({
+                  value: wellBeing,
+                  min: 1,
+                  max: 10,
+                })}
+                value={wellBeing}
+                min={1}
+                max={10}
+                onChange={setWellBeing}
+                blockSlider={mode === 'PREVIEW' && !isEditing}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div style={{ marginTop: s(50, scale) }}>
+          {isCompleted ? <CompletedSection /> : renderButton()}
         </div>
       </div>
+
+      {timePopupOpen && (
+        <PopupWindow title="Time" onClose={() => setTimePopupOpen(false)}>
+          <TextInput
+            value={timeText}
+            onChange={(value) => setTimeText(maskColonInput(value))}
+            onBlur={() => setTimeText((value) => normalizeTime(value))}
+            placeholder="hh:mm"
+            inputMode="numeric"
+          />
+          <Button onClick={() => setTimePopupOpen(false)}>Save</Button>
+        </PopupWindow>
+      )}
+
+      {distancePopupOpen && (
+        <PopupWindow
+          title="Distance"
+          onClose={() => setDistancePopupOpen(false)}
+        >
+          <TextInput
+            value={distanceText}
+            onChange={(value) => setDistanceText(maskColonInput(value))}
+            onBlur={() => setDistanceText((value) => normalizeDistance(value))}
+            placeholder="km:mm"
+            inputMode="numeric"
+          />
+          <Button onClick={() => setDistancePopupOpen(false)}>Save</Button>
+        </PopupWindow>
+      )}
 
       {showSuccess && (
         <SuccessAnimation
