@@ -15,6 +15,7 @@ import Button from './buttons/Button';
 import { formatDuration, formatDistance, formatPace } from '@/lib/format';
 import { iconBasedOnRange } from '@/lib/helpers';
 import ExerciseAccordion from './ExerciseAccordion';
+import CompletedSection from './CompletedSection';
 
 export function formatDurationToString(seconds: number | null): string {
   const data = formatDuration(seconds);
@@ -410,23 +411,7 @@ export default function WorkoutPreview({
         }}
       >
         {workout.completed_at ? (
-          <div
-            style={{
-              flex: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: s(12, scale),
-              borderRadius: s(14, scale),
-              border: `1px solid ${colors.accentBorder}`,
-              background: colors.accentSurface,
-              color: colors.accentLight,
-              fontSize: s(fontSizes.bodySmall, scale),
-              fontWeight: 700,
-            }}
-          >
-            Completed
-          </div>
+          <CompletedSection />
         ) : (
           <>
             <Button onClick={onConfirm} width="3/4" align="center">

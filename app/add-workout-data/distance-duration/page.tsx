@@ -24,7 +24,10 @@ import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
 import ChevronIcon from '@/components/icons/ChevronIcon';
 import TopBar from '@/components/ui/topBar/TopBar';
 import TextInput from '@/components/ui/inputs/TextInput';
+import TimeInput from '@/components/ui/inputs/TimeInput';
+import DistanceInput from '@/components/ui/inputs/DistanceInput';
 import PopupWindow from '@/components/ui/popups/PopUpWindow';
+import CompletedSection from '@/components/ui/CompletedSection';
 
 export default function AddWorkoutDataDuration() {
   const supabase = createClient();
@@ -48,6 +51,8 @@ export default function AddWorkoutDataDuration() {
   const [wellBeing, setWellBeing] = useState(5);
   const [timePopupOpen, setTimePopupOpen] = useState(false);
   const [distancePopupOpen, setDistancePopupOpen] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   const contentMaxWidth = isMobile ? '100%' : isTablet ? 620 : 760;
 
@@ -79,7 +84,7 @@ export default function AddWorkoutDataDuration() {
     const [km = '', m = ''] = text.split(':');
     return {
       kilometers: Math.max(0, Math.floor(Number(km) || 0)),
-      meters: Math.min(99, Math.max(0, Math.floor(Number(m) || 0))),
+      meters: Math.min(999, Math.max(0, Math.floor(Number(m) || 0))),
     };
   }
 
@@ -140,6 +145,7 @@ export default function AddWorkoutDataDuration() {
         setWorkoutGroupType(
           workout.workout_types.workout_group as WorkoutTypeGroup
         );
+        setIsCompleted(workout.completed_at !== null);
       }
 
       if (mode === 'NEW') {
@@ -169,13 +175,13 @@ export default function AddWorkoutDataDuration() {
 
     if (!workoutId) {
       setError('Missing workout id.');
-      return;
+      return false;
     }
 
     const { hours, minutes } = parseTimeText(timeText);
 
     if (!validateTime(hours * 60 + minutes)) {
-      return;
+      return false;
     }
 
     setIsSaving(true);
@@ -190,7 +196,7 @@ export default function AddWorkoutDataDuration() {
       } = await supabase.auth.getUser();
       if (!user) {
         setError('Not authenticated.');
-        return;
+        return false;
       }
       await upsertWorkoutMetrics({
         workoutId: workoutId,
@@ -202,26 +208,37 @@ export default function AddWorkoutDataDuration() {
 
       pendingNavRef.current = '/dashboard';
       setShowSuccess(true);
+      return true;
     } catch (saveError) {
       setError(
         saveError instanceof Error
           ? saveError.message
           : 'Could not add time to workout.'
       );
+      return false;
     } finally {
       setIsSaving(false);
     }
   }
 
   function renderButton() {
+    const buttonText = isEditing ? 'Save' : 'Edit';
+    const onClick = async () => {
+      if (isEditing) {
+        const saved = await handleAddWorkoutData();
+        if (saved) setIsEditing(false);
+        return;
+      }
+      setIsEditing(true);
+    };
     return (
       <Button
-        onClick={handleAddWorkoutData}
-        disabled={isSaving}
+        onClick={onClick}
+        disabled={isSaving || isCompleted}
         width="3/4"
         align="center"
       >
-        {isSaving ? <LoadingCircle size={18} /> : 'Save'}
+        {isSaving ? <LoadingCircle size={18} /> : buttonText}
       </Button>
     );
   }
@@ -276,7 +293,16 @@ export default function AddWorkoutDataDuration() {
 
           <div style={fieldStyle}>
             <span style={labelStyle}>Time</span>
-            {canEdit && timeText === '' ? (
+            {isEditing ? (
+              <TimeInput
+                hours={parseTimeText(timeText).hours}
+                minutes={parseTimeText(timeText).minutes}
+                disabled={false}
+                onChange={({ hours, minutes }) =>
+                  setTimeText(`${hours}:${String(minutes).padStart(2, '0')}`)
+                }
+              />
+            ) : canEdit && timeText === '' ? (
               <Button onClick={() => setTimePopupOpen(true)}>Add time</Button>
             ) : (
               <TextInput
@@ -293,7 +319,18 @@ export default function AddWorkoutDataDuration() {
           {workoutGroupType === 'DistanceDuration' && (
             <div style={fieldStyle}>
               <span style={labelStyle}>Distance</span>
-              {canEdit && distanceText === '' ? (
+              {isEditing ? (
+                <DistanceInput
+                  value={{
+                    km: parseDistanceText(distanceText).kilometers,
+                    m: parseDistanceText(distanceText).meters,
+                  }}
+                  disabled={false}
+                  onChange={({ km, m }) =>
+                    setDistanceText(`${km}:${String(m).padStart(2, '0')}`)
+                  }
+                />
+              ) : canEdit && distanceText === '' ? (
                 <Button onClick={() => setDistancePopupOpen(true)}>
                   Add distance
                 </Button>
@@ -333,15 +370,15 @@ export default function AddWorkoutDataDuration() {
                 min={1}
                 max={10}
                 onChange={setWellBeing}
-                blockSlider={mode === 'PREVIEW'}
+                blockSlider={mode === 'PREVIEW' && !isEditing}
               />
             </div>
           </div>
         </div>
 
-        {isPreview && (
-          <div style={{ marginTop: s(100, scale) }}>{renderButton()}</div>
-        )}
+        <div style={{ marginTop: s(50, scale) }}>
+          {isCompleted ? <CompletedSection /> : renderButton()}
+        </div>
       </div>
 
       {timePopupOpen && (

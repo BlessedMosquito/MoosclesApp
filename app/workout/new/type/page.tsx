@@ -41,7 +41,7 @@ function TypeContent() {
 
       setWorkoutsTypes(types);
     } catch {
-      setError('An error occured');
+      setError('An error occurred');
     } finally {
       setIsLoading(false);
     }

@@ -23,46 +23,52 @@ export default function TimeInput({
   return (
     <div
       style={{
+        position: 'relative',
         display: 'flex',
         alignItems: 'flex-end',
         justifyContent: 'center',
-        gap: 8,
+        gap: 16,
+        width: '100%',
       }}
     >
-      <NumericInput
-        label="Hours"
-        value={hours}
-        min={0}
-        max={23}
-        placeholder="0"
-        width={100}
-        mobileWidth={70}
-        disabled={disabled}
-        onChange={(h) => onChange({ hours: Number(h), minutes })}
-      />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <NumericInput
+          label="Hours"
+          value={hours}
+          min={0}
+          max={23}
+          placeholder="0"
+          disabled={disabled}
+          onChange={(h) => onChange({ hours: Number(h), minutes })}
+        />
+      </div>
 
       <span
         style={{
+          position: 'absolute',
+          left: '50%',
+          bottom: s(12, scale),
+          transform: 'translateX(-50%)',
           color: colors.text,
           fontWeight: 700,
           fontSize: s(fontSizes.input, scale),
-          paddingBottom: s(12, scale),
+          pointerEvents: 'none',
         }}
       >
         :
       </span>
 
-      <NumericInput
-        label="Minutes"
-        value={minutes}
-        min={0}
-        max={59}
-        placeholder="0"
-        width={100}
-        mobileWidth={70}
-        disabled={disabled}
-        onChange={(m) => onChange({ hours, minutes: Number(m) })}
-      />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <NumericInput
+          label="Minutes"
+          value={minutes}
+          min={0}
+          max={59}
+          placeholder="0"
+          disabled={disabled}
+          onChange={(m) => onChange({ hours, minutes: Number(m) })}
+        />
+      </div>
     </div>
   );
 }

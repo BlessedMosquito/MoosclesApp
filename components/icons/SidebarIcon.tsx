@@ -1,12 +1,12 @@
 import {
-  commmonIconColor,
+  commonIconColor,
   commonIconSize,
 } from '@/app/constants/iconsConstants';
 import { IconProps } from '@/types/common';
 
 export default function SidebarIcon({
   size = commonIconSize,
-  color = commmonIconColor,
+  color = commonIconColor,
 }: IconProps) {
   return (
     <svg

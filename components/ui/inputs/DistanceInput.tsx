@@ -25,31 +25,32 @@ export default function DistanceInput({
         alignItems: 'flex-end',
         justifyContent: 'center',
         gap: 16,
+        width: '100%',
       }}
     >
-      <NumericInput
-        label="Kilometers"
-        value={value.km}
-        min={0}
-        max={999}
-        placeholder="0"
-        width={120}
-        mobileWidth={90}
-        disabled={disabled}
-        onChange={(km) => onChange({ ...value, km: Number(km) })}
-      />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <NumericInput
+          label="Kilometers"
+          value={value.km}
+          min={0}
+          max={999}
+          placeholder="0"
+          disabled={disabled}
+          onChange={(km) => onChange({ ...value, km: Number(km) })}
+        />
+      </div>
 
-      <NumericInput
-        label="Meters"
-        value={value.m}
-        min={0}
-        max={999}
-        placeholder="0"
-        width={120}
-        mobileWidth={90}
-        disabled={disabled}
-        onChange={(m) => onChange({ ...value, m: Number(m) })}
-      />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <NumericInput
+          label="Meters"
+          value={value.m}
+          min={0}
+          max={999}
+          placeholder="0"
+          disabled={disabled}
+          onChange={(m) => onChange({ ...value, m: Number(m) })}
+        />
+      </div>
     </div>
   );
 }

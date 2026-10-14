@@ -43,7 +43,7 @@ function PreviewContent() {
 
   useEffect(() => {
     setBackRoute('/workout/new/type');
-    setText('Your wokrout');
+    setText('Your workout');
   }, [setBackRoute, setText]);
 
   function checkName(value: string) {
