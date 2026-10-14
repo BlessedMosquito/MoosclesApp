@@ -6,6 +6,7 @@ import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
 import Grid, { GridColumn } from '@/components/ui/Grid';
 import TextInput from '@/components/ui/inputs/TextInput';
 import TopBar from '@/components/ui/topBar/TopBar';
+import { BOTTOM_BAR_HEIGHT } from '@/app/constants/layoutConstants';
 import { createClient } from '@/lib/supabase/client';
 import { s, useResponsive } from '@/lib/useResponsive';
 import { WorkoutTypeGroup } from '@/services/workoutTypes';
@@ -121,7 +122,7 @@ export default function WorkoutsList() {
         background: 'transparent',
         padding: s(isMobile ? 18 : 28, scale),
         color: colors.text,
-        height: '100%',
+        height: `calc(100% + ${BOTTOM_BAR_HEIGHT}px)`,
         boxSizing: 'border-box',
         overflow: 'hidden',
         display: 'flex',
@@ -188,6 +189,7 @@ export default function WorkoutsList() {
               columns={columns.length}
               columnConfig={columns}
               data={workouts}
+              contentPaddingBottom={BOTTOM_BAR_HEIGHT}
               keyExtractor={(item) => item.id}
               onRowClick={openWorkout}
               emptyMessage={

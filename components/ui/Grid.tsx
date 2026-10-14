@@ -26,6 +26,7 @@ type GridProps<T> = {
   gap?: number;
   columnGap?: number;
   padding?: number;
+  contentPaddingBottom?: number;
   emptyMessage?: string;
   onRowClick?: (item: T, index: number) => void;
   numberedRows?: boolean;
@@ -54,6 +55,7 @@ export default function Grid<T>({
   gap,
   columnGap,
   padding,
+  contentPaddingBottom,
   emptyMessage = 'No data',
   onRowClick,
   numberedRows = false,
@@ -160,6 +162,7 @@ export default function Grid<T>({
           display: 'flex',
           flexDirection: 'column',
           rowGap: s(resolvedGap, scale),
+          paddingBottom: contentPaddingBottom,
         }}
       >
         {data.length === 0 ? (

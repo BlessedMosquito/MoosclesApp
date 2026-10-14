@@ -10,8 +10,14 @@ import SettingsIcon from './icons/SettingsIcon';
 import BottomBar from './ui/bottomBar/BottomBar';
 import BottomBarItem from './ui/bottomBar/BottomBarItem';
 import LoadingCircle from './ui/feedback/LoadingCircle';
+import { BOTTOM_BAR_HEIGHT } from '@/app/constants/layoutConstants';
 
-const AUTHENTICATED_PATHS = ['/dashboard', '/calendar', '/profile'];
+const AUTHENTICATED_PATHS = [
+  '/dashboard',
+  '/calendar',
+  '/workouts-list',
+  '/profile',
+];
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -38,8 +44,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const iconSize = isMobile ? 16 : isTablet ? 18 : 20;
 
   const hideSidebar = !AUTHENTICATED_PATHS.some((p) => pathname.startsWith(p));
-
-  const BOTTOM_BAR_HEIGHT = 90;
 
   return (
     <div
@@ -90,24 +94,28 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             activePath="/dashboard"
             onClick={() => router.push('/dashboard')}
             icon={<HomeIcon size={iconSize} />}
+            label="Dashboard"
           />
 
           <BottomBarItem
             activePath="/calendar"
             onClick={() => router.push('/calendar')}
             icon={<CalendarIcon size={iconSize} />}
+            label="Calendar"
           />
 
           <BottomBarItem
             activePath="/workouts-list"
             onClick={() => router.push('/workouts-list')}
             icon={<LayersIcon size={iconSize} />}
+            label="Workouts"
           />
 
           <BottomBarItem
             activePath="/profile"
             onClick={() => router.push('/profile')}
             icon={<SettingsIcon size={iconSize} />}
+            label="Profile"
           />
         </BottomBar>
       )}
