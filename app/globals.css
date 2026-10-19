@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 
+@custom-variant dark (&:is(.dark *));
+
 :root {
   --bg: #171717;
   --componentsBg: #212121;
@@ -31,12 +33,83 @@
   --shadow: rgba(0, 0, 0, 0.6);
 
   --transparent: transparent;
+
+  --foreground: #eaeaea;
+  --muted: #212121;
+  --muted-foreground: #848484;
+
+  --chart-background: #171717;
+  --chart-foreground: #eaeaea;
+  --chart-foreground-muted: #848484;
+  --chart-label: #848484;
+  --chart-1: #34d399;
+  --chart-2: #6ee7b7;
+  --chart-3: #a7f3d0;
+  --chart-4: #059669;
+  --chart-5: #0a6345;
+  --legend: #212121;
+  --legend-foreground: #eaeaea;
+  --legend-muted: #2a2a2a;
+  --legend-muted-foreground: #848484;
+  --legend-track: rgba(255, 255, 255, 0.12);
+  --ring-background: #3a3a3a;
+  --chart-line-primary: var(--chart-1);
+  --chart-line-secondary: var(--chart-2);
+  --chart-crosshair: oklch(0.4 0.1828 274.34);
+  --chart-grid: oklch(0.9 0 0);
+  --chart-brush-border: var(--chart-grid);
+  --chart-tooltip-background: var(--popover);
+  --chart-tooltip-foreground: var(--popover-foreground);
+  --chart-tooltip-muted: var(--muted-foreground);
+  --chart-marker-background: oklch(0.97 0.005 260);
+  --chart-marker-border: oklch(0.85 0.01 260);
+  --chart-marker-foreground: oklch(0.3 0.01 260);
+  --chart-scale-01: #262626;
+  --chart-scale-02: #0a6345;
+  --chart-scale-03: #059669;
+  --chart-scale-04: #34d399;
+  --chart-scale-05: #6ee7b7;
+  --chart-scale-pattern-color: oklch(0.96 0.005 106);
 }
 
 @theme inline {
   --color-background: #0b0c0c;
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-chart-label: var(--chart-label);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-legend-track: var(--legend-track);
+  --color-legend-muted-foreground: var(--legend-muted-foreground);
+  --color-legend-muted: var(--legend-muted);
+  --color-legend-foreground: var(--legend-foreground);
+  --color-legend: var(--legend);
+  --color-chart-scale-pattern-color: var(--chart-scale-pattern-color);
+  --color-chart-scale-05: var(--chart-scale-05);
+  --color-chart-scale-04: var(--chart-scale-04);
+  --color-chart-scale-03: var(--chart-scale-03);
+  --color-chart-scale-02: var(--chart-scale-02);
+  --color-chart-scale-01: var(--chart-scale-01);
+  --color-chart-marker-foreground: var(----chart-marker-foreground);
+  --color-chart-marker-border: var(----chart-marker-border);
+  --color-chart-marker-background: var(----chart-marker-background);
+  --chart-tooltip-muted: var(----chart-tooltip-muted);
+  --chart-tooltip-foreground: var(----chart-tooltip-foreground);
+  --chart-tooltip-background: var(----chart-tooltip-background);
+  --chart-brush-border: var(----chart-brush-border);
+  --color-chart-grid: var(----chart-grid);
+  --color-chart-crosshair: var(----chart-crosshair);
+  --chart-line-secondary: var(----chart-line-secondary);
+  --chart-line-primary: var(----chart-line-primary);
+  --color-chart-foreground-muted: var(----chart-foreground-muted);
+  --color-chart-foreground: var(----chart-foreground);
+  --color-chart-background: var(----chart-background);
+  --color-chart-5: var(----chart-5);
+  --color-chart-4: var(----chart-4);
+  --color-chart-3: var(----chart-3);
+  --color-chart-2: var(----chart-2);
+  --color-chart-1: var(----chart-1);
 }
 
 html {
@@ -77,4 +150,33 @@ body > div {
   to {
     transform: rotate(360deg);
   }
+}
+
+.dark {
+  --legend: oklch(0.21 0.006 285.885);
+  --legend-foreground: oklch(0.985 0 0);
+  --legend-muted: oklch(0.274 0.006 286.033);
+  --legend-muted-foreground: oklch(0.705 0.015 286.067);
+  --legend-track: oklch(0.274 0.006 286.033);
+  --chart-1: oklch(1 0 none);
+  --chart-2: oklch(0.73 0 none);
+  --chart-3: oklch(0.51 0 none);
+  --chart-4: oklch(0.39 0 none);
+  --chart-5: oklch(0.32 0 none);
+  --chart-background: oklch(0.145 0 0);
+  --chart-foreground: oklch(0.45 0 0);
+  --chart-foreground-muted: oklch(0.65 0.01 260);
+  --chart-crosshair: oklch(0.45 0 0);
+  --chart-grid: oklch(0.25 0 0);
+  --chart-brush-border: var(--chart-grid);
+  --chart-marker-background: oklch(0.25 0.01 260);
+  --chart-marker-border: oklch(0.4 0.01 260);
+  --chart-marker-foreground: oklch(0.9 0 0);
+  --chart-label: oklch(0.75 0.01 260);
+  --chart-scale-01: oklch(0.28 0.03 270);
+  --chart-scale-02: oklch(0.38 0.04 270);
+  --chart-scale-03: oklch(0.48 0.05 270);
+  --chart-scale-04: oklch(0.58 0.06 270);
+  --chart-scale-05: oklch(0.68 0.07 270);
+  --chart-scale-pattern-color: oklch(0.145 0 0);
 }

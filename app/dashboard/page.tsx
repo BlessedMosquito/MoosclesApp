@@ -1,21 +1,24 @@
 'use client';
 
 import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
-import LevelTile from '@/components/ui/tiles/LevelTile';
-import DurationTile from '@/components/ui/tiles/DurationTile';
-import DistanceTile from '@/components/ui/tiles/DistanceTile';
+import LevelGaugeTile from '@/components/ui/tiles/LevelGaugeTile';
 import WeeklyWorkoutTile from '@/components/ui/tiles/WeeklyWorkoutTile';
 import ErrorPopUp from '@/components/ui/feedback/ErrorPopUp';
 import { createClient } from '@/lib/supabase/client';
 import { s, useResponsive } from '@/lib/useResponsive';
 import { getUserData, ReturnGetUserData } from '@/services/userData';
-import { getWorkoutDaysForWeek } from '@/services/workouts';
+import {
+  getCompletedWorkoutDays,
+  getWorkoutDaysForWeek,
+} from '@/services/workouts';
 import { useEffect, useState } from 'react';
 import WaterTile from '@/components/ui/tiles/WaterTile';
 import Button from '@/components/ui/buttons/Button';
 import TopBar from '@/components/ui/topBar/TopBar';
 import AddIcon from '@/components/icons/AddIcon';
 import { useRouter } from 'next/navigation';
+import MetricsTile from '@/components/ui/tiles/MetricsTile';
+import WorkoutActivityTile from '@/components/ui/tiles/WorkoutActivityTile';
 
 export default function DashboardPage() {
   const supabase = createClient();
@@ -32,6 +35,9 @@ export default function DashboardPage() {
   });
   const [userId, setUserId] = useState<string | null>(null);
   const [workoutDays, setWorkoutDays] = useState<Record<string, boolean>>({});
+  const [monthWorkoutCounts, setMonthWorkoutCounts] = useState<
+    Record<string, number>
+  >({});
   const [workoutCount, setWorkoutCount] = useState(0);
   const [activeWeeks, setActiveWeeks] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -63,9 +69,16 @@ export default function DashboardPage() {
       setUserId(user.id);
       setFirstName(user.user_metadata?.first_name ?? null);
 
-      const [data, weekData] = await Promise.all([
+      const now = new Date();
+      const pad = (value: number) => String(value).padStart(2, '0');
+      const monthStart = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-01`;
+      const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+      const monthEnd = `${nextMonth.getFullYear()}-${pad(nextMonth.getMonth() + 1)}-01`;
+
+      const [data, weekData, monthDays] = await Promise.all([
         getUserData(user.id),
         getWorkoutDaysForWeek(user.id),
+        getCompletedWorkoutDays(user.id, monthStart, monthEnd),
       ]);
       setUserData(data);
 
@@ -74,6 +87,13 @@ export default function DashboardPage() {
       setWorkoutDays(mapped);
       setWorkoutCount(weekData.workout_count);
       setActiveWeeks(weekData.active_weeks);
+
+      const monthCounts: Record<string, number> = {};
+      for (const d of monthDays) {
+        const key = d.slice(0, 10);
+        monthCounts[key] = (monthCounts[key] ?? 0) + 1;
+      }
+      setMonthWorkoutCounts(monthCounts);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not load data.');
     } finally {
@@ -144,8 +164,8 @@ export default function DashboardPage() {
             maxWidth: contentMaxWidth,
           }}
         >
-          <LevelTile
-            {...userData}
+          <LevelGaugeTile
+            experience={userData.experience}
             tileWidth={tileWidth}
             tileHeight={tileHeight}
           />
@@ -169,25 +189,19 @@ export default function DashboardPage() {
             </div>
             <WaterTile tileWidth={tileWidth} tileHeight={halfTileHeight} />
           </div>
-          <DurationTile
-            weekly_duration_goal_minutes={userData.weekly_duration_goal_minutes}
-            userId={userId ?? ''}
-            tileWidth={tileWidth}
+          <MetricsTile
+            tileWidth={contentMaxWidth}
             tileHeight={tileHeight}
-          />
-          <DistanceTile
-            weekly_distance_goal_meters={userData.weekly_distance_goal_meters}
-            userId={userId ?? ''}
-            tileWidth={tileWidth}
-            tileHeight={tileHeight}
+            chartSize={tileWidth}
+            distance={1050}
+            duration={700}
           />
           <div style={{ width: '100%' }}>
-            <WeeklyWorkoutTile
-              workoutDays={workoutDays}
-              workoutsThisWeek={workoutCount}
-              activeWeeks={activeWeeks}
-              width={contentMaxWidth}
-              height={tileHeight}
+            <WorkoutActivityTile
+              tileWidth={contentMaxWidth}
+              tileHeight={tileHeight}
+              workoutCounts={monthWorkoutCounts}
+              weeklyWorkouts={workoutCount}
             />
           </div>
         </div>
@@ -201,23 +215,20 @@ export default function DashboardPage() {
             maxWidth: contentMaxWidth,
           }}
         >
-          <LevelTile
-            {...userData}
+          <LevelGaugeTile
+            experience={userData.experience}
             tileWidth={tileWidth}
             tileHeight={tileHeight}
           />
-          <DurationTile
-            weekly_duration_goal_minutes={userData.weekly_duration_goal_minutes}
-            userId={userId ?? ''}
-            tileWidth={tileWidth}
-            tileHeight={tileHeight}
-          />
-          <DistanceTile
-            weekly_distance_goal_meters={userData.weekly_distance_goal_meters}
-            userId={userId ?? ''}
-            tileWidth={tileWidth}
-            tileHeight={tileHeight}
-          />
+          <div style={{ gridColumn: 'span 2' }}>
+            <MetricsTile
+              tileWidth={tileWidth * 2 + gridGap}
+              tileHeight={tileHeight}
+              chartSize={tileWidth}
+              distance={1050}
+              duration={700}
+            />
+          </div>
           <div
             style={{
               display: 'flex',
@@ -248,6 +259,20 @@ export default function DashboardPage() {
               activeWeeks={activeWeeks}
               width={tileWidth * 2 + gridGap}
               height={tileHeight}
+            />
+          </div>
+          <div
+            style={{
+              gridColumn: 'span 3',
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
+            <WorkoutActivityTile
+              tileWidth={tileWidth}
+              tileHeight={tileHeight}
+              workoutCounts={monthWorkoutCounts}
+              weeklyWorkouts={workoutCount}
             />
           </div>
         </div>

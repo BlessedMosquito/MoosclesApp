@@ -13,6 +13,15 @@ const eslintConfig = defineConfig([
     'build/**',
     'next-env.d.ts',
   ]),
+  // Vendored bklit chart components use effect/ref patterns the React
+  // Compiler lint rules flag.
+  {
+    files: ['components/charts/**/*.{ts,tsx}'],
+    rules: {
+      'react-hooks/set-state-in-effect': 'off',
+      'react-hooks/refs': 'off',
+    },
+  },
 ]);
 
 export default eslintConfig;
