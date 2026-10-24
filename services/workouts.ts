@@ -40,6 +40,8 @@ export type CompleteWorkoutResult = {
 
 const supabase = createClient();
 
+const errorMessage = 'An error occurred while';
+
 export async function createWorkout(props: CreateWorkoutProperties) {
   const { data, error } = await supabase
     .from('workouts')
@@ -53,7 +55,7 @@ export async function createWorkout(props: CreateWorkoutProperties) {
     .single();
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(`${errorMessage} adding workout.`);
   }
 
   return data;
@@ -89,7 +91,7 @@ export async function getWorkouts(
   });
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(`${errorMessage} loading workouts.`);
   }
 
   return data as ReturnGetWorkoutsData[];
@@ -110,7 +112,7 @@ export async function getWorkoutById(
     .maybeSingle();
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(`${errorMessage} loading workout.`);
   }
 
   return data as ReturnGetWorkoutsData | null;
@@ -122,7 +124,7 @@ export async function completeWorkout({ workoutId }: { workoutId: string }) {
   });
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error(`${errorMessage} completing workout.`);
   }
 
   return data as CompleteWorkoutResult;
@@ -146,6 +148,31 @@ export async function getCompletedWorkoutDays(
   return ((data ?? []) as { workout_date: string }[]).map(
     (row) => row.workout_date
   );
+}
+
+export type ReturnCompletedWorkoutData = {
+  workout_date: string;
+  name: string;
+};
+
+export async function getCompletedWorkouts(
+  userId: string,
+  start: string,
+  end: string
+): Promise<ReturnCompletedWorkoutData[]> {
+  const { data, error } = await supabase
+    .from('workouts')
+    .select('workout_date, name')
+    .eq('user_id', userId)
+    .not('completed_at', 'is', null)
+    .gte('workout_date', start)
+    .lt('workout_date', end);
+
+  if (error) {
+    throw new Error(`${errorMessage} loading completed workouts.`);
+  }
+
+  return (data ?? []) as ReturnCompletedWorkoutData[];
 }
 
 export type WorkoutDaysResult = {

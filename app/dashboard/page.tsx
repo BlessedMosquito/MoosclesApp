@@ -8,8 +8,9 @@ import { createClient } from '@/lib/supabase/client';
 import { s, useResponsive } from '@/lib/useResponsive';
 import { getUserData, ReturnGetUserData } from '@/services/userData';
 import {
-  getCompletedWorkoutDays,
+  getCompletedWorkouts,
   getWorkoutDaysForWeek,
+  type ReturnCompletedWorkoutData,
 } from '@/services/workouts';
 import { useEffect, useState } from 'react';
 import WaterTile from '@/components/ui/tiles/WaterTile';
@@ -35,9 +36,9 @@ export default function DashboardPage() {
   });
   const [userId, setUserId] = useState<string | null>(null);
   const [workoutDays, setWorkoutDays] = useState<Record<string, boolean>>({});
-  const [monthWorkoutCounts, setMonthWorkoutCounts] = useState<
-    Record<string, number>
-  >({});
+  const [monthWorkouts, setMonthWorkouts] = useState<
+    ReturnCompletedWorkoutData[]
+  >([]);
   const [workoutCount, setWorkoutCount] = useState(0);
   const [activeWeeks, setActiveWeeks] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -75,10 +76,10 @@ export default function DashboardPage() {
       const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
       const monthEnd = `${nextMonth.getFullYear()}-${pad(nextMonth.getMonth() + 1)}-01`;
 
-      const [data, weekData, monthDays] = await Promise.all([
+      const [data, weekData, monthWorkouts] = await Promise.all([
         getUserData(user.id),
         getWorkoutDaysForWeek(user.id),
-        getCompletedWorkoutDays(user.id, monthStart, monthEnd),
+        getCompletedWorkouts(user.id, monthStart, monthEnd),
       ]);
       setUserData(data);
 
@@ -88,12 +89,7 @@ export default function DashboardPage() {
       setWorkoutCount(weekData.workout_count);
       setActiveWeeks(weekData.active_weeks);
 
-      const monthCounts: Record<string, number> = {};
-      for (const d of monthDays) {
-        const key = d.slice(0, 10);
-        monthCounts[key] = (monthCounts[key] ?? 0) + 1;
-      }
-      setMonthWorkoutCounts(monthCounts);
+      setMonthWorkouts(monthWorkouts);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not load data.');
     } finally {
@@ -193,14 +189,16 @@ export default function DashboardPage() {
             tileWidth={contentMaxWidth}
             tileHeight={tileHeight}
             chartSize={tileWidth}
-            distance={1050}
-            duration={700}
+            distanceMax={userData.weekly_distance_goal_meters / 1000}
+            distance={0}
+            durationMax={userData.weekly_duration_goal_minutes / 60}
+            duration={0}
           />
           <div style={{ width: '100%' }}>
             <WorkoutActivityTile
               tileWidth={contentMaxWidth}
               tileHeight={tileHeight}
-              workoutCounts={monthWorkoutCounts}
+              workouts={monthWorkouts}
               weeklyWorkouts={workoutCount}
             />
           </div>
@@ -225,8 +223,10 @@ export default function DashboardPage() {
               tileWidth={tileWidth * 2 + gridGap}
               tileHeight={tileHeight}
               chartSize={tileWidth}
-              distance={1050}
-              duration={700}
+              distanceMax={userData.weekly_distance_goal_meters / 1000}
+              distance={0}
+              durationMax={userData.weekly_duration_goal_minutes / 60}
+              duration={0}
             />
           </div>
           <div
@@ -271,7 +271,7 @@ export default function DashboardPage() {
             <WorkoutActivityTile
               tileWidth={tileWidth}
               tileHeight={tileHeight}
-              workoutCounts={monthWorkoutCounts}
+              workouts={monthWorkouts}
               weeklyWorkouts={workoutCount}
             />
           </div>

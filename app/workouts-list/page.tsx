@@ -15,11 +15,7 @@ import { colors } from '@/theme/colors';
 import { Mode } from '@/types/common';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-
-function formatWorkoutDate(value: string) {
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString();
-}
+import { getFormatedDate } from '@/lib/helpers';
 
 export default function WorkoutsList() {
   const router = useRouter();
@@ -39,7 +35,12 @@ export default function WorkoutsList() {
       key: 'workout_date',
       header: 'Date',
       align: 'right',
-      render: (item) => formatWorkoutDate(item.workout_date),
+      render: (item) =>
+        getFormatedDate({
+          date: new Date(item.workout_date),
+          showYear: true,
+          nameMonth: false,
+        }),
     },
   ];
 

@@ -37,6 +37,8 @@ type MetricItem = {
 type MetricsTileProps = {
   distance: number;
   duration: number;
+  distanceMax: number;
+  durationMax: number;
   tileWidth: number;
   tileHeight: number;
   chartSize: number;
@@ -122,6 +124,8 @@ function SelectableLegendRow({
 export default function MetricsTile({
   distance,
   duration,
+  distanceMax,
+  durationMax,
   tileWidth,
   tileHeight,
   chartSize,

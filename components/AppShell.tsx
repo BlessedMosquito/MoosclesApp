@@ -19,6 +19,8 @@ const AUTHENTICATED_PATHS = [
   '/profile',
 ];
 
+const BOTTOM_BAR_EXACT_PATHS = ['/add-workout-data/repetition-based'];
+
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -43,7 +45,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   const iconSize = isMobile ? 16 : isTablet ? 18 : 20;
 
-  const hideSidebar = !AUTHENTICATED_PATHS.some((p) => pathname.startsWith(p));
+  const hideSidebar = !(
+    AUTHENTICATED_PATHS.some((p) => pathname.startsWith(p)) ||
+    BOTTOM_BAR_EXACT_PATHS.includes(pathname)
+  );
 
   return (
     <div
