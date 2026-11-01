@@ -19,6 +19,17 @@ export function getWeekRange(date = new Date()) {
   return { start, end };
 }
 
+export function toDateKey(date: Date) {
+  const pad = (value: number) => String(value).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+export function parseDateKey(value: string) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (!match) return new Date(value);
+  return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+}
+
 export type GetLevelProgressType = {
   level: number;
   currentExp: number;
@@ -66,4 +77,42 @@ export function iconBasedOnRange({
   if (value < min + third) return iconsArr[0];
   if (value < min + third * 2) return iconsArr[1];
   return iconsArr[2];
+}
+
+/**
+ *
+ * @param date
+ * @param showYear enable/disable year in formatted date
+ * Formats date to: eg. 14th October 2026
+ */
+export function getFormatedDate({
+  date,
+  showYear,
+  nameMonth,
+}: {
+  date: Date;
+  showYear: boolean;
+  nameMonth: boolean;
+}) {
+  const day = date.getDate();
+  const year = date.getFullYear();
+  const month = date.getMonth() + 1;
+
+  if (nameMonth) {
+    const suffix = {
+      zero: '',
+      one: 'st',
+      two: 'nd',
+      few: 'rd',
+      many: 'th',
+      other: '',
+    }[new Intl.PluralRules('en', { type: 'ordinal' }).select(day)];
+
+    const month = date.toLocaleString('en-US', { month: 'long' });
+    return showYear
+      ? `${day}${suffix} ${month} ${year}`
+      : `${day}${suffix} ${month}`;
+  }
+
+  return `${day}/${month}/${year}`;
 }

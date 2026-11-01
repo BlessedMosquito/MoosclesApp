@@ -1,0 +1,393 @@
+@layer components {
+  .wizard {
+    @apply box-border flex min-h-dvh flex-col items-center bg-transparent p-6 text-content sm:p-8;
+  }
+
+  .wizard-content {
+    @apply flex w-full flex-1 flex-col sm:w-1/2;
+  }
+
+  .wizard-heading {
+    @apply my-8 text-center text-h2 font-bold text-content sm:text-[2rem];
+  }
+
+  .wizard-leave-loader {
+    @apply pointer-events-none fixed inset-0 z-[500] flex items-center justify-center;
+  }
+
+  .wizard-list {
+    @apply flex w-full flex-col gap-3;
+  }
+
+  .wizard-step {
+    @apply flex w-full flex-1 flex-col items-center justify-center;
+  }
+
+  .wizard-form {
+    @apply flex w-full flex-col items-stretch gap-[22px] sm:w-[420px];
+  }
+
+  .wizard-form-loose {
+    @apply items-center gap-8;
+  }
+
+  .wizard-type {
+    @apply flex w-full flex-col gap-8 pt-6;
+  }
+
+  .field {
+    @apply flex w-full flex-col gap-2;
+  }
+
+  .field-label {
+    @apply text-body font-semibold text-content;
+  }
+
+  .field-label-lg {
+    @apply text-h2;
+  }
+
+  .field-hint {
+    @apply text-caption text-content-muted;
+  }
+
+  .question-page {
+    @apply flex min-h-[80dvh] w-full flex-col items-center justify-center;
+  }
+
+  .question-panel {
+    @apply box-border flex w-[85%] flex-col items-center gap-4 self-center rounded-[20px] border border-content bg-surface p-8 text-center;
+  }
+
+  .question-panel-title {
+    @apply m-0 text-h2 font-bold text-content;
+  }
+
+  .question-panel-text {
+    @apply m-0 text-body-sm leading-normal text-content-muted;
+  }
+
+  .question-panel-actions {
+    @apply mt-1 flex w-full flex-col items-center gap-3;
+  }
+
+  .workout-data-fields {
+    @apply mt-6 flex flex-col gap-5;
+  }
+
+  .workout-data-slider {
+    @apply flex w-full items-center justify-center gap-2;
+  }
+
+  .workout-data-actions {
+    @apply mt-[50px];
+  }
+
+  .workout-data-buttons {
+    @apply flex gap-3;
+  }
+
+  .workout-data-header {
+    @apply mt-6 flex flex-col gap-1;
+  }
+
+  .workout-data-heading {
+    @apply m-0 text-h2 font-bold text-content;
+  }
+
+  .workout-data-subheading {
+    @apply m-0 text-body-sm text-content-muted first-letter:uppercase;
+  }
+
+  .exercise-list {
+    @apply mt-4 flex flex-col gap-4;
+  }
+
+  .exercise-list-loading {
+    @apply flex min-h-[120px] items-center justify-center;
+  }
+
+  .exercise-filters {
+    @apply flex flex-col gap-2.5;
+  }
+
+  .exercise-filter-row {
+    @apply flex gap-2;
+  }
+
+  .muscle-list {
+    @apply flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain pb-2;
+  }
+
+  .workout-preview {
+    @apply mt-[18px] rounded-[20px] border border-line bg-surface p-4;
+  }
+
+  .workout-preview-header {
+    @apply mb-1 flex items-center justify-between;
+  }
+
+  .workout-preview-title {
+    @apply mt-1.5 mb-0 text-h2 font-bold;
+  }
+
+  .workout-preview-type {
+    @apply m-0 text-caption text-content;
+  }
+
+  .workout-preview-error {
+    @apply mt-2.5 rounded-[10px] border border-danger-border bg-danger p-2.5 text-caption text-on-danger;
+  }
+
+  .workout-preview-content {
+    @apply mt-3.5 flex flex-col gap-2;
+  }
+
+  .workout-preview-actions {
+    @apply mt-4 flex gap-2;
+  }
+
+  .preview-empty {
+    @apply m-0 text-body-sm text-content;
+  }
+
+  .preview-metrics {
+    @apply flex flex-col gap-2;
+  }
+
+  .preview-metric-grid {
+    @apply grid grid-cols-1 gap-2;
+  }
+
+  .metric-card {
+    @apply rounded-xl border border-line bg-surface p-3;
+
+    & .metric-card-label {
+      @apply m-0 text-caption text-content;
+    }
+
+    & .metric-card-value {
+      @apply mt-1 mb-0 text-body font-bold;
+    }
+  }
+
+  .metric-card-row {
+    @apply flex items-center justify-between p-3.5;
+
+    & .metric-card-label {
+      @apply pr-2.5 text-body-sm;
+    }
+
+    & .metric-card-value {
+      @apply m-0;
+    }
+  }
+
+  .metric-card-wellbeing {
+    @apply flex items-center gap-2;
+  }
+
+  .accordion {
+    @apply rounded-[18px] border border-line bg-surface text-body text-content transition-colors;
+  }
+
+  .accordion-open {
+    @apply border-accent-border;
+  }
+
+  .accordion-toggle {
+    @apply flex w-full cursor-pointer items-center gap-3 border-none bg-transparent p-3.5 text-left text-content;
+  }
+
+  .accordion-index {
+    @apply flex size-10 shrink-0 items-center justify-center rounded-full bg-tile text-body-sm font-bold text-accent transition-colors;
+  }
+
+  .accordion-open .accordion-index {
+    @apply bg-accent text-app;
+  }
+
+  .accordion-title {
+    @apply flex min-w-0 flex-1 flex-col gap-0.5;
+  }
+
+  .accordion-name {
+    @apply truncate text-body font-semibold first-letter:uppercase;
+  }
+
+  .accordion-meta {
+    @apply text-caption text-content-muted;
+  }
+
+  .accordion-chevron {
+    @apply flex shrink-0 text-content-muted;
+  }
+
+  .accordion-content {
+    @apply flex flex-col gap-4 px-3.5 pb-3.5;
+  }
+
+  .accordion-empty {
+    @apply m-0 py-2 text-center text-body-sm text-content-muted;
+  }
+
+  .accordion-actions {
+    @apply flex flex-col items-stretch gap-1;
+  }
+
+  .accordion-delete {
+    @apply cursor-pointer border-none bg-transparent py-2 text-body-sm font-semibold text-danger;
+  }
+
+  .set-table {
+    @apply flex flex-col overflow-hidden rounded-xl border border-line;
+  }
+
+  .set-row {
+    @apply grid grid-cols-[2.5rem_1fr_1fr_2rem] items-center gap-2 border-t border-line px-3 py-2.5 text-body-sm first:border-t-0;
+  }
+
+  .set-row-head {
+    @apply bg-tile py-2 text-caption font-semibold tracking-[0.04em] text-content-muted uppercase;
+  }
+
+  .set-number {
+    @apply font-semibold text-content-muted;
+  }
+
+  .set-delete {
+    @apply size-8 rounded-full text-content-muted transition-colors hover:text-danger;
+  }
+
+  .set-form {
+    @apply flex w-full flex-col gap-5 pt-2;
+
+    & .numeric-field {
+      @apply mx-auto w-3/4 items-stretch gap-2;
+    }
+
+    & .numeric-label {
+      @apply text-body-sm font-semibold;
+    }
+  }
+
+  .exp-overlay {
+    @apply fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black/60 p-5 backdrop-blur-[6px];
+  }
+
+  .exp-content {
+    @apply flex w-full max-w-[360px] flex-col items-center gap-6;
+  }
+
+  .exp-level-card {
+    @apply flex w-full flex-col items-center gap-3 rounded-[20px] border border-line bg-tile p-6;
+  }
+
+  .exp-levels {
+    @apply flex items-center gap-4;
+  }
+
+  .exp-level {
+    @apply flex flex-col items-center;
+  }
+
+  .exp-level-caption {
+    @apply text-caption font-semibold tracking-[0.04em] text-content-muted uppercase;
+  }
+
+  .exp-level-value {
+    @apply text-[28px] leading-[1.2] font-extrabold;
+  }
+
+  .exp-arrow {
+    @apply text-2xl text-accent;
+  }
+
+  .exp-caption {
+    @apply text-caption text-content-muted;
+  }
+
+  .exp-total {
+    @apply text-h2 font-extrabold text-accent;
+  }
+
+  .exp-breakdown {
+    @apply flex w-full flex-col gap-2;
+  }
+
+  .exp-breakdown-item {
+    @apply flex items-center justify-between rounded-[14px] border border-line bg-tile px-4 py-3;
+  }
+
+  .exp-breakdown-label {
+    @apply text-body-sm font-semibold text-content;
+  }
+
+  .exp-breakdown-amount {
+    @apply text-body font-bold text-accent;
+  }
+
+  .template-list {
+    @apply mt-6 flex flex-col gap-3;
+  }
+
+  .template-empty {
+    @apply flex min-h-[160px] items-center justify-center text-center;
+  }
+
+  .template-card {
+    @apply flex items-center gap-2 rounded-[18px] border border-line bg-surface pr-2 transition-colors hover:border-accent-border;
+  }
+
+  .template-card-main {
+    @apply flex min-w-0 flex-1 cursor-pointer items-center gap-3 border-none bg-transparent p-3.5 text-left text-content disabled:cursor-default;
+  }
+
+  .template-card-icon {
+    @apply flex size-11 shrink-0 items-center justify-center rounded-full bg-tile text-accent;
+  }
+
+  .template-card-text {
+    @apply flex min-w-0 flex-col gap-0.5;
+  }
+
+  .template-card-title {
+    @apply truncate text-body font-semibold;
+  }
+
+  .template-card-meta {
+    @apply truncate text-caption text-content-muted;
+  }
+
+  .template-card-edit {
+    @apply size-10 shrink-0 rounded-full text-content-muted transition-colors hover:text-accent;
+  }
+
+  .template-form {
+    @apply mt-6 flex flex-col gap-6;
+  }
+
+  .template-subgroups {
+    @apply -mx-1 flex gap-2 overflow-x-auto px-1 pb-1;
+  }
+
+  .template-hint {
+    @apply mt-4 mb-0 text-body-sm text-content-muted;
+  }
+
+  .template-exercises {
+    @apply m-0 mt-4 flex list-none flex-col gap-2 p-0;
+  }
+
+  .template-exercise {
+    @apply flex items-center gap-3 rounded-[18px] border border-line bg-surface py-2.5 pr-2 pl-3;
+  }
+
+  .template-exercise-name {
+    @apply min-w-0 flex-1 truncate text-body font-semibold first-letter:uppercase;
+  }
+
+  .template-actions {
+    @apply mt-8 flex flex-col items-stretch gap-1;
+  }
+}

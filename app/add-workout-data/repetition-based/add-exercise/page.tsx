@@ -8,19 +8,21 @@ import Grid, { GridColumn } from '@/components/ui/Grid';
 import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
 import TextInput from '@/components/ui/inputs/TextInput';
 import TopBar from '@/components/ui/topBar/TopBar';
-import ChevronIcon from '@/components/icons/ChevronIcon';
+import BackButton from '@/components/ui/buttons/BackButton';
 import {
   EXERCISE_RETURN_PATH_KEY,
+  PENDING_EXERCISE_TEMPLATE_ID_KEY,
   PENDING_EXERCISE_WORKOUT_ID_KEY,
 } from '@/app/constants/storageConstants';
-import { s, useResponsive } from '@/lib/useResponsive';
+import { cn } from '@/lib/utils';
 import { addExercise, getExercisesByWorkout } from '@/services/exercises';
+import { canEditWorkout } from '@/services/workouts';
+import { LOCKED_WORKOUT_MESSAGE } from '@/services/serviceError';
+import { addTemplateExercise } from '@/services/workoutTemplates';
 import {
   getExercisesList,
   GetExercisesListReturnData,
 } from '@/services/exercisesList';
-import { colors } from '@/theme/colors';
-import { fontSizes } from '@/theme/typography';
 
 function subscribeNoop() {
   return () => {};
@@ -30,7 +32,11 @@ function readPendingWorkoutId() {
   return window.sessionStorage.getItem(PENDING_EXERCISE_WORKOUT_ID_KEY);
 }
 
-function readPendingWorkoutIdOnServer() {
+function readPendingTemplateId() {
+  return window.sessionStorage.getItem(PENDING_EXERCISE_TEMPLATE_ID_KEY);
+}
+
+function readOnServer() {
   return null;
 }
 
@@ -38,7 +44,6 @@ export default function AddExerciseList() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { isMobile, isTablet, scale } = useResponsive();
 
   const muscle = searchParams.get('muscle')?.trim() || null;
 
@@ -50,8 +55,14 @@ export default function AddExerciseList() {
   const workoutId = useSyncExternalStore(
     subscribeNoop,
     readPendingWorkoutId,
-    readPendingWorkoutIdOnServer
+    readOnServer
   );
+  const templateId = useSyncExternalStore(
+    subscribeNoop,
+    readPendingTemplateId,
+    readOnServer
+  );
+  const targetId = workoutId ?? templateId;
 
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
@@ -63,7 +74,6 @@ export default function AddExerciseList() {
   const [isClearing, setIsClearing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const contentMaxWidth = isMobile ? '100%' : isTablet ? 620 : 760;
   const isInitialLoading = listResult === null;
 
   const columns: GridColumn<GetExercisesListReturnData>[] = [
@@ -79,7 +89,7 @@ export default function AddExerciseList() {
   }, [search]);
 
   useEffect(() => {
-    if (!workoutId) return;
+    if (!targetId) return;
 
     let cancelled = false;
 
@@ -105,35 +115,72 @@ export default function AddExerciseList() {
     return () => {
       cancelled = true;
     };
-  }, [workoutId, debouncedSearch, muscle]);
+  }, [targetId, debouncedSearch, muscle]);
+
+  function returnToSource() {
+    const returnPath = window.sessionStorage.getItem(EXERCISE_RETURN_PATH_KEY);
+    window.sessionStorage.removeItem(PENDING_EXERCISE_WORKOUT_ID_KEY);
+    window.sessionStorage.removeItem(PENDING_EXERCISE_TEMPLATE_ID_KEY);
+    window.sessionStorage.removeItem(EXERCISE_RETURN_PATH_KEY);
+
+    if (returnPath && window.history.length <= 1) {
+      router.replace(returnPath);
+    } else {
+      router.back();
+    }
+  }
 
   async function handlePick(item: GetExercisesListReturnData) {
-    if (isSubmitting || !workoutId) return;
+    if (isSubmitting || !targetId) return;
 
     setError(null);
     setIsSubmitting(true);
 
+    if (!workoutId && templateId) {
+      try {
+        await addTemplateExercise({
+          templateId,
+          name: item.name,
+          exerciseListId: item.id,
+        });
+        returnToSource();
+      } catch (addError) {
+        setError(
+          addError instanceof Error
+            ? addError.message
+            : 'Could not add exercise.'
+        );
+        setIsSubmitting(false);
+      }
+      return;
+    }
+
+    if (!workoutId) return;
+
     try {
-      const existing = await getExercisesByWorkout(workoutId);
+      const [isEditable, existing] = await Promise.all([
+        canEditWorkout(workoutId),
+        getExercisesByWorkout(workoutId),
+      ]);
+
+      if (!isEditable) {
+        setError(LOCKED_WORKOUT_MESSAGE);
+        setIsSubmitting(false);
+        return;
+      }
 
       await addExercise({
         workoutId,
         name: item.name,
         exerciseListId: item.id,
-        order: existing.length + 1,
+        order:
+          existing.reduce(
+            (max, exercise) => Math.max(max, exercise.exercise_order),
+            0
+          ) + 1,
       });
 
-      const returnPath = window.sessionStorage.getItem(
-        EXERCISE_RETURN_PATH_KEY
-      );
-      window.sessionStorage.removeItem(PENDING_EXERCISE_WORKOUT_ID_KEY);
-      window.sessionStorage.removeItem(EXERCISE_RETURN_PATH_KEY);
-
-      if (returnPath) {
-        router.replace(returnPath);
-      } else {
-        router.back();
-      }
+      returnToSource();
     } catch (addError) {
       setError(
         addError instanceof Error ? addError.message : 'Could not add exercise.'
@@ -155,40 +202,10 @@ export default function AddExerciseList() {
   }
 
   return (
-    <main
-      style={{
-        background: 'transparent',
-        padding: s(isMobile ? 18 : 28, scale),
-        color: colors.text,
-        height: '100%',
-        boxSizing: 'border-box',
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-      }}
-    >
-      <div
-        style={{
-          width: '100%',
-          maxWidth: contentMaxWidth,
-          height: '100%',
-          minHeight: 0,
-          position: 'relative',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: s(16, scale),
-        }}
-      >
+    <main className="page page-padded page-fill">
+      <div className="page-content page-content-narrow page-fill-content relative">
         <TopBar
-          left={
-            <button
-              style={{ rotate: '-180deg', cursor: 'pointer' }}
-              onClick={() => router.back()}
-            >
-              <ChevronIcon />
-            </button>
-          }
+          left={<BackButton onClick={() => router.back()} />}
           center="Select exercise"
         />
 
@@ -196,103 +213,34 @@ export default function AddExerciseList() {
           <ErrorPopUp onClose={() => setError(null)}>{error}</ErrorPopUp>
         )}
 
-        {!isClient || (workoutId && isInitialLoading) ? (
-          <div
-            style={{
-              flex: 1,
-              minHeight: 0,
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
+        {!isClient || (targetId && isInitialLoading) ? (
+          <div className="content-center">
             <LoadingCircle />
           </div>
-        ) : !workoutId ? (
-          <div
-            style={{
-              flex: 1,
-              minHeight: 0,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              alignItems: 'center',
-              gap: s(16, scale),
-            }}
-          >
-            <p
-              style={{
-                margin: 0,
-                color: colors.textMuted,
-                fontSize: s(fontSizes.bodySmall, scale),
-                textAlign: 'center',
-              }}
-            >
-              Missing workout id.
-            </p>
+        ) : !targetId ? (
+          <div className="content-center flex-col gap-4">
+            <p className="muted-text">Missing workout id.</p>
             <Button onClick={() => router.back()} width="1/2">
               Back
             </Button>
           </div>
         ) : (
-          <div
-            style={{
-              flex: 1,
-              minHeight: 0,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: s(16, scale),
-            }}
-          >
-            <div
-              style={{
-                flexShrink: 0,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: s(10, scale),
-              }}
-            >
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: s(8, scale),
-                }}
-              >
+          <div className="page-fill-content">
+            <div className="exercise-filters">
+              <div className="exercise-filter-row">
                 <button
+                  type="button"
                   onClick={openMusclePicker}
-                  style={{
-                    flex: 1,
-                    padding: `${s(10, scale)}px ${s(14, scale)}px`,
-                    borderRadius: s(14, scale),
-                    border: `1px solid ${
-                      muscle ? colors.accent : colors.border
-                    }`,
-                    background: muscle
-                      ? colors.accentSurface
-                      : colors.componentsBg,
-                    color: muscle ? colors.accent : colors.text,
-                    fontSize: s(fontSizes.bodySmall, scale),
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                  }}
+                  className={cn('chip flex-1', muscle && 'chip-active')}
                 >
                   {muscle ? `Muscle: ${muscle}` : 'Filter by muscle'}
                 </button>
 
                 {muscle && (
                   <button
+                    type="button"
                     onClick={clearMuscle}
-                    style={{
-                      padding: `${s(10, scale)}px ${s(14, scale)}px`,
-                      borderRadius: s(14, scale),
-                      border: `1px solid ${colors.border}`,
-                      background: colors.componentsBg,
-                      color: colors.textMuted,
-                      fontSize: s(fontSizes.bodySmall, scale),
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                    }}
+                    className="chip text-content-muted"
                   >
                     Clear
                   </button>
@@ -306,14 +254,7 @@ export default function AddExerciseList() {
               />
             </div>
 
-            <div
-              style={{
-                flex: 1,
-                minHeight: 0,
-                display: 'flex',
-                flexDirection: 'column',
-              }}
-            >
+            <div className="page-fill-content">
               <Grid
                 columns={1}
                 columnConfig={columns}
@@ -333,17 +274,7 @@ export default function AddExerciseList() {
         )}
 
         {(isSubmitting || isClearing) && (
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'rgba(23, 23, 23, 0.72)',
-              pointerEvents: 'none',
-            }}
-          >
+          <div className="busy-overlay">
             <LoadingCircle size={44} />
           </div>
         )}

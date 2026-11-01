@@ -1,22 +1,20 @@
 'use client';
 
-import { KeyboardEvent, ReactNode, useRef } from 'react';
-import { s, useResponsive } from '@/lib/useResponsive';
-import { fontSizes } from '@/theme/typography';
-import { colors } from '@/theme/colors';
+import { KeyboardEvent, ReactNode } from 'react';
 import { motion } from 'motion/react';
+import { cn } from '@/lib/utils';
 
 type TileProps = {
   title?: string;
   subtitle?: string;
   children?: ReactNode;
   onClick?: () => void;
-  width?: number | string;
-  height?: number | string;
-  aspectRatio?: string;
+  width?: number;
+  height?: number;
+  className?: string;
   titleAlign?: 'left' | 'center';
   titleVAlign?: 'top' | 'center';
-  titleSize?: number;
+  titleSize?: 'sm' | 'lg';
 };
 
 export default function Tile({
@@ -26,18 +24,11 @@ export default function Tile({
   onClick,
   width,
   height,
-  aspectRatio = '1 / 1',
+  className,
   titleAlign = 'left',
   titleVAlign = 'top',
-  titleSize,
+  titleSize = 'sm',
 }: TileProps) {
-  const { isMobile, scale } = useResponsive();
-
-  const finalWidth = width ?? (isMobile ? 350 : 500);
-  const finalHeight = height ?? (isMobile ? 180 : 300);
-
-  const tileRef = useRef<HTMLDivElement>(null);
-
   function handleKeyDown(event: KeyboardEvent) {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
@@ -47,90 +38,39 @@ export default function Tile({
 
   return (
     <motion.div
-      ref={tileRef}
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
       onClick={onClick}
       onKeyDown={handleKeyDown}
-      whileHover={{
-        scale: 0.97,
-      }}
-      whileTap={{
-        scale: 0.95,
-      }}
-      transition={{
-        duration: 0.2,
-        ease: [0.4, 0, 0.2, 1],
-      }}
-      style={{
-        width: finalWidth,
-        height: finalHeight,
-        aspectRatio: finalHeight ? undefined : aspectRatio,
-        minHeight: 0,
-        padding: s(14, scale),
-        borderRadius: s(18, scale),
-        background: colors.componentsBg,
-        border: `1px solid ${colors.border}`,
-        backdropFilter: 'blur(10px)',
-        WebkitBackdropFilter: 'blur(10px)',
-        color: colors.text,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        overflow: 'hidden',
-        cursor: onClick ? 'pointer' : 'default',
-      }}
+      whileHover={{ scale: 0.97 }}
+      whileTap={{ scale: 0.95 }}
+      transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+      className={cn('tile', onClick && 'cursor-pointer', className)}
+      style={{ width, height }}
     >
       {(title || subtitle) && (
         <div
-          style={{
-            flex: titleVAlign === 'center' ? 1 : undefined,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: titleVAlign === 'center' ? 'center' : undefined,
-            gap: s(4, scale),
-            alignItems: titleAlign === 'center' ? 'center' : 'flex-start',
-          }}
+          className={cn(
+            'tile-header',
+            titleVAlign === 'center' && 'tile-header-middle',
+            titleAlign === 'center' && 'tile-header-centered'
+          )}
         >
           {title && (
             <p
-              style={{
-                margin: 0,
-                fontSize: s(titleSize ?? fontSizes.bodySmall, scale),
-                fontWeight: 800,
-                color: colors.text,
-                textAlign: titleAlign,
-              }}
+              className={cn(
+                'tile-title',
+                titleSize === 'lg' && 'tile-title-lg'
+              )}
             >
               {title}
             </p>
           )}
-
-          {subtitle && (
-            <p
-              style={{
-                margin: 0,
-                fontSize: s(fontSizes.caption, scale),
-                color: colors.text,
-                textAlign: titleAlign,
-              }}
-            >
-              {subtitle}
-            </p>
-          )}
+          {subtitle && <p className="tile-subtitle">{subtitle}</p>}
         </div>
       )}
 
-      <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'flex-start',
-        }}
-      >
-        {children}
-      </div>
+      <div className="tile-body">{children}</div>
     </motion.div>
   );
 }

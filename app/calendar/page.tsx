@@ -4,7 +4,6 @@ import CalendarGrid from '@/components/ui/CalendarGrid';
 import ErrorPopUp from '@/components/ui/feedback/ErrorPopUp';
 import QuestionPopUp from '@/components/ui/popups/QuestionPopUp';
 import WorkoutPreview from '@/components/ui/WorkoutPreview';
-import { s, useResponsive } from '@/lib/useResponsive';
 import {
   getExercisesByWorkout,
   ReturnGetExercisesData,
@@ -22,7 +21,6 @@ import {
 import { getUserData, ReturnGetUserData } from '@/services/userData';
 import ExperienceSummaryPopUp from '@/components/ui/popups/ExperienceSummaryPopUp';
 import { getWorkoutTypeGroup, WorkoutTypeGroup } from '@/services/workoutTypes';
-import { colors } from '@/theme/colors';
 import { Mode } from '@/types/common';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -37,7 +35,6 @@ function getWorkoutDateKey(workoutDate: string) {
 export default function CalendarPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isMobile, isTablet, scale } = useResponsive();
   const previewRef = useRef<HTMLElement>(null);
   const supabase = createClient();
 
@@ -57,7 +54,6 @@ export default function CalendarPage() {
     null
   );
 
-  const contentMaxWidth = isMobile ? '100%' : isTablet ? 700 : 880;
   const selectedWorkoutFromParams = searchParams.get('workoutId');
 
   const workoutsByDay = useMemo(() => {
@@ -156,7 +152,7 @@ export default function CalendarPage() {
 
     const path = workoutDataView[selectedWorkoutGroup];
 
-    router.push(`add-workout-data${path}?${params.toString()}`);
+    router.push(`/add-workout-data${path}?${params.toString()}`);
   }
 
   async function handleConfirmWorkout() {
@@ -188,17 +184,8 @@ export default function CalendarPage() {
   }
 
   return (
-    <main
-      style={{
-        minHeight: '100dvh',
-        background: 'transparent',
-        color: colors.text,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-      }}
-    >
-      <div style={{ width: '100%', maxWidth: contentMaxWidth }}>
+    <main className="page">
+      <div className="page-content page-content-wide">
         {error && (
           <ErrorPopUp onClose={() => setError(null)}>{error}</ErrorPopUp>
         )}

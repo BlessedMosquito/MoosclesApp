@@ -10,8 +10,14 @@ import SettingsIcon from './icons/SettingsIcon';
 import BottomBar from './ui/bottomBar/BottomBar';
 import BottomBarItem from './ui/bottomBar/BottomBarItem';
 import LoadingCircle from './ui/feedback/LoadingCircle';
+import { cn } from '@/lib/utils';
 
-const AUTHENTICATED_PATHS = ['/dashboard', '/calendar', '/profile'];
+const AUTHENTICATED_PATHS = [
+  '/dashboard',
+  '/calendar',
+  '/workouts-list',
+  '/profile',
+];
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -39,25 +45,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   const hideSidebar = !AUTHENTICATED_PATHS.some((p) => pathname.startsWith(p));
 
-  const BOTTOM_BAR_HEIGHT = 90;
-
   return (
-    <div
-      style={{
-        height: '100dvh',
-        overflow: 'hidden',
-        background: 'var(--background)',
-      }}
-    >
-      <main
-        style={{
-          height: '100%',
-          overflowY: 'auto',
-          overflowX: 'hidden',
-          paddingBottom: hideSidebar ? 0 : BOTTOM_BAR_HEIGHT,
-          WebkitOverflowScrolling: 'touch',
-        }}
-      >
+    <div className="app-shell">
+      <main className={cn('app-main', !hideSidebar && 'app-main-with-bar')}>
         {children}
       </main>
 
@@ -68,16 +58,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.18, ease: 'easeOut' }}
-            style={{
-              position: 'fixed',
-              inset: 0,
-              zIndex: 500,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'var(--background)',
-              pointerEvents: 'none',
-            }}
+            className="route-loader"
           >
             <LoadingCircle size={44} />
           </motion.div>
@@ -90,24 +71,28 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             activePath="/dashboard"
             onClick={() => router.push('/dashboard')}
             icon={<HomeIcon size={iconSize} />}
+            label="Dashboard"
           />
 
           <BottomBarItem
             activePath="/calendar"
             onClick={() => router.push('/calendar')}
             icon={<CalendarIcon size={iconSize} />}
+            label="Calendar"
           />
 
           <BottomBarItem
             activePath="/workouts-list"
             onClick={() => router.push('/workouts-list')}
             icon={<LayersIcon size={iconSize} />}
+            label="Workouts"
           />
 
           <BottomBarItem
             activePath="/profile"
             onClick={() => router.push('/profile')}
             icon={<SettingsIcon size={iconSize} />}
+            label="Profile"
           />
         </BottomBar>
       )}

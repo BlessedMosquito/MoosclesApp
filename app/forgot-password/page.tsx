@@ -7,7 +7,6 @@ import Button from '@/components/ui/buttons/Button';
 import AuthLayout from '@/components/layout/AuthLayout';
 import TextInput from '@/components/ui/inputs/TextInput';
 import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
-import { fontSizes } from '@/theme/typography';
 
 function ForgotPasswordForm() {
   const supabase = createClient();
@@ -44,25 +43,15 @@ function ForgotPasswordForm() {
 
   return (
     <AuthLayout error={authError} onDismissError={() => setAuthError(null)}>
-      <h1 style={{ color: 'white', fontSize: fontSizes.heading1 }}>
-        Forgot Password
-      </h1>
+      <h1 className="auth-title">Forgot Password</h1>
 
       {success ? (
-        <p
-          style={{ fontSize: fontSizes.body, color: '#888', textAlign: 'left' }}
-        >
+        <p className="auth-text">
           We sent a password reset link to <b>{email}</b>. Check your inbox.
         </p>
       ) : (
         <>
-          <p
-            style={{
-              fontSize: fontSizes.body,
-              color: '#888',
-              textAlign: 'left',
-            }}
-          >
+          <p className="auth-text">
             Enter your email and we&apos;ll send you a link to reset your
             password.
           </p>

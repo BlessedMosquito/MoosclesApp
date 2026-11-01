@@ -1,10 +1,9 @@
 'use client';
 
-import ArrowIcon from '@/components/icons/ArrowIcon';
+import BackButton from '@/components/ui/buttons/BackButton';
 import TopBar from '@/components/ui/topBar/TopBar';
 import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
-import { s, useResponsive } from '@/lib/useResponsive';
-import { colors } from '@/theme/colors';
+import { useResponsive } from '@/lib/useResponsive';
 import { AnimatePresence, motion } from 'motion/react';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -14,7 +13,6 @@ import {
   useEffect,
   useState,
 } from 'react';
-import ChevronIcon from '@/components/icons/ChevronIcon';
 
 const BackRouteContext = createContext<(route: string) => void>(() => {});
 
@@ -39,7 +37,7 @@ export default function NewWorkoutLayout({
 }: {
   children: ReactNode;
 }) {
-  const { isMobile, scale } = useResponsive();
+  const { isMobile } = useResponsive();
   const router = useRouter();
   const pathname = usePathname();
   const [currentBackRoute, setCurrentBackRoute] = useState('/dashboard');
@@ -65,19 +63,9 @@ export default function NewWorkoutLayout({
     <BackRouteContext.Provider value={setCurrentBackRoute}>
       <TextContext.Provider value={setText}>
         <LeaveContext.Provider value={startLeave}>
-          <main
-            style={{
-              minHeight: '100dvh',
-              background: 'transparent',
-              padding: s(isMobile ? 24 : 32, scale),
-              color: colors.text,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-            }}
-          >
+          <main className="wizard">
             <motion.div
-              style={{ width: isMobile ? '100%' : '50%' }}
+              className="wizard-content"
               initial={{ x: 0, opacity: 1 }}
               animate={
                 isLeaving && isMobile
@@ -86,39 +74,13 @@ export default function NewWorkoutLayout({
               }
               transition={{ duration: 0.45, ease: [0.4, 0, 0.2, 1] }}
             >
-              <div
-                style={{
-                  width: '100%',
-                }}
-              >
-                <TopBar
-                  left={
-                    <button
-                      style={{
-                        rotate: '-180deg',
-                        cursor: 'pointer',
-                      }}
-                      onClick={() => router.push(currentBackRoute)}
-                    >
-                      <ChevronIcon />
-                    </button>
-                  }
-                  center={`Step ${step} of 4`}
-                />
-              </div>
-              {text ? (
-                <p
-                  style={{
-                    margin: `${s(32, scale)}px 0`,
-                    color: colors.text,
-                    fontSize: s(isMobile ? 22 : 32, scale),
-                    fontWeight: 700,
-                    textAlign: 'center',
-                  }}
-                >
-                  {text}
-                </p>
-              ) : null}
+              <TopBar
+                left={
+                  <BackButton onClick={() => router.push(currentBackRoute)} />
+                }
+                center={`Step ${step} of 4`}
+              />
+              {text ? <p className="wizard-heading">{text}</p> : null}
 
               {children}
             </motion.div>
@@ -130,15 +92,7 @@ export default function NewWorkoutLayout({
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.15, ease: 'easeOut' }}
-                  style={{
-                    position: 'fixed',
-                    inset: 0,
-                    zIndex: 500,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    pointerEvents: 'none',
-                  }}
+                  className="wizard-leave-loader"
                 >
                   <LoadingCircle size={44} />
                 </motion.div>

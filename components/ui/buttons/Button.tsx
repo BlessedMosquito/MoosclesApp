@@ -1,24 +1,22 @@
 import { ReactNode } from 'react';
 import { motion } from 'motion/react';
-
-import { s, useResponsive } from '@/lib/useResponsive';
-import { colors } from '@/theme/colors';
-import { fontSizes } from '@/theme/typography';
+import { cn } from '@/lib/utils';
 
 type ButtonWidth = number | '1/4' | '1/2' | '3/4' | 'full';
 type ButtonAlign = 'left' | 'center' | 'right';
+type ButtonVariant = 'primary' | 'secondary' | 'danger';
 
-const widthMap: Record<ButtonWidth, string> = {
-  full: '100%',
-  '3/4': '75%',
-  '1/2': '50%',
-  '1/4': '25%',
+const widthClass: Record<Exclude<ButtonWidth, number>, string> = {
+  full: 'w-full',
+  '3/4': 'w-3/4',
+  '1/2': 'w-1/2',
+  '1/4': 'w-1/4',
 };
 
-const alignMap: Record<ButtonAlign, string> = {
-  left: 'flex-start',
-  center: 'center',
-  right: 'flex-end',
+const alignClass: Record<ButtonAlign, string> = {
+  left: 'btn-align-left',
+  center: 'btn-align-center',
+  right: 'btn-align-right',
 };
 
 type ButtonProps = {
@@ -29,7 +27,7 @@ type ButtonProps = {
   height?: number;
   align?: ButtonAlign;
   type?: 'button' | 'submit' | 'reset';
-  color?: string;
+  variant?: ButtonVariant;
 };
 
 export default function Button({
@@ -37,61 +35,28 @@ export default function Button({
   onClick,
   disabled = false,
   width,
-  height = 56,
+  height,
   align,
   type = 'button',
-  color,
+  variant = 'primary',
 }: ButtonProps) {
-  const { scale } = useResponsive();
-
-  const resolvedWidth =
-    width === undefined
-      ? 'auto'
-      : typeof width === 'number'
-        ? `${s(width, scale)}px`
-        : widthMap[width];
-
   const button = (
     <motion.button
       type={type}
       onClick={onClick}
       disabled={disabled}
-      whileHover={
-        disabled
-          ? undefined
-          : {
-              scale: 1.05,
-              background: color ? colors.redLight : colors.accentLight,
-              borderColor: colors.border,
-              boxShadow: `0 8px 30px ${color ? colors.shadow : colors.shadow}`,
-            }
-      }
-      whileTap={
-        disabled
-          ? undefined
-          : {
-              scale: 0.9,
-            }
-      }
-      transition={{
-        duration: 0.18,
-        ease: 'easeOut',
-      }}
+      whileHover={disabled ? undefined : { scale: 1.05 }}
+      whileTap={disabled ? undefined : { scale: 0.9 }}
+      transition={{ duration: 0.18, ease: 'easeOut' }}
+      className={cn(
+        'btn',
+        variant === 'secondary' && 'btn-secondary',
+        variant === 'danger' && 'btn-danger',
+        typeof width === 'string' && widthClass[width]
+      )}
       style={{
-        width: resolvedWidth,
-        height: s(height, scale),
-        padding: `0 ${s(24, scale)}px`,
-        borderRadius: s(20, scale),
-        background: color ? color : colors.accent,
-        color: colors.bg,
-        fontSize: s(fontSizes.button, scale),
-        fontWeight: 600,
-        cursor: disabled ? 'default' : 'pointer',
-        border: `1px solid ${colors.border}`,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        gap: s(8, scale),
+        width: typeof width === 'number' ? width : undefined,
+        height,
       }}
     >
       {children}
@@ -100,15 +65,5 @@ export default function Button({
 
   if (!align) return button;
 
-  return (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: alignMap[align],
-        width: '100%',
-      }}
-    >
-      {button}
-    </div>
-  );
+  return <div className={cn('btn-align', alignClass[align])}>{button}</div>;
 }

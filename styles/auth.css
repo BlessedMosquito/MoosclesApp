@@ -1,0 +1,29 @@
+@layer components {
+  .auth-page {
+    @apply flex min-h-dvh items-stretch justify-start bg-transparent sm:items-center sm:justify-center sm:p-6;
+  }
+
+  .auth-card {
+    @apply flex h-full w-full flex-col gap-[18px] bg-transparent p-6 text-center sm:h-auto sm:max-w-[420px] sm:rounded-[28px] sm:border-2 sm:border-line sm:bg-surface sm:p-8 sm:shadow-[0_20px_60px_var(--shadow)] sm:backdrop-blur-[20px];
+  }
+
+  .auth-title {
+    @apply my-[0.67em] text-h1 font-bold text-white;
+  }
+
+  .auth-hint {
+    @apply m-0 text-caption text-[#888];
+  }
+
+  .auth-text {
+    @apply m-0 text-left text-body text-[#888];
+  }
+
+  .auth-link {
+    @apply text-white no-underline hover:underline;
+  }
+
+  .auth-link-accent {
+    @apply cursor-pointer border-none bg-transparent p-0 text-inherit text-accent no-underline hover:underline;
+  }
+}

@@ -1,5 +1,6 @@
 'use client';
 
+import { PROFILE_PROMPT_DISMISSED_KEY } from '@/app/constants/storageConstants';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
@@ -8,7 +9,6 @@ import AuthLayout from '@/components/layout/AuthLayout';
 import TextInput from '@/components/ui/inputs/TextInput';
 import Link from 'next/link';
 import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
-import { fontSizes } from '@/theme/typography';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -79,12 +79,13 @@ export default function LoginPage() {
       return;
     }
 
+    window.sessionStorage.removeItem(PROFILE_PROMPT_DISMISSED_KEY);
     router.push('/dashboard');
   }
 
   return (
     <AuthLayout error={authError} onDismissError={() => setAuthError(null)}>
-      <h1 style={{ color: 'white', fontSize: fontSizes.heading1 }}>MOOSCLES</h1>
+      <h1 className="auth-title">MOOSCLES</h1>
 
       <TextInput
         type="email"
@@ -110,35 +111,20 @@ export default function LoginPage() {
       </Button>
 
       {failedAttempts >= 3 && (
-        <p style={{ fontSize: fontSizes.caption, color: '#888' }}>
+        <p className="auth-hint">
           Forgot your password?{' '}
           <Link
-            style={{ color: 'white', textDecoration: 'none' }}
+            className="auth-link"
             href={`/forgot-password?email=${encodeURIComponent(email)}`}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.textDecoration = 'underline';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.textDecoration = 'none';
-            }}
           >
             Reset it
           </Link>
         </p>
       )}
 
-      <p style={{ fontSize: fontSizes.caption, color: '#888' }}>
+      <p className="auth-hint">
         New to MOOSCLES?{' '}
-        <Link
-          style={{ color: 'white', textDecoration: 'none' }}
-          href="/register"
-          onMouseEnter={(e) => {
-            e.currentTarget.style.textDecoration = 'underline';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.textDecoration = 'none';
-          }}
-        >
+        <Link className="auth-link" href="/register">
           Create an account
         </Link>
       </p>

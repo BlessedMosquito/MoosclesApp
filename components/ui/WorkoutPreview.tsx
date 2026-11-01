@@ -2,9 +2,7 @@
 
 import { useState } from 'react';
 import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
-import { s, useResponsive } from '@/lib/useResponsive';
-import { colors } from '@/theme/colors';
-import { fontSizes } from '@/theme/typography';
+import { cn } from '@/lib/utils';
 import { getSetsByExercise, ReturnGetSetsData } from '@/services/sets';
 import { WorkoutTypeGroup } from '@/services/workoutTypes';
 import { ReturnGetExercisesData } from '@/services/exercises';
@@ -69,7 +67,6 @@ export default function WorkoutPreview({
   previewRef,
   mode = 'PREVIEW',
 }: WorkoutPreviewProps) {
-  const { scale } = useResponsive();
   const [expandedExerciseId, setExpandedExerciseId] = useState<string | null>(
     null
   );
@@ -124,76 +121,21 @@ export default function WorkoutPreview({
 
   function renderMetricCard(label: string, value: string) {
     return (
-      <div
-        key={label}
-        style={{
-          padding: s(12, scale),
-          borderRadius: s(12, scale),
-          border: `1px solid ${colors.border}`,
-          background: colors.componentsBg,
-        }}
-      >
-        <p
-          style={{
-            margin: 0,
-            color: colors.text,
-            fontSize: s(fontSizes.caption, scale),
-          }}
-        >
-          {label}
-        </p>
-        <p
-          style={{
-            margin: `${s(4, scale)}px 0 0`,
-            fontWeight: 700,
-            fontSize: s(fontSizes.body, scale),
-          }}
-        >
-          {value}
-        </p>
+      <div key={label} className="metric-card">
+        <p className="metric-card-label">{label}</p>
+        <p className="metric-card-value">{value}</p>
       </div>
     );
   }
 
   function renderWellBeing(well_being: number | null) {
     return (
-      <div
-        style={{
-          padding: s(14, scale),
-          borderRadius: s(12, scale),
-          border: `1px solid ${colors.border}`,
-          background: colors.componentsBg,
-          display: 'flex',
-        }}
-      >
-        <p
-          style={{
-            margin: 0,
-            color: colors.text,
-            fontSize: s(fontSizes.bodySmall, scale),
-            paddingRight: 10,
-          }}
-        >
-          Well-being during workout:
-        </p>
+      <div className="metric-card metric-card-row">
+        <p className="metric-card-label">Well-being during workout:</p>
 
         {well_being !== null && (
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: s(8, scale),
-            }}
-          >
-            <p
-              style={{
-                margin: 0,
-                fontWeight: 700,
-                fontSize: s(fontSizes.body, scale),
-              }}
-            >
-              {well_being}
-            </p>
+          <div className="metric-card-wellbeing">
+            <p className="metric-card-value">{well_being}</p>
             {iconBasedOnRange({ value: well_being, min: 1, max: 10 })}
           </div>
         )}
@@ -201,107 +143,59 @@ export default function WorkoutPreview({
     );
   }
 
+  function renderMetrics(cards: [string, string][]) {
+    if (!metrics) return <p className="preview-empty">No data added.</p>;
+
+    return (
+      <div className="preview-metrics">
+        <div
+          className={cn(
+            'preview-metric-grid',
+            cards.length > 1 && 'grid-cols-3'
+          )}
+        >
+          {cards.map(([label, value]) => renderMetricCard(label, value))}
+        </div>
+        {renderWellBeing(metrics.well_being)}
+      </div>
+    );
+  }
+
   return (
     <section
       ref={previewRef as React.RefObject<HTMLElement>}
-      style={{
-        marginTop: s(18, scale),
-        border: `1px solid ${colors.border}`,
-        borderRadius: s(20, scale),
-        background: colors.componentsBg,
-        padding: s(16, scale),
-      }}
+      className="workout-preview"
     >
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: s(4, scale),
-        }}
-      >
-        <h2
-          style={{
-            margin: `${s(6, scale)}px 0 0`,
-            fontSize: s(fontSizes.heading2, scale),
-          }}
-        >
-          {`Name: ${workout.name}`}
-        </h2>
+      <div className="workout-preview-header">
+        <h2 className="workout-preview-title">{`Name: ${workout.name}`}</h2>
         <button
           type="button"
+          aria-label="Close preview"
           onClick={onClose}
-          style={{
-            marginLeft: 'auto',
-            border: 'none',
-            background: 'none',
-            color: colors.text,
-            fontSize: s(20, scale),
-            cursor: 'pointer',
-            lineHeight: 1,
-            padding: 0,
-          }}
+          className="icon-btn ml-auto"
         >
           <CloseIcon />
         </button>
       </div>
 
-      <p
-        style={{
-          margin: 0,
-          color: colors.text,
-          fontSize: s(fontSizes.caption, scale),
-        }}
-      >
+      <p className="workout-preview-type">
         {`Workout type: ${workout.workout_types.name}`}
       </p>
 
       {error && (
-        <div
-          role="alert"
-          style={{
-            marginTop: s(10, scale),
-            padding: s(10, scale),
-            borderRadius: s(10, scale),
-            border: `1px solid ${colors.errorSurface}`,
-            background: colors.errorSurface,
-            color: colors.errorSurface,
-            fontSize: s(fontSizes.caption, scale),
-          }}
-        >
+        <div role="alert" className="workout-preview-error">
           {error}
         </div>
       )}
 
-      <div
-        style={{
-          marginTop: s(14, scale),
-          display: 'flex',
-          flexDirection: 'column',
-          gap: s(8, scale),
-        }}
-      >
+      <div className="workout-preview-content">
         {isLoading ? (
-          <div
-            style={{
-              display: 'flex',
-              justifyContent: 'center',
-              padding: s(8, scale),
-            }}
-          >
+          <div className="flex justify-center p-2">
             <LoadingCircle />
           </div>
         ) : workoutGroup === 'RepetitionBased' ? (
           exercises.length === 0 ? (
-            <p
-              style={{
-                margin: 0,
-                color: colors.text,
-                fontSize: s(fontSizes.bodySmall, scale),
-              }}
-            >
-              No exercises added.
-            </p>
+            <p className="preview-empty">No exercises added.</p>
           ) : (
             exercises.map((exercise, index) => {
               const exerciseId = String(exercise.id);
@@ -323,93 +217,28 @@ export default function WorkoutPreview({
             })
           )
         ) : workoutGroup === 'DurationOnly' ? (
-          metrics ? (
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: s(8, scale),
-              }}
-            >
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr',
-                  gap: s(8, scale),
-                }}
-              >
-                {renderMetricCard(
-                  'Time',
-                  formatDurationToString(metrics.duration_minutes)
-                )}
-              </div>
-              {renderWellBeing(metrics.well_being)}
-            </div>
-          ) : (
-            <p
-              style={{
-                margin: 0,
-                color: colors.text,
-                fontSize: s(fontSizes.bodySmall, scale),
-              }}
-            >
-              No data added.
-            </p>
-          )
+          renderMetrics([
+            ['Time', formatDurationToString(metrics?.duration_minutes ?? null)],
+          ])
         ) : workoutGroup === 'DistanceDuration' ? (
-          metrics ? (
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: s(8, scale),
-              }}
-            >
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(3, 1fr)',
-                  gap: s(8, scale),
-                }}
-              >
-                {renderMetricCard(
-                  'Time',
-                  formatDurationToString(metrics.duration_minutes)
-                )}
-                {renderMetricCard(
-                  'Distance',
-                  formatDistanceToString(metrics.distance_meters)
-                )}
-                {renderMetricCard(
-                  'Pace',
-                  formatPaceToString(
-                    metrics.duration_minutes,
-                    metrics.distance_meters
-                  )
-                )}
-              </div>
-              {renderWellBeing(metrics.well_being)}
-            </div>
-          ) : (
-            <p
-              style={{
-                margin: 0,
-                color: colors.text,
-                fontSize: s(fontSizes.bodySmall, scale),
-              }}
-            >
-              No data added.
-            </p>
-          )
+          renderMetrics([
+            ['Time', formatDurationToString(metrics?.duration_minutes ?? null)],
+            [
+              'Distance',
+              formatDistanceToString(metrics?.distance_meters ?? null),
+            ],
+            [
+              'Pace',
+              formatPaceToString(
+                metrics?.duration_minutes ?? null,
+                metrics?.distance_meters ?? null
+              ),
+            ],
+          ])
         ) : null}
       </div>
-      <div
-        style={{
-          marginTop: s(16, scale),
-          display: 'flex',
-          gap: s(8, scale),
-        }}
-      >
+
+      <div className="workout-preview-actions">
         {workout.completed_at ? (
           <CompletedSection />
         ) : (

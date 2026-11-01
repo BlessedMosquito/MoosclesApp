@@ -1,8 +1,7 @@
 'use client';
 
-import { type JSX, useRef, useState } from 'react';
-import { colors } from '@/theme/colors';
-import { s, useResponsive } from '@/lib/useResponsive';
+import { type CSSProperties, type JSX, useRef, useState } from 'react';
+import { cn } from '@/lib/utils';
 
 type SliderProps = {
   label?: string | JSX.Element;
@@ -13,7 +12,6 @@ type SliderProps = {
   scale?: number;
   disabled?: boolean;
   blockSlider?: boolean;
-  width?: number | string;
 };
 
 export default function Slider({
@@ -25,9 +23,7 @@ export default function Slider({
   scale,
   disabled,
   blockSlider = false,
-  width = '100%',
 }: SliderProps) {
-  const { scale: resScale } = useResponsive();
   const trackRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -47,10 +43,6 @@ export default function Slider({
   const index = sections > 0 ? Math.round((value - min) / step) : 0;
   const ratio =
     sections > 0 ? index / sections : range === 0 ? 0 : (value - min) / range;
-
-  const THUMB = s(26, resScale);
-  const TRACK_H = s(14, resScale);
-  const PAD = THUMB / 2;
 
   function updateFromClientX(clientX: number) {
     if (blockSlider) return;
@@ -90,26 +82,8 @@ export default function Slider({
   }
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: s(10, resScale),
-        width,
-      }}
-    >
-      {label && (
-        <span
-          style={{
-            color: colors.text,
-            fontSize: s(14, resScale),
-            fontWeight: 700,
-          }}
-        >
-          {label}
-        </span>
-      )}
+    <div className="slider">
+      {label && <span className="slider-label">{label}</span>}
 
       <div
         ref={trackRef}
@@ -117,92 +91,33 @@ export default function Slider({
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
-        style={{
-          position: 'relative',
-          width: '100%',
-          height: THUMB,
-          cursor: isBlocked ? 'not-allowed' : isDragging ? 'grabbing' : 'grab',
-          touchAction: 'pan-y',
-          opacity: disabled ? 0.5 : 1,
-        }}
+        className={cn(
+          'slider-track',
+          isBlocked
+            ? 'cursor-not-allowed'
+            : isDragging
+              ? 'cursor-grabbing'
+              : 'cursor-grab',
+          disabled && 'opacity-50'
+        )}
+        style={{ '--ratio': ratio } as CSSProperties}
       >
-        {/* tor tła */}
-        <div
-          style={{
-            position: 'absolute',
-            left: PAD,
-            right: PAD,
-            top: '50%',
-            transform: 'translateY(-50%)',
-            height: TRACK_H,
-            borderRadius: 999,
-            background: colors.componentsBg,
-            border: `1px solid ${colors.border}`,
-          }}
-        />
-
-        {/* wypełnienie */}
-        <div
-          style={{
-            position: 'absolute',
-            left: PAD,
-            top: '50%',
-            transform: 'translateY(-50%)',
-            width: `calc(${ratio * 100}% - ${PAD}px)`,
-            minWidth: 0,
-            height: TRACK_H,
-            borderRadius: 999,
-            background: colors.accent,
-            transition: isDragging ? 'none' : 'width 0.1s ease',
-          }}
-        />
-
-        {/* kciuk — wypełniony */}
-        <div
-          style={{
-            position: 'absolute',
-            left: `calc(${PAD}px + (100% - ${PAD * 2}px) * ${ratio})`,
-            top: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: THUMB,
-            height: THUMB,
-            borderRadius: '50%',
-            background: colors.accent,
-            border: `3px solid grey`,
-            boxShadow: `0 2px 8px black`,
-            pointerEvents: 'none',
-          }}
-        />
+        <div className="slider-rail" />
+        <div className={cn('slider-fill', isDragging && 'transition-none')} />
+        <div className="slider-thumb" />
       </div>
 
-      {/* liczby podziałki pod slajderem */}
       {sections > 0 && (
-        <div
-          style={{
-            position: 'relative',
-            width: '100%',
-            height: s(16, resScale),
-            boxSizing: 'border-box',
-            pointerEvents: 'none',
-          }}
-        >
-          {values.map((number, i) => {
-            const pos = (i / sections) * 100;
-            return (
-              <span
-                key={i}
-                style={{
-                  position: 'absolute',
-                  left: `calc(${PAD}px + (100% - ${PAD * 2}px) * ${pos / 100})`,
-                  transform: 'translateX(-50%)',
-                  fontSize: s(11, resScale),
-                  color: colors.text,
-                }}
-              >
-                {Number.isInteger(number) ? number : number.toFixed(1)}
-              </span>
-            );
-          })}
+        <div className="slider-ticks">
+          {values.map((number, i) => (
+            <span
+              key={number}
+              className="slider-tick"
+              style={{ '--ratio': i / sections } as CSSProperties}
+            >
+              {Number.isInteger(number) ? number : number.toFixed(1)}
+            </span>
+          ))}
         </div>
       )}
     </div>

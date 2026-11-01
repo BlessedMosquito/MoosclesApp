@@ -1,0 +1,45 @@
+@layer components {
+  .profile-header {
+    @apply mt-7 mb-6 flex flex-col gap-1;
+  }
+
+  .profile-subtitle {
+    @apply m-0 truncate text-body-sm text-content-muted;
+  }
+
+  .profile-form {
+    @apply mt-6 flex flex-col gap-6;
+  }
+
+  .profile-danger {
+    @apply mt-4 border-t border-line pt-6;
+  }
+
+  .profile-actions {
+    @apply mt-8 grid grid-cols-2 gap-3;
+  }
+
+  .profile-prompt {
+    @apply flex flex-col gap-5 pt-2;
+  }
+
+  .profile-prompt-text {
+    @apply m-0 text-body-sm text-content-muted;
+  }
+
+  .profile-prompt-list {
+    @apply m-0 flex list-none flex-col gap-2 p-0;
+  }
+
+  .profile-prompt-item {
+    @apply rounded-xl border border-line px-4 py-3 text-body font-semibold text-content;
+  }
+
+  .profile-prompt-actions {
+    @apply flex flex-col items-stretch gap-2;
+  }
+
+  .profile-prompt-later {
+    @apply cursor-pointer border-none bg-transparent py-2 text-body-sm text-content-muted;
+  }
+}

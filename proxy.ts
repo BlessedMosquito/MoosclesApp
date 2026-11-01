@@ -11,6 +11,8 @@ const PUBLIC_PATHS = [
   '/reset-password',
 ];
 
+const AUTH_ALLOWED_PUBLIC_PATHS = ['/reset-password'];
+
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 
@@ -38,13 +40,14 @@ export async function proxy(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  const isPublicPath = PUBLIC_PATHS.includes(request.nextUrl.pathname);
+  const pathname = request.nextUrl.pathname;
+  const isPublicPath = PUBLIC_PATHS.includes(pathname);
 
   if (!user && !isPublicPath) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  if (user && isPublicPath) {
+  if (user && isPublicPath && !AUTH_ALLOWED_PUBLIC_PATHS.includes(pathname)) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 

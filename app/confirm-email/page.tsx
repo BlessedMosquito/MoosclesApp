@@ -6,10 +6,7 @@ import { createClient } from '@/lib/supabase/client';
 import Button from '@/components/ui/buttons/Button';
 import AuthLayout from '@/components/layout/AuthLayout';
 import TextInput from '@/components/ui/inputs/TextInput';
-import Link from 'next/link';
 import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
-import { fontSizes } from '@/theme/typography';
-import { colors } from '@/theme/colors';
 
 function ConfirmEmailForm() {
   const supabase = createClient();
@@ -93,11 +90,9 @@ function ConfirmEmailForm() {
 
   return (
     <AuthLayout error={authError} onDismissError={() => setAuthError(null)}>
-      <h1 style={{ color: 'white', fontSize: fontSizes.heading1 }}>MOOSCLES</h1>
+      <h1 className="auth-title">MOOSCLES</h1>
 
-      <p style={{ margin: 0, fontSize: fontSizes.caption, color: '#888' }}>
-        We sent a confirmation code to your email.
-      </p>
+      <p className="auth-hint">We sent a confirmation code to your email.</p>
 
       <TextInput
         type="email"
@@ -116,25 +111,23 @@ function ConfirmEmailForm() {
         value={code}
         onChange={setCode}
         disabled={isLoading}
-        style={{ letterSpacing: 4, textAlign: 'center' }}
+        className="input-code"
       />
 
       <Button onClick={verifyCode} disabled={isLoading}>
         {isLoading ? <LoadingCircle size={18} /> : 'Confirm email'}
       </Button>
 
-      <p style={{ fontSize: fontSizes.caption, color: '#888' }}>
+      <p className="auth-hint">
         Didn&apos;t get the code?{' '}
-        <Link
-          style={{ color: colors.accent, textDecoration: 'none' }}
-          href=""
-          onClick={(e) => {
-            e.preventDefault();
-            resendCode();
-          }}
+        <button
+          type="button"
+          className="auth-link-accent"
+          onClick={resendCode}
+          disabled={isLoading}
         >
           Resend
-        </Link>
+        </button>
       </p>
     </AuthLayout>
   );
@@ -144,14 +137,7 @@ export default function ConfirmEmailPage() {
   return (
     <Suspense
       fallback={
-        <div
-          style={{
-            minHeight: '100dvh',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
+        <div className="page-center">
           <LoadingCircle />
         </div>
       }

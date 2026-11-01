@@ -1,0 +1,65 @@
+@layer components {
+  .calendar {
+    @apply mt-4 w-full sm:mt-6;
+  }
+
+  .calendar-nav {
+    @apply mx-2.5 mb-2.5 flex items-center justify-between sm:mb-4;
+  }
+
+  .calendar-nav-title {
+    @apply flex flex-col items-center gap-1;
+  }
+
+  .calendar-year {
+    @apply cursor-pointer border-none bg-transparent p-0 text-h1 leading-none font-bold text-content sm:text-display;
+  }
+
+  .calendar-month {
+    @apply m-0 text-body font-semibold text-content sm:text-h2;
+  }
+
+  .calendar-years {
+    @apply grid grid-cols-3 gap-2 sm:gap-3;
+  }
+
+  .calendar-year-option {
+    @apply min-h-[54px] cursor-pointer rounded-[14px] border-2 border-line bg-surface text-body font-medium text-content sm:min-h-[72px] sm:text-h2;
+  }
+
+  .calendar-year-option-active {
+    @apply border-content font-bold;
+  }
+
+  .calendar-loading {
+    @apply min-h-60 sm:min-h-[360px];
+  }
+
+  .calendar-loading-spinner {
+    @apply absolute inset-0 z-[1] flex items-center justify-center;
+  }
+
+  .calendar-days {
+    @apply grid grid-cols-7 gap-[3px] transition-opacity duration-150 sm:gap-1.5;
+  }
+
+  .calendar-weekday {
+    @apply pb-0.5 text-center text-body text-content sm:pb-1;
+  }
+
+  .calendar-day {
+    @apply flex min-h-[54px] cursor-default flex-col items-start justify-start overflow-hidden rounded-lg border border-line bg-surface p-[3px] text-left text-body-sm text-content sm:min-h-28 sm:rounded-xl sm:p-1.5 sm:text-body;
+
+    & p {
+      @apply m-0 self-start;
+    }
+  }
+
+  .calendar-day-empty {
+    @apply border-transparent bg-transparent;
+  }
+
+  .calendar-day-active {
+    @apply cursor-pointer bg-accent text-black;
+  }
+}

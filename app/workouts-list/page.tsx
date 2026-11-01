@@ -1,28 +1,20 @@
 'use client';
 
-import ChevronIcon from '@/components/icons/ChevronIcon';
 import ErrorPopUp from '@/components/ui/feedback/ErrorPopUp';
 import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
 import Grid, { GridColumn } from '@/components/ui/Grid';
 import TextInput from '@/components/ui/inputs/TextInput';
-import TopBar from '@/components/ui/topBar/TopBar';
 import { createClient } from '@/lib/supabase/client';
-import { s, useResponsive } from '@/lib/useResponsive';
 import { WorkoutTypeGroup } from '@/services/workoutTypes';
 import { getWorkouts, ReturnGetWorkoutsData } from '@/services/workouts';
 import { colors } from '@/theme/colors';
 import { Mode } from '@/types/common';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-
-function formatWorkoutDate(value: string) {
-  const date = new Date(value);
-  return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString();
-}
+import { getFormatedDate, parseDateKey } from '@/lib/helpers';
 
 export default function WorkoutsList() {
   const router = useRouter();
-  const { isMobile, isTablet, scale } = useResponsive();
 
   const [workouts, setWorkouts] = useState<ReturnGetWorkoutsData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,15 +22,18 @@ export default function WorkoutsList() {
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
-  const contentMaxWidth = isMobile ? '100%' : isTablet ? 620 : 760;
-
   const columns: GridColumn<ReturnGetWorkoutsData>[] = [
     { key: 'name', header: 'Name', align: 'left' },
     {
       key: 'workout_date',
       header: 'Date',
       align: 'right',
-      render: (item) => formatWorkoutDate(item.workout_date),
+      render: (item) =>
+        getFormatedDate({
+          date: parseDateKey(item.workout_date),
+          showYear: true,
+          nameMonth: false,
+        }),
     },
   ];
 
@@ -116,43 +111,8 @@ export default function WorkoutsList() {
   }
 
   return (
-    <main
-      style={{
-        background: 'transparent',
-        padding: s(isMobile ? 18 : 28, scale),
-        color: colors.text,
-        height: '100%',
-        boxSizing: 'border-box',
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-      }}
-    >
-      <div
-        style={{
-          width: '100%',
-          maxWidth: contentMaxWidth,
-          height: '100%',
-          minHeight: 0,
-          position: 'relative',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: s(16, scale),
-        }}
-      >
-        <TopBar
-          left={
-            <button
-              style={{ rotate: '-180deg', cursor: 'pointer' }}
-              onClick={() => router.back()}
-            >
-              <ChevronIcon />
-            </button>
-          }
-          center="Workouts"
-        />
-
+    <main className="page page-padded page-fill page-under-bar">
+      <div className="page-content page-content-narrow page-fill-content">
         {error && (
           <ErrorPopUp onClose={() => setError(null)}>{error}</ErrorPopUp>
         )}
@@ -163,23 +123,9 @@ export default function WorkoutsList() {
           onChange={setSearch}
         />
 
-        <div
-          style={{
-            flex: 1,
-            minHeight: 0,
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
+        <div className="page-fill-content">
           {isLoading ? (
-            <div
-              style={{
-                flex: 1,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
+            <div className="content-center">
               <LoadingCircle />
             </div>
           ) : (
