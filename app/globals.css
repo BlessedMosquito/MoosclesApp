@@ -1,9 +1,17 @@
 @import 'tailwindcss';
+@import '../styles/ui.css';
+@import '../styles/layout.css';
+@import '../styles/auth.css';
+@import '../styles/dashboard.css';
+@import '../styles/calendar.css';
+@import '../styles/workout.css';
+@import '../styles/profile.css';
 
 @custom-variant dark (&:is(.dark *));
 
 :root {
   --bg: #171717;
+  --background: var(--bg);
   --componentsBg: #212121;
   --tileBg: #1c1c1c;
 
@@ -73,6 +81,33 @@
 }
 
 @theme inline {
+  --color-app: var(--bg);
+  --color-surface: var(--componentsBg);
+  --color-tile: var(--tileBg);
+  --color-line: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-dark: var(--accentDark);
+  --color-accent-light: var(--accentLight);
+  --color-accent-surface: var(--accentSurface);
+  --color-accent-border: var(--accentBorder);
+  --color-content: var(--text);
+  --color-content-muted: var(--text-muted);
+  --color-danger: var(--red);
+  --color-danger-light: var(--redLight);
+  --color-danger-border: var(--error-border);
+  --color-on-danger: var(--error-muted);
+  --color-success: #30d158;
+  --color-water: #0ea5e9;
+  --color-duration: #a855f7;
+  --color-shade: var(--shadow);
+
+  --text-display: 2.125rem;
+  --text-h1: 1.75rem;
+  --text-h2: 1.375rem;
+  --text-body: 1rem;
+  --text-body-sm: 0.875rem;
+  --text-caption: 0.75rem;
+
   --color-background: #0b0c0c;
   --color-foreground: var(--foreground);
   --color-muted: var(--muted);
@@ -91,25 +126,19 @@
   --color-chart-scale-03: var(--chart-scale-03);
   --color-chart-scale-02: var(--chart-scale-02);
   --color-chart-scale-01: var(--chart-scale-01);
-  --color-chart-marker-foreground: var(----chart-marker-foreground);
-  --color-chart-marker-border: var(----chart-marker-border);
-  --color-chart-marker-background: var(----chart-marker-background);
-  --chart-tooltip-muted: var(----chart-tooltip-muted);
-  --chart-tooltip-foreground: var(----chart-tooltip-foreground);
-  --chart-tooltip-background: var(----chart-tooltip-background);
-  --chart-brush-border: var(----chart-brush-border);
-  --color-chart-grid: var(----chart-grid);
-  --color-chart-crosshair: var(----chart-crosshair);
-  --chart-line-secondary: var(----chart-line-secondary);
-  --chart-line-primary: var(----chart-line-primary);
-  --color-chart-foreground-muted: var(----chart-foreground-muted);
-  --color-chart-foreground: var(----chart-foreground);
-  --color-chart-background: var(----chart-background);
-  --color-chart-5: var(----chart-5);
-  --color-chart-4: var(----chart-4);
-  --color-chart-3: var(----chart-3);
-  --color-chart-2: var(----chart-2);
-  --color-chart-1: var(----chart-1);
+  --color-chart-marker-foreground: var(--chart-marker-foreground);
+  --color-chart-marker-border: var(--chart-marker-border);
+  --color-chart-marker-background: var(--chart-marker-background);
+  --color-chart-grid: var(--chart-grid);
+  --color-chart-crosshair: var(--chart-crosshair);
+  --color-chart-foreground-muted: var(--chart-foreground-muted);
+  --color-chart-foreground: var(--chart-foreground);
+  --color-chart-background: var(--chart-background);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
 }
 
 html {
@@ -144,12 +173,6 @@ body::before {
 body > div {
   min-height: 100dvh;
   background: transparent;
-}
-
-@keyframes loading-circle-spin {
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 .dark {

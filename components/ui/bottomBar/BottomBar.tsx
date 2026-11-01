@@ -8,7 +8,6 @@ import {
   useRef,
   useState,
 } from 'react';
-import { colors } from '@/theme/colors';
 
 type SetActiveEl = (el: HTMLElement | null) => void;
 
@@ -25,7 +24,17 @@ type Rect = {
   height: number;
 };
 
-const spring = { type: 'spring', stiffness: 500, damping: 40 } as const;
+export const ITEM_COLLAPSED_WIDTH = 48;
+export const ITEM_ACTIVE_WIDTH = 132;
+export const ITEM_HEIGHT = 48;
+export const BAR_SPRING = {
+  type: 'spring',
+  stiffness: 420,
+  damping: 38,
+} as const;
+
+const NAV_PADDING = 8;
+const NAV_GAP = 6;
 
 export default function BottomBar({ children }: { children: React.ReactNode }) {
   const navRef = useRef<HTMLElement | null>(null);
@@ -39,11 +48,17 @@ export default function BottomBar({ children }: { children: React.ReactNode }) {
         setRect(null);
         return;
       }
+      const items = Array.from(nav.querySelectorAll(':scope > button'));
+      const index = items.indexOf(activeEl);
+      if (index === -1) {
+        setRect(null);
+        return;
+      }
       setRect({
-        left: activeEl.offsetLeft,
-        top: activeEl.offsetTop,
-        width: activeEl.offsetWidth,
-        height: activeEl.offsetHeight,
+        left: NAV_PADDING + index * (ITEM_COLLAPSED_WIDTH + NAV_GAP),
+        top: NAV_PADDING,
+        width: ITEM_ACTIVE_WIDTH,
+        height: ITEM_HEIGHT,
       });
     }
 
@@ -53,64 +68,29 @@ export default function BottomBar({ children }: { children: React.ReactNode }) {
   }, [activeEl]);
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        bottom: 20,
-        left: 0,
-        right: 0,
-        display: 'flex',
-        justifyContent: 'center',
-        pointerEvents: 'none',
-        zIndex: 40,
-      }}
-    >
-      <BottomBarContext.Provider value={setActiveEl}>
-        <nav
-          ref={navRef}
-          style={{
-            position: 'relative',
-            display: 'flex',
-            gap: 6,
-            padding: 8,
-            borderRadius: 24,
-            background: 'rgba(33, 33, 33, 0.65)',
-            backdropFilter: 'blur(18px)',
-            WebkitBackdropFilter: 'blur(18px)',
-            border: `1px solid ${colors.textMuted}`,
-            pointerEvents: 'auto',
-          }}
-        >
-          {rect && (
-            <motion.div
-              initial={false}
-              animate={{
-                x: rect.left,
-                y: rect.top,
-                width: rect.width,
-                height: rect.height,
-              }}
-              transition={spring}
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                borderRadius: 24,
+    <>
+      <div className="bottom-bar-fade" />
+      <div className="bottom-bar">
+        <BottomBarContext.Provider value={setActiveEl}>
+          <nav ref={navRef} className="bottom-bar-nav">
+            {rect && (
+              <motion.div
+                initial={false}
+                animate={{
+                  x: rect.left,
+                  y: rect.top,
+                  width: rect.width,
+                  height: rect.height,
+                }}
+                transition={BAR_SPRING}
+                className="bottom-bar-indicator"
+              />
+            )}
 
-                background: colors.componentsBg,
-                backdropFilter: 'blur(18px)',
-                WebkitBackdropFilter: 'blur(18px)',
-
-                border: `1px solid ${colors.accent}`,
-                boxShadow: '0 6px 25px rgba(0,0,0,0.35)',
-                zIndex: 0,
-              }}
-            />
-          )}
-
-          {children}
-        </nav>
-      </BottomBarContext.Provider>
-    </div>
+            {children}
+          </nav>
+        </BottomBarContext.Provider>
+      </div>
+    </>
   );
 }

@@ -14,19 +14,10 @@ export function useResponsive() {
     return () => window.removeEventListener('resize', update);
   }, []);
 
-  const isMobile = width < 640;
-  const isTablet = width >= 640 && width < 1024;
-  const isDesktop = width >= 1024;
-
   return {
     width,
-    isMobile,
-    isTablet,
-    isDesktop,
-    scale: Math.min(Math.max(width / 1440, 0.85), 1.2),
+    isMobile: width < 640,
+    isTablet: width >= 640 && width < 1024,
+    isDesktop: width >= 1024,
   };
-}
-
-export function s(value: number, scale: number) {
-  return Math.round(value * scale);
 }

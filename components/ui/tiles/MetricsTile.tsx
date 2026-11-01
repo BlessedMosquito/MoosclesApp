@@ -23,7 +23,6 @@ import {
 } from '@/components/charts/chart-center-typography';
 import { useRingStable } from '@/components/charts/ring-context';
 import { cn } from '@/lib/utils';
-import { s, useResponsive } from '@/lib/useResponsive';
 import Tile from './Tile';
 
 type MetricItem = {
@@ -48,10 +47,15 @@ type MetricsTileProps = {
 
 const statFormat: ChartStatFlowFormat = {
   notation: 'standard',
-  maximumFractionDigits: 0,
+  maximumFractionDigits: 1,
 };
 
+function goalOrFallback(goal: number, value: number) {
+  return goal > 0 ? goal : Math.max(value, 1);
+}
+
 const INACTIVE_RING_ALPHA = 0.4;
+const TILE_PADDING = 14;
 
 function withAlpha(hex: string, alpha: number) {
   const value = hex.replace('#', '');
@@ -80,10 +84,7 @@ function MetricsCenter({
 
   return (
     <div
-      className={cn(
-        chartCenterContainerClassName,
-        'flex flex-col items-center justify-center text-center'
-      )}
+      className={cn(chartCenterContainerClassName, 'metrics-center')}
       style={{ width: centerSize, height: centerSize }}
     >
       <ChartStatFlow
@@ -109,10 +110,10 @@ function SelectableLegendRow({
 
   return (
     <div onClick={() => onSelect(index)}>
-      <LegendItem className="flex flex-col gap-1.5 px-2 py-1.5">
-        <div className="flex items-center gap-2">
+      <LegendItem className="metrics-legend-item">
+        <div className="metrics-legend-row">
           <LegendMarker />
-          <LegendLabel className="flex-1 truncate text-sm font-medium" />
+          <LegendLabel className="metrics-legend-label" />
           <LegendValue showPercentage />
         </div>
         <LegendProgress />
@@ -132,28 +133,29 @@ export default function MetricsTile({
   distanceUnit = 'km',
   durationUnit = 'h',
 }: MetricsTileProps) {
-  const { scale } = useResponsive();
   const [activeIndex, setActiveIndex] = useState<number | null>(0);
 
   const data: MetricItem[] = [
     {
       label: 'Distance',
       value: distance,
-      maxValue: 5000,
+      maxValue: goalOrFallback(distanceMax, distance),
       color: '#0ea5e9',
       unit: distanceUnit,
     },
     {
       label: 'Duration',
       value: duration,
-      maxValue: 5000,
+      maxValue: goalOrFallback(durationMax, duration),
       color: '#a855f7',
       unit: durationUnit,
     },
   ];
 
-  const padding = s(14, scale);
-  const ringSize = Math.max(0, Math.min(chartSize, tileHeight - padding * 2));
+  const ringSize = Math.max(
+    0,
+    Math.min(chartSize, tileHeight - TILE_PADDING * 2)
+  );
 
   function handleSelect(index: number) {
     setActiveIndex((current) => (current === index ? null : index));
@@ -161,16 +163,7 @@ export default function MetricsTile({
 
   return (
     <Tile width={tileWidth} height={tileHeight}>
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: s(24, scale),
-          width: '100%',
-          height: '100%',
-          minWidth: 0,
-        }}
-      >
+      <div className="metrics-content">
         <RingChart
           data={data}
           size={ringSize}
@@ -198,7 +191,7 @@ export default function MetricsTile({
           <MetricsCenter activeIndex={activeIndex} items={data} />
         </RingChart>
 
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div className="min-w-0 flex-1">
           <Legend items={data} hoveredIndex={activeIndex}>
             <SelectableLegendRow onSelect={handleSelect} />
           </Legend>

@@ -1,7 +1,7 @@
 'use client';
 
-import { colors } from '@/theme/colors';
-import { s, useResponsive } from '@/lib/useResponsive';
+import { toDateKey } from '@/lib/helpers';
+import { cn } from '@/lib/utils';
 import Tile from './Tile';
 
 type Props = {
@@ -12,13 +12,6 @@ type Props = {
   width?: number;
   height?: number;
 };
-
-function toKey(date: Date) {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
-}
 
 function getCurrentWeekDates() {
   const today = new Date();
@@ -45,114 +38,42 @@ export default function WeeklyStreakTile({
   width = 350,
   height = 180,
 }: Props) {
-  const { isMobile, scale } = useResponsive();
-
-  const todayKey = toKey(new Date());
+  const todayKey = toDateKey(new Date());
 
   return (
     <Tile width={width} height={height}>
-      {/* HEADER */}
-      <div style={{ marginBottom: s(10, scale) }}>
-        <p
-          style={{
-            margin: 0,
-            fontSize: s(isMobile ? 12 : 14, scale),
-            fontWeight: 800,
-            color: colors.text,
-          }}
-        >
-          Your Weekly streak!
-        </p>
-
-        <p
-          style={{
-            margin: `${s(4, scale)}px 0 0`,
-            fontSize: s(isMobile ? 10 : 12, scale),
-            color: colors.text,
-          }}
-        >
+      <div className="mb-2.5">
+        <p className="streak-title">Your Weekly streak!</p>
+        <p className="streak-subtitle">
           You’ve done{' '}
-          <span style={{ color: '#30D158', fontWeight: 700 }}>
-            {workoutsThisWeek}
-          </span>{' '}
+          <span className="streak-highlight-success">{workoutsThisWeek}</span>{' '}
           workouts this week
         </p>
       </div>
 
-      {/* WEEK GRID */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(7, minmax(0, 1fr))',
-          gap: s(6, scale),
-        }}
-      >
+      <div className="streak-week">
         {weekDates.map((date, index) => {
-          const key = toKey(date);
-          const isToday = key === todayKey;
-          const hasWorkout = !!workoutDays[key];
+          const key = toDateKey(date);
 
           return (
             <div
               key={key}
-              style={{
-                width: '100%',
-                minHeight: s(isMobile ? 76 : 56, scale),
-                borderRadius: 999,
-
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: s(3, scale),
-
-                background: hasWorkout ? colors.accent : colors.componentsBg,
-
-                border: isToday
-                  ? `1px solid ${colors.text}`
-                  : `1px solid ${colors.border}`,
-
-                color: hasWorkout ? '#30D158' : colors.text,
-                marginTop: s(10, scale),
-              }}
+              className={cn(
+                'streak-day',
+                workoutDays[key] && 'streak-day-done',
+                key === todayKey && 'streak-day-today'
+              )}
             >
-              <span
-                style={{
-                  fontSize: s(9, scale),
-                  lineHeight: 1,
-                  fontWeight: 700,
-                  color: colors.text,
-                }}
-              >
-                {weekdays[index]}
-              </span>
-
-              <span
-                style={{
-                  fontSize: s(12, scale),
-                  lineHeight: 1,
-                  fontWeight: 800,
-                  color: colors.text,
-                }}
-              >
-                {date.getDate()}
-              </span>
+              <span className="streak-day-name">{weekdays[index]}</span>
+              <span className="streak-day-number">{date.getDate()}</span>
             </div>
           );
         })}
       </div>
 
-      <p
-        style={{
-          margin: 0,
-          fontSize: s(isMobile ? 9 : 11, scale),
-          color: colors.text,
-          textAlign: 'center',
-          marginTop: s(8, scale),
-        }}
-      >
+      <p className="streak-footer">
         You have{' '}
-        <span style={{ color: colors.accent, fontWeight: 700 }}>
+        <span className="streak-highlight">
           {activeWeeks} {activeWeeks === 1 ? 'week' : 'weeks'}
         </span>{' '}
         streak with at least one day spent working out

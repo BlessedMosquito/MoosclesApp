@@ -1,9 +1,7 @@
 'use client';
 
-import { CSSProperties, KeyboardEvent, Ref } from 'react';
-import { s, useResponsive } from '@/lib/useResponsive';
-import { colors } from '@/theme/colors';
-import { fontSizes } from '@/theme/typography';
+import { KeyboardEvent, Ref } from 'react';
+import { cn } from '@/lib/utils';
 
 type TextInputProps = {
   value: string;
@@ -16,7 +14,7 @@ type TextInputProps = {
   readOnly?: boolean;
   onBlur?: () => void;
   onKeyDown?: (event: KeyboardEvent<HTMLInputElement>) => void;
-  style?: CSSProperties;
+  className?: string;
   ref?: Ref<HTMLInputElement>;
 };
 
@@ -31,24 +29,9 @@ export default function TextInput({
   readOnly = false,
   onBlur,
   onKeyDown,
-  style,
+  className,
   ref,
 }: TextInputProps) {
-  const { scale } = useResponsive();
-
-  const mergedStyle: CSSProperties = {
-    width: '100%',
-    boxSizing: 'border-box',
-    padding: s(14, scale),
-    borderRadius: s(14, scale),
-    border: `1px solid ${colors.border}`,
-    background: colors.componentsBg,
-    color: colors.text,
-    fontSize: Math.max(s(fontSizes.input, scale), 16),
-    outline: 'none',
-    ...style,
-  };
-
   return (
     <input
       ref={ref}
@@ -62,7 +45,7 @@ export default function TextInput({
       onChange={(event) => onChange(event.target.value)}
       onBlur={onBlur}
       onKeyDown={onKeyDown}
-      style={mergedStyle}
+      className={cn('input', className)}
     />
   );
 }

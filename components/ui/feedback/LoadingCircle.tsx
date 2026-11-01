@@ -1,57 +1,29 @@
 'use client';
 
-import { CSSProperties } from 'react';
-import { s, useResponsive } from '@/lib/useResponsive';
-import { colors } from '@/theme/colors';
 import { motion } from 'motion/react';
 
 type LoadingCircleProps = {
   size?: number;
-  style?: CSSProperties;
 };
 
-export default function LoadingCircle({
-  size = 24,
-  style,
-}: LoadingCircleProps) {
-  const { scale } = useResponsive();
-  const scaledSize = s(size, scale);
-  const scaledStroke = Math.max(s(3, scale), 3);
+const spin = { repeat: Infinity, duration: 0.8, ease: 'linear' } as const;
 
+export default function LoadingCircle({ size = 24 }: LoadingCircleProps) {
   return (
     <motion.span
       aria-label="Loading"
       role="status"
-      initial={{ rotate: 0, opacity: 1 }}
+      initial={{ rotate: 0 }}
       animate={{ rotate: 360 }}
-      transition={{ repeat: Infinity, duration: 0.8, ease: 'linear' }}
-      style={{
-        position: 'relative',
-        width: scaledSize,
-        height: scaledSize,
-        display: 'inline-block',
-        ...style,
-      }}
+      transition={spin}
+      className="spinner"
+      style={{ width: size, height: size }}
     >
+      <span className="spinner-track" />
       <motion.span
-        style={{
-          position: 'absolute',
-          inset: 0,
-          borderRadius: '50%',
-          border: `${scaledStroke}px solid ${colors.border}`,
-        }}
-      />
-      <motion.span
-        style={{
-          position: 'absolute',
-          inset: 0,
-          borderRadius: '50%',
-          border: `${scaledStroke}px solid transparent`,
-          borderTopColor: colors.accent,
-          borderRightColor: colors.accent,
-        }}
+        className="spinner-arc"
         animate={{ rotate: 360 }}
-        transition={{ repeat: Infinity, duration: 0.8, ease: 'linear' }}
+        transition={spin}
       />
     </motion.span>
   );

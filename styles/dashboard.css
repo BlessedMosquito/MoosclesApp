@@ -1,0 +1,229 @@
+@layer components {
+  .dashboard {
+    @apply box-border flex min-h-dvh flex-col items-stretch gap-5 bg-transparent p-[18px] sm:items-center sm:p-6;
+  }
+
+  .dashboard-title {
+    @apply m-0 text-h2 font-bold text-white sm:text-[2rem];
+  }
+
+  .dashboard-loading {
+    @apply flex min-h-[300px] w-full items-center justify-center;
+  }
+
+  .dashboard-grid-mobile {
+    @apply mx-auto flex w-full flex-wrap justify-center gap-3;
+  }
+
+  .dashboard-grid {
+    @apply grid w-full grid-cols-3 gap-3 sm:gap-6;
+  }
+
+  .dashboard-column {
+    @apply flex flex-col gap-3 sm:gap-6;
+  }
+
+  .dashboard-activity {
+    @apply col-span-3 flex justify-center;
+  }
+
+  .streak-title {
+    @apply m-0 text-caption font-extrabold text-content sm:text-body-sm;
+  }
+
+  .streak-subtitle {
+    @apply mt-1 mb-0 text-[10px] text-content sm:text-caption;
+  }
+
+  .streak-highlight {
+    @apply font-bold text-accent;
+  }
+
+  .streak-highlight-success {
+    @apply font-bold text-success;
+  }
+
+  .streak-week {
+    @apply grid grid-cols-7 gap-1.5;
+  }
+
+  .streak-day {
+    @apply flex min-h-[76px] w-full flex-col items-center justify-center gap-[3px] rounded-full border border-line bg-surface text-content sm:min-h-14;
+  }
+
+  .streak-day-done {
+    @apply bg-accent text-success;
+  }
+
+  .streak-day-today {
+    @apply border-content;
+  }
+
+  .streak-day-name {
+    @apply text-[9px] leading-none font-bold text-content;
+  }
+
+  .streak-day-number {
+    @apply text-caption leading-none font-extrabold text-content;
+  }
+
+  .streak-footer {
+    @apply mt-2 mb-0 text-center text-[9px] text-content sm:text-[11px];
+  }
+
+  .level-gauge {
+    @apply flex h-full flex-col items-center justify-between gap-2;
+  }
+
+  .level-gauge-caption {
+    @apply m-0 text-caption font-bold text-content-muted;
+  }
+
+  .activity-tile {
+    @apply select-none [-webkit-touch-callout:none];
+  }
+
+  .activity-content {
+    @apply flex min-h-0 w-full flex-1 items-center justify-center gap-3;
+  }
+
+  .activity-summary {
+    @apply flex w-[92px] shrink-0 flex-col gap-1.5;
+  }
+
+  .activity-date {
+    @apply m-0 text-base font-bold text-content;
+  }
+
+  .activity-muted {
+    @apply text-caption leading-[1.3] text-content-muted;
+  }
+
+  .activity-label {
+    @apply mt-[5px] text-[11px] leading-[1.3] text-content-muted;
+  }
+
+  .activity-count {
+    @apply text-h2 leading-none font-semibold text-content;
+  }
+
+  .metrics-content {
+    @apply flex h-full w-full min-w-0 items-center gap-6;
+  }
+
+  .metrics-center {
+    @apply flex flex-col items-center justify-center text-center;
+  }
+
+  .metrics-legend-item {
+    @apply flex cursor-pointer flex-col gap-1.5 px-2 py-1.5;
+  }
+
+  .metrics-legend-row {
+    @apply flex items-center gap-2;
+  }
+
+  .metrics-legend-label {
+    @apply flex-1 truncate text-sm font-medium;
+  }
+
+  .water-tile-card {
+    @apply p-2;
+  }
+
+  .water-tile {
+    @apply flex h-full w-full items-center justify-between gap-2;
+  }
+
+  .water-tile-ring {
+    @apply relative flex shrink-0 items-center justify-center;
+  }
+
+  .water-tile-label {
+    @apply absolute inset-[22%] flex cursor-pointer items-center justify-center rounded-full border-none bg-transparent p-0 text-center text-body-sm leading-none font-bold text-water tabular-nums select-none sm:text-body lg:text-h2;
+  }
+
+  .water-tile-add {
+    @apply flex size-12 shrink-0 cursor-pointer items-center justify-center rounded-full border-none bg-water text-white shadow-[0_6px_20px_rgba(14,165,233,0.35)] transition-transform active:scale-90 sm:size-14;
+  }
+
+  .water-form {
+    @apply flex flex-col gap-5 pt-2;
+
+    & .numeric-field {
+      @apply mx-auto w-3/4 items-stretch gap-2;
+    }
+
+    & .numeric-label {
+      @apply text-body-sm font-semibold;
+    }
+  }
+
+  .water-form-summary {
+    @apply m-0 text-center text-body-sm text-content-muted;
+  }
+
+  .water-quick {
+    @apply mx-auto flex w-3/4 gap-2;
+  }
+
+  .water-quick-chip {
+    @apply flex-1 border-water/40 text-water disabled:opacity-50;
+  }
+
+  .water-section {
+    @apply flex flex-col gap-2 border-t border-line pt-4;
+  }
+
+  .water-section-title {
+    @apply m-0 text-caption font-semibold tracking-[0.06em] text-content-muted uppercase;
+  }
+
+  .water-empty {
+    @apply m-0 text-body-sm text-content-muted;
+  }
+
+  .water-entries {
+    @apply m-0 flex list-none flex-col gap-1.5 p-0;
+  }
+
+  .water-entry {
+    @apply flex items-center gap-3 rounded-xl border border-line bg-tile px-3 py-2;
+  }
+
+  .water-entry-amount {
+    @apply text-body-sm font-semibold text-water tabular-nums;
+  }
+
+  .water-entry-time {
+    @apply flex-1 text-caption text-content-muted tabular-nums;
+  }
+
+  .water-entry-delete {
+    @apply size-8 text-danger-light;
+  }
+
+  .water-history {
+    @apply grid grid-cols-7 gap-2;
+  }
+
+  .water-history-day {
+    @apply flex flex-col items-center gap-1;
+  }
+
+  .water-history-track {
+    @apply relative flex h-20 w-full max-w-7 items-end overflow-hidden rounded-lg bg-tile;
+  }
+
+  .water-history-bar {
+    @apply w-full rounded-lg bg-water/50 transition-[height] duration-300;
+  }
+
+  .water-history-bar-done {
+    @apply bg-water;
+  }
+
+  .water-history-label {
+    @apply text-caption text-content-muted;
+  }
+}

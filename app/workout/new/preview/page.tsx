@@ -7,19 +7,16 @@ import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
 import SuccessAnimation from '@/components/ui/feedback/SuccessAnimation';
 import TextInput from '@/components/ui/inputs/TextInput';
 import { createClient } from '@/lib/supabase/client';
-import { s, useResponsive } from '@/lib/useResponsive';
-import { colors } from '@/theme/colors';
-import { fontSizes } from '@/theme/typography';
+import { useResponsive } from '@/lib/useResponsive';
 import { Mode } from '@/types/common';
 import { createWorkout } from '@/services/workouts';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useRef, useState } from 'react';
-import type { CSSProperties } from 'react';
 import { useSetBackRoute, useSetText, useStartLeave } from '../layout';
 import { motion } from 'motion/react';
 
 function PreviewContent() {
-  const { isMobile, scale } = useResponsive();
+  const { isMobile } = useResponsive();
   const router = useRouter();
   const searchParams = useSearchParams();
   const setBackRoute = useSetBackRoute();
@@ -30,10 +27,8 @@ function PreviewContent() {
   const workoutNameInit = searchParams.get('workoutName') ?? '';
   const typeLabelInit = searchParams.get('typeLabel') ?? '';
 
-  const [group, setGroup] = useState(subgroup);
-  const [name, setName] = useState(workoutNameInit);
-  const [workout, setWorkout] = useState(typeLabelInit);
-  const [typeId] = useState(searchParams.get('typeId') ?? '');
+  const name = workoutNameInit;
+  const typeId = searchParams.get('typeId') ?? '';
 
   const [error, setError] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
@@ -63,15 +58,14 @@ function PreviewContent() {
     return true;
   }
 
-  const navigate = (target: string) => {
+  const navigate = (target: string, replace = false) => {
+    const go = () => (replace ? router.replace(target) : router.push(target));
     if (!isMobile) {
-      router.push(target);
+      go();
       return;
     }
     startLeave();
-    setTimeout(() => {
-      router.push(target);
-    }, 450);
+    setTimeout(go, 450);
   };
 
   const handleCreate = async () => {
@@ -128,77 +122,35 @@ function PreviewContent() {
     navigate('/dashboard');
   };
 
-  const labelStyle: CSSProperties = {
-    fontSize: s(fontSizes.body, scale),
-    color: colors.text,
-    fontWeight: 600,
-  };
+  const summary: [string, string][] = [
+    ['Name', name],
+    ['Workout type:', subgroup],
+    ['Selected workout:', typeLabelInit],
+  ];
 
   return (
-    <div
-      style={{
-        width: '100%',
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <div
-        style={{
-          width: isMobile ? '100%' : 420,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'stretch',
-          gap: s(22, scale),
-        }}
-      >
+    <div className="wizard-step">
+      <div className="wizard-form">
         {error && (
           <ErrorPopUp onClose={() => setError(null)}>{error}</ErrorPopUp>
         )}
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{
-            duration: 0.8,
-            delay: 0.5,
-            ease: [0, 0.71, 0.2, 1.01],
-          }}
-          style={{ display: 'flex', flexDirection: 'column', gap: s(8, scale) }}
-        >
-          <label style={labelStyle}>Name</label>
-          <TextInput value={name} onChange={setName} readOnly />
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{
-            duration: 0.8,
-            delay: 0.5,
-            ease: [0, 0.71, 0.2, 1.01],
-          }}
-          style={{ display: 'flex', flexDirection: 'column', gap: s(8, scale) }}
-        >
-          <label style={labelStyle}>Workout type:</label>
-          <TextInput value={group} onChange={setGroup} readOnly />
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{
-            duration: 0.8,
-            delay: 0.5,
-            ease: [0, 0.71, 0.2, 1.01],
-          }}
-          style={{ display: 'flex', flexDirection: 'column', gap: s(8, scale) }}
-        >
-          <label style={labelStyle}>Selected workout:</label>
-          <TextInput value={workout} onChange={setWorkout} readOnly />
-        </motion.div>
+        {summary.map(([label, value]) => (
+          <motion.label
+            key={label}
+            initial={{ opacity: 0, scale: 0.5 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{
+              duration: 0.8,
+              delay: 0.5,
+              ease: [0, 0.71, 0.2, 1.01],
+            }}
+            className="field"
+          >
+            <span className="field-label">{label}</span>
+            <TextInput value={value} onChange={() => {}} readOnly />
+          </motion.label>
+        ))}
 
         <Button
           onClick={handleCreate}
@@ -227,7 +179,7 @@ function PreviewContent() {
           onDone={() => {
             setShowSuccess(false);
             if (pendingNavRef.current) {
-              navigate(pendingNavRef.current);
+              navigate(pendingNavRef.current, true);
             }
           }}
         />

@@ -1,5 +1,6 @@
 import { getWeekRange } from '@/lib/helpers';
 import { createClient } from '@/lib/supabase/client';
+import { toServiceError } from './serviceError';
 
 type UpsertWorkoutMetricsProps = {
   workoutId: string;
@@ -38,7 +39,7 @@ export async function upsertWorkoutMetrics(props: UpsertWorkoutMetricsProps) {
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) throw toServiceError(error, 'Could not save workout data.');
 
   return data;
 }

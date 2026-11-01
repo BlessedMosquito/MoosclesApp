@@ -12,11 +12,13 @@ import {
   type HeatmapColumn,
 } from '@/components/charts/heatmap';
 import { colors } from '@/theme/colors';
-import { s, useResponsive } from '@/lib/useResponsive';
 import Tile from './Tile';
-import { getFormatedDate } from '@/lib/helpers';
+import { getFormatedDate, parseDateKey, toDateKey } from '@/lib/helpers';
 
 const WEEKDAYS = 7;
+const SUMMARY_WIDTH = 92;
+const CONTENT_GAP = 12;
+const CHART_MARGIN = { top: 10, right: 10, bottom: 30, left: 50 };
 const CELL_GAP = 4;
 const INACTIVE_CELL = 'rgba(255, 255, 255, 0.08)';
 
@@ -37,14 +39,6 @@ type WorkoutActivityTileProps = {
   weeklyWorkouts: number;
 };
 
-function pad(value: number) {
-  return String(value).padStart(2, '0');
-}
-
-function toDateKey(date: Date) {
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
-}
-
 type MonthGrid = {
   columns: HeatmapColumn[];
   start: Date;
@@ -64,7 +58,7 @@ function buildMonthGrid(
 
   const namesByDate: Record<string, string[]> = {};
   for (const workout of workouts) {
-    const key = toDateKey(new Date(workout.workout_date));
+    const key = toDateKey(parseDateKey(workout.workout_date));
     const names = namesByDate[key] ?? [];
     names.push(workout.name);
     namesByDate[key] = names;
@@ -99,7 +93,7 @@ function HeatmapCalendarLabels() {
   const weekCount = data[0]?.bins.length ?? 0;
 
   return (
-    <g style={{ pointerEvents: 'none' }}>
+    <g className="pointer-events-none">
       {WEEKDAY_LABELS.map((label, column) => (
         <text
           key={`weekday-${column}`}
@@ -136,7 +130,6 @@ export default function WorkoutActivityTile({
   workouts,
   weeklyWorkouts,
 }: WorkoutActivityTileProps) {
-  const { scale } = useResponsive();
   const { columns, start, end, namesByDate } = useMemo(
     () => buildMonthGrid(workouts),
     [workouts]
@@ -150,33 +143,25 @@ export default function WorkoutActivityTile({
   });
   const yearLabel = today.getFullYear().toString();
 
-  const margin = useMemo(
-    () => ({
-      top: s(10, scale),
-      right: s(10, scale),
-      bottom: s(30, scale),
-      left: s(50, scale),
-    }),
-    [scale]
-  );
-
-  const labelWidth = s(92, scale);
-  const tileGap = s(12, scale);
   const weekCount = columns[0]?.bins.length ?? 1;
 
   const bin = Math.max(
     Math.floor(
       Math.min(
-        (tileWidth - labelWidth - tileGap - margin.left - margin.right) /
+        (tileWidth -
+          SUMMARY_WIDTH -
+          CONTENT_GAP -
+          CHART_MARGIN.left -
+          CHART_MARGIN.right) /
           WEEKDAYS,
-        (tileHeight - margin.top - margin.bottom) / weekCount
+        (tileHeight - CHART_MARGIN.top - CHART_MARGIN.bottom) / weekCount
       )
     ),
     4
   );
 
-  const chartWidth = margin.left + WEEKDAYS * bin + margin.right;
-  const chartHeight = margin.top + weekCount * bin + margin.bottom;
+  const chartWidth = CHART_MARGIN.left + WEEKDAYS * bin + CHART_MARGIN.right;
+  const chartHeight = CHART_MARGIN.top + weekCount * bin + CHART_MARGIN.bottom;
 
   const formatLabel = useCallback(
     (_count: number, date: Date) => {
@@ -187,80 +172,17 @@ export default function WorkoutActivityTile({
   );
 
   return (
-    <div
-      style={{
-        userSelect: 'none',
-        WebkitUserSelect: 'none',
-        WebkitTouchCallout: 'none',
-      }}
-    >
+    <div className="activity-tile">
       <Tile width={tileWidth} height={tileHeight}>
-        <div
-          style={{
-            display: 'flex',
-            flex: 1,
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: tileGap,
-            minHeight: 0,
-            width: '100%',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: s(6, scale),
-              width: labelWidth,
-              flexShrink: 0,
-            }}
-          >
-            <p
-              style={{
-                color: colors.text,
-                fontSize: s(16, scale),
-                fontWeight: 700,
-              }}
-            >
-              {dayMonthLabel}
-            </p>
-            <span
-              style={{
-                color: colors.textMuted,
-                fontSize: s(12, scale),
-                lineHeight: 1.3,
-              }}
-            >
-              {yearLabel}
-            </span>
-            <span
-              style={{
-                color: colors.textMuted,
-                fontSize: s(11, scale),
-                lineHeight: 1.3,
-                marginTop: s(5, scale),
-              }}
-            >
-              Workouts done:
-            </span>
-            <span
-              style={{
-                color: colors.text,
-                fontSize: s(22, scale),
-                fontWeight: 600,
-                lineHeight: 1,
-              }}
-            >
-              {weeklyWorkouts}
-            </span>
+        <div className="activity-content">
+          <div className="activity-summary">
+            <p className="activity-date">{dayMonthLabel}</p>
+            <span className="activity-muted">{yearLabel}</span>
+            <span className="activity-label">Workouts done:</span>
+            <span className="activity-count">{weeklyWorkouts}</span>
           </div>
 
-          <div
-            style={{
-              width: chartWidth,
-              height: chartHeight,
-            }}
-          >
+          <div style={{ width: chartWidth, height: chartHeight }}>
             <HeatmapInteractionProvider>
               <HeatmapInteractionBoundary>
                 <HeatmapChart
@@ -268,7 +190,7 @@ export default function WorkoutActivityTile({
                   gap={CELL_GAP}
                   layout="fill"
                   levelColors={LEVEL_COLORS}
-                  margin={margin}
+                  margin={CHART_MARGIN}
                 >
                   <HeatmapCells
                     cornerRadius={4}

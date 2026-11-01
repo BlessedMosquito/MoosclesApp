@@ -10,7 +10,7 @@ import SettingsIcon from './icons/SettingsIcon';
 import BottomBar from './ui/bottomBar/BottomBar';
 import BottomBarItem from './ui/bottomBar/BottomBarItem';
 import LoadingCircle from './ui/feedback/LoadingCircle';
-import { BOTTOM_BAR_HEIGHT } from '@/app/constants/layoutConstants';
+import { cn } from '@/lib/utils';
 
 const AUTHENTICATED_PATHS = [
   '/dashboard',
@@ -18,8 +18,6 @@ const AUTHENTICATED_PATHS = [
   '/workouts-list',
   '/profile',
 ];
-
-const BOTTOM_BAR_EXACT_PATHS = ['/add-workout-data/repetition-based'];
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -45,28 +43,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   const iconSize = isMobile ? 16 : isTablet ? 18 : 20;
 
-  const hideSidebar = !(
-    AUTHENTICATED_PATHS.some((p) => pathname.startsWith(p)) ||
-    BOTTOM_BAR_EXACT_PATHS.includes(pathname)
-  );
+  const hideSidebar = !AUTHENTICATED_PATHS.some((p) => pathname.startsWith(p));
 
   return (
-    <div
-      style={{
-        height: '100dvh',
-        overflow: 'hidden',
-        background: 'var(--background)',
-      }}
-    >
-      <main
-        style={{
-          height: '100%',
-          overflowY: 'auto',
-          overflowX: 'hidden',
-          paddingBottom: hideSidebar ? 0 : BOTTOM_BAR_HEIGHT,
-          WebkitOverflowScrolling: 'touch',
-        }}
-      >
+    <div className="app-shell">
+      <main className={cn('app-main', !hideSidebar && 'app-main-with-bar')}>
         {children}
       </main>
 
@@ -77,16 +58,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.18, ease: 'easeOut' }}
-            style={{
-              position: 'fixed',
-              inset: 0,
-              zIndex: 500,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'var(--background)',
-              pointerEvents: 'none',
-            }}
+            className="route-loader"
           >
             <LoadingCircle size={44} />
           </motion.div>

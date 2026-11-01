@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { cn } from '@/lib/utils';
 
 type ToastVariant = 'error' | 'success';
 
@@ -82,20 +83,7 @@ function ToastContainer({
   if (toasts.length === 0) return null;
 
   return (
-    <div
-      style={{
-        position: 'fixed',
-        bottom: 100,
-        left: '50%',
-        transform: 'translateX(-50%)',
-        zIndex: 300,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 8,
-        maxWidth: 400,
-        width: '90%',
-      }}
-    >
+    <div className="toast-stack">
       {toasts.map((toast) => (
         <ToastItem
           key={toast.id}
@@ -119,32 +107,14 @@ function ToastItem({
   return (
     <div
       role="alert"
-      style={{
-        padding: '12px 16px',
-        borderRadius: 12,
-        border: `1px solid ${isError ? 'var(--error-border)' : 'var(--accentBorder)'}`,
-        background: isError ? 'var(--error-surface)' : 'var(--accentSurface)',
-        color: isError ? 'var(--error-muted)' : 'var(--accentLight)',
-        fontSize: 14,
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-      }}
+      className={cn('toast', isError ? 'toast-error' : 'toast-success')}
     >
       <span>{toast.message}</span>
       <button
+        type="button"
+        aria-label="Dismiss"
         onClick={onDismiss}
-        style={{
-          background: 'none',
-          border: 'none',
-          color: 'inherit',
-          cursor: 'pointer',
-          fontSize: 16,
-          padding: '0 0 0 12px',
-          opacity: 0.7,
-        }}
+        className="toast-close"
       >
         x
       </button>

@@ -4,17 +4,14 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ErrorPopUp from '@/components/ui/feedback/ErrorPopUp';
 import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
-import Tile from '@/components/ui/tiles/Tile';
+import ChoiceTile from '@/components/ui/tiles/ChoiceTile';
+import MuscleIcon from '@/components/muscles/MuscleIcon';
 import TopBar from '@/components/ui/topBar/TopBar';
-import ChevronIcon from '@/components/icons/ChevronIcon';
-import { s, useResponsive } from '@/lib/useResponsive';
+import BackButton from '@/components/ui/buttons/BackButton';
 import { getMuscles } from '@/services/exercisesList';
-import { colors } from '@/theme/colors';
-import { motion } from 'motion/react';
 
 export default function ChooseMuscle() {
   const router = useRouter();
-  const { isMobile, scale } = useResponsive();
 
   const [muscles, setMuscles] = useState<string[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -54,42 +51,17 @@ export default function ChooseMuscle() {
   }
 
   return (
-    <main
-      style={{
-        background: 'transparent',
-        padding: s(isMobile ? 18 : 28, scale),
-        color: colors.text,
-        height: '100%',
-        boxSizing: 'border-box',
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-      }}
-    >
-      <div
-        style={{
-          width: '100%',
-          maxWidth: isMobile ? '100%' : 760,
-          height: '100%',
-          minHeight: 0,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: s(16, scale),
-        }}
-      >
+    <main className="page page-padded page-fill">
+      <div className="page-content page-content-wide page-fill-content">
         <TopBar
           left={
-            <button
-              style={{ rotate: '-180deg', cursor: 'pointer' }}
+            <BackButton
               onClick={() =>
                 router.replace(
                   '/add-workout-data/repetition-based/add-exercise'
                 )
               }
-            >
-              <ChevronIcon />
-            </button>
+            />
           }
           center="Choose muscle"
         />
@@ -99,51 +71,22 @@ export default function ChooseMuscle() {
         )}
 
         {isLoading ? (
-          <div
-            style={{
-              flex: 1,
-              minHeight: 0,
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
+          <div className="content-center">
             <LoadingCircle />
           </div>
         ) : (
-          <div
-            style={{
-              flex: 1,
-              minHeight: 0,
-              overflowY: 'auto',
-              overscrollBehavior: 'contain',
-              WebkitOverflowScrolling: 'touch',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: s(12, scale),
-              paddingBottom: s(8, scale),
-            }}
-          >
-            {muscles?.map((muscle) => (
-              <motion.div
-                key={muscle}
-                initial={{ opacity: 0, scale: 0 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{
-                  duration: 0.4,
-                  scale: { type: 'spring', visualDuration: 0.4, bounce: 0.3 },
-                }}
-              >
-                <Tile
-                  title={muscle}
-                  titleVAlign="center"
-                  titleSize={isMobile ? 24 : 32}
-                  width="100%"
-                  height={50}
+          <div className="muscle-list">
+            <div className="choice-grid">
+              {muscles?.map((muscle, index) => (
+                <ChoiceTile
+                  key={muscle}
+                  media={<MuscleIcon muscle={muscle} />}
+                  label={muscle}
+                  index={index}
                   onClick={() => pickMuscle(muscle)}
                 />
-              </motion.div>
-            ))}
+              ))}
+            </div>
           </div>
         )}
       </div>

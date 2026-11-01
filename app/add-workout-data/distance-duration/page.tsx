@@ -4,36 +4,32 @@ import Button from '@/components/ui/buttons/Button';
 import ErrorPopUp from '@/components/ui/feedback/ErrorPopUp';
 import SuccessAnimation from '@/components/ui/feedback/SuccessAnimation';
 import { formatDistance, formatDuration } from '@/lib/format';
-import { s, useResponsive } from '@/lib/useResponsive';
 import {
   getWorkoutMetrics,
   upsertWorkoutMetrics,
 } from '@/services/workoutMetrics';
-import { getWorkoutById } from '@/services/workouts';
+import { deleteWorkout, getWorkoutById } from '@/services/workouts';
 import { WorkoutTypeGroup } from '@/services/workoutTypes';
-import { colors } from '@/theme/colors';
-import { fontSizes } from '@/theme/typography';
 import { Mode } from '@/types/common';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import type { CSSProperties } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import Slider from '@/components/ui/slider/Slider';
 import { iconBasedOnRange } from '@/lib/helpers';
 import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
-import ChevronIcon from '@/components/icons/ChevronIcon';
+import BackButton from '@/components/ui/buttons/BackButton';
 import TopBar from '@/components/ui/topBar/TopBar';
 import TextInput from '@/components/ui/inputs/TextInput';
 import TimeInput from '@/components/ui/inputs/TimeInput';
 import DistanceInput from '@/components/ui/inputs/DistanceInput';
 import PopupWindow from '@/components/ui/popups/PopUpWindow';
 import CompletedSection from '@/components/ui/CompletedSection';
+import QuestionPopUp from '@/components/ui/popups/QuestionPopUp';
 
 export default function AddWorkoutDataDuration() {
   const supabase = createClient();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isMobile, isTablet, scale } = useResponsive();
 
   const workoutId = searchParams.get('workoutId');
   const mode = searchParams.get('mode') as Mode;
@@ -53,24 +49,11 @@ export default function AddWorkoutDataDuration() {
   const [distancePopupOpen, setDistancePopupOpen] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-
-  const contentMaxWidth = isMobile ? '100%' : isTablet ? 620 : 760;
+  const [showDeletePopUp, setShowDeletePopUp] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const isPreview = mode === 'PREVIEW';
-  const canEdit = mode === 'EDIT' || mode === 'NEW';
-
-  const fieldStyle: CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: s(8, scale),
-    width: '100%',
-  };
-
-  const labelStyle: CSSProperties = {
-    fontSize: s(fontSizes.heading2, scale),
-    fontWeight: 600,
-    color: colors.text,
-  };
+  const canEdit = mode === 'EDIT' || mode === 'NEW' || isEditing;
 
   function parseTimeText(text: string) {
     const [h = '', m = ''] = text.split(':');
@@ -173,6 +156,10 @@ export default function AddWorkoutDataDuration() {
   async function handleAddWorkoutData() {
     setError(null);
 
+    if (!canEdit || isCompleted) {
+      return false;
+    }
+
     if (!workoutId) {
       setError('Missing workout id.');
       return false;
@@ -206,7 +193,7 @@ export default function AddWorkoutDataDuration() {
         userId: user.id,
       });
 
-      pendingNavRef.current = '/dashboard';
+      pendingNavRef.current = isPreview ? null : '/dashboard';
       setShowSuccess(true);
       return true;
     } catch (saveError) {
@@ -243,32 +230,64 @@ export default function AddWorkoutDataDuration() {
     );
   }
 
+  async function handleDeleteWorkout() {
+    if (!workoutId || isCompleted) return;
+
+    setShowDeletePopUp(false);
+    setIsDeleting(true);
+    setError(null);
+
+    try {
+      await deleteWorkout(workoutId);
+      if (window.history.length > 1) {
+        router.back();
+      } else {
+        router.replace('/workouts-list');
+      }
+    } catch (deleteError) {
+      setError(
+        deleteError instanceof Error
+          ? deleteError.message
+          : 'Could not delete workout.'
+      );
+      setIsDeleting(false);
+    }
+  }
+
+  function renderPreviewActions() {
+    return (
+      <div className="workout-data-buttons">
+        <Button
+          onClick={() => setIsEditing(true)}
+          disabled={isDeleting}
+          width="full"
+        >
+          Edit
+        </Button>
+        <Button
+          onClick={() => setShowDeletePopUp(true)}
+          disabled={isDeleting}
+          width="full"
+          variant="danger"
+        >
+          {isDeleting ? <LoadingCircle size={18} /> : 'Delete'}
+        </Button>
+      </div>
+    );
+  }
+
+  function renderActions() {
+    if (isCompleted) return <CompletedSection />;
+    if (isPreview && !isEditing) return renderPreviewActions();
+    if (canEdit) return renderButton();
+    return null;
+  }
+
   return (
-    <main
-      style={{
-        background: 'transparent',
-        padding: s(isMobile ? 18 : 28, scale),
-        color: colors.text,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-      }}
-    >
-      <div style={{ width: '100%', maxWidth: contentMaxWidth }}>
+    <main className="page-section">
+      <div className="page-content page-content-narrow">
         <TopBar
-          left={
-            <button
-              style={{
-                rotate: '-180deg',
-                cursor: 'pointer',
-              }}
-              onClick={() =>
-                mode === 'PREVIEW' ? router.back() : router.push('/calendar')
-              }
-            >
-              <ChevronIcon />
-            </button>
-          }
+          left={<BackButton onClick={() => router.push('/workouts-list')} />}
           center={workoutName}
         />
 
@@ -276,23 +295,16 @@ export default function AddWorkoutDataDuration() {
           <ErrorPopUp onClose={() => setError(null)}>{error}</ErrorPopUp>
         )}
 
-        <div
-          style={{
-            marginTop: s(24, scale),
-            display: 'flex',
-            flexDirection: 'column',
-            gap: s(20, scale),
-          }}
-        >
+        <div className="workout-data-fields">
           {workoutType && (
-            <div style={fieldStyle}>
-              <span style={labelStyle}>Workout type</span>
+            <div className="field">
+              <span className="field-label field-label-lg">Workout type</span>
               <TextInput value={workoutType} readOnly onChange={() => {}} />
             </div>
           )}
 
-          <div style={fieldStyle}>
-            <span style={labelStyle}>Time</span>
+          <div className="field">
+            <span className="field-label field-label-lg">Time</span>
             {isEditing ? (
               <TimeInput
                 hours={parseTimeText(timeText).hours}
@@ -317,8 +329,8 @@ export default function AddWorkoutDataDuration() {
           </div>
 
           {workoutGroupType === 'DistanceDuration' && (
-            <div style={fieldStyle}>
-              <span style={labelStyle}>Distance</span>
+            <div className="field">
+              <span className="field-label field-label-lg">Distance</span>
               {isEditing ? (
                 <DistanceInput
                   value={{
@@ -349,17 +361,9 @@ export default function AddWorkoutDataDuration() {
             </div>
           )}
 
-          <div style={fieldStyle}>
-            <span style={labelStyle}>Well-being</span>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: s(8, scale),
-                width: '100%',
-              }}
-            >
+          <div className="field">
+            <span className="field-label field-label-lg">Well-being</span>
+            <div className="workout-data-slider">
               <Slider
                 label={iconBasedOnRange({
                   value: wellBeing,
@@ -370,15 +374,13 @@ export default function AddWorkoutDataDuration() {
                 min={1}
                 max={10}
                 onChange={setWellBeing}
-                blockSlider={mode === 'PREVIEW' && !isEditing}
+                blockSlider={!canEdit || isCompleted}
               />
             </div>
           </div>
         </div>
 
-        <div style={{ marginTop: s(50, scale) }}>
-          {isCompleted ? <CompletedSection /> : renderButton()}
-        </div>
+        <div className="workout-data-actions">{renderActions()}</div>
       </div>
 
       {timePopupOpen && (
@@ -408,6 +410,14 @@ export default function AddWorkoutDataDuration() {
           />
           <Button onClick={() => setDistancePopupOpen(false)}>Save</Button>
         </PopupWindow>
+      )}
+
+      {showDeletePopUp && (
+        <QuestionPopUp
+          text="Do you really want to delete this workout?"
+          onYes={handleDeleteWorkout}
+          onNo={() => setShowDeletePopUp(false)}
+        />
       )}
 
       {showSuccess && (

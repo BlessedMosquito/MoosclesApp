@@ -1,33 +1,26 @@
 'use client';
 
-import ChevronIcon from '@/components/icons/ChevronIcon';
 import ErrorPopUp from '@/components/ui/feedback/ErrorPopUp';
 import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
 import Grid, { GridColumn } from '@/components/ui/Grid';
 import TextInput from '@/components/ui/inputs/TextInput';
-import TopBar from '@/components/ui/topBar/TopBar';
-import { BOTTOM_BAR_HEIGHT } from '@/app/constants/layoutConstants';
 import { createClient } from '@/lib/supabase/client';
-import { s, useResponsive } from '@/lib/useResponsive';
 import { WorkoutTypeGroup } from '@/services/workoutTypes';
 import { getWorkouts, ReturnGetWorkoutsData } from '@/services/workouts';
 import { colors } from '@/theme/colors';
 import { Mode } from '@/types/common';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { getFormatedDate } from '@/lib/helpers';
+import { getFormatedDate, parseDateKey } from '@/lib/helpers';
 
 export default function WorkoutsList() {
   const router = useRouter();
-  const { isMobile, isTablet, scale } = useResponsive();
 
   const [workouts, setWorkouts] = useState<ReturnGetWorkoutsData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-
-  const contentMaxWidth = isMobile ? '100%' : isTablet ? 620 : 760;
 
   const columns: GridColumn<ReturnGetWorkoutsData>[] = [
     { key: 'name', header: 'Name', align: 'left' },
@@ -37,7 +30,7 @@ export default function WorkoutsList() {
       align: 'right',
       render: (item) =>
         getFormatedDate({
-          date: new Date(item.workout_date),
+          date: parseDateKey(item.workout_date),
           showYear: true,
           nameMonth: false,
         }),
@@ -118,43 +111,8 @@ export default function WorkoutsList() {
   }
 
   return (
-    <main
-      style={{
-        background: 'transparent',
-        padding: s(isMobile ? 18 : 28, scale),
-        color: colors.text,
-        height: `calc(100% + ${BOTTOM_BAR_HEIGHT}px)`,
-        boxSizing: 'border-box',
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-      }}
-    >
-      <div
-        style={{
-          width: '100%',
-          maxWidth: contentMaxWidth,
-          height: '100%',
-          minHeight: 0,
-          position: 'relative',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: s(16, scale),
-        }}
-      >
-        <TopBar
-          left={
-            <button
-              style={{ rotate: '-180deg', cursor: 'pointer' }}
-              onClick={() => router.back()}
-            >
-              <ChevronIcon />
-            </button>
-          }
-          center="Workouts"
-        />
-
+    <main className="page page-padded page-fill page-under-bar">
+      <div className="page-content page-content-narrow page-fill-content">
         {error && (
           <ErrorPopUp onClose={() => setError(null)}>{error}</ErrorPopUp>
         )}
@@ -165,23 +123,9 @@ export default function WorkoutsList() {
           onChange={setSearch}
         />
 
-        <div
-          style={{
-            flex: 1,
-            minHeight: 0,
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
+        <div className="page-fill-content">
           {isLoading ? (
-            <div
-              style={{
-                flex: 1,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
+            <div className="content-center">
               <LoadingCircle />
             </div>
           ) : (
@@ -190,7 +134,6 @@ export default function WorkoutsList() {
               columns={columns.length}
               columnConfig={columns}
               data={workouts}
-              contentPaddingBottom={BOTTOM_BAR_HEIGHT}
               keyExtractor={(item) => item.id}
               onRowClick={openWorkout}
               emptyMessage={

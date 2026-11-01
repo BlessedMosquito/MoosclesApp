@@ -5,53 +5,60 @@ import LevelGaugeTile from '@/components/ui/tiles/LevelGaugeTile';
 import WeeklyWorkoutTile from '@/components/ui/tiles/WeeklyWorkoutTile';
 import ErrorPopUp from '@/components/ui/feedback/ErrorPopUp';
 import { createClient } from '@/lib/supabase/client';
-import { s, useResponsive } from '@/lib/useResponsive';
-import { getUserData, ReturnGetUserData } from '@/services/userData';
+import { useResponsive } from '@/lib/useResponsive';
+import {
+  emptyUserData,
+  getMissingProfileItems,
+  getUserData,
+  ReturnGetUserData,
+} from '@/services/userData';
 import {
   getCompletedWorkouts,
   getWorkoutDaysForWeek,
   type ReturnCompletedWorkoutData,
 } from '@/services/workouts';
+import { getWeeklyDataSummary } from '@/services/workoutMetrics';
 import { useEffect, useState } from 'react';
-import WaterTile from '@/components/ui/tiles/WaterTile';
-import Button from '@/components/ui/buttons/Button';
 import TopBar from '@/components/ui/topBar/TopBar';
 import AddIcon from '@/components/icons/AddIcon';
 import { useRouter } from 'next/navigation';
 import MetricsTile from '@/components/ui/tiles/MetricsTile';
 import WorkoutActivityTile from '@/components/ui/tiles/WorkoutActivityTile';
+import DailyWaterIntakeTile from '@/components/ui/tiles/DailyWaterIntakeTile';
+import ProfileSetupPrompt from '@/components/ui/popups/ProfileSetupPrompt';
+import ExpandableButton, {
+  ExpandableButtonOption,
+} from '@/components/ui/buttons/ExpandableButton';
+import { IconBarbell, IconTemplate } from '@tabler/icons-react';
+import { PROFILE_PROMPT_DISMISSED_KEY } from '@/app/constants/storageConstants';
 
 export default function DashboardPage() {
   const supabase = createClient();
-  const router = useRouter();
-  const { isMobile, scale, width } = useResponsive();
+  const { isMobile, width } = useResponsive();
 
-  const [userData, setUserData] = useState<ReturnGetUserData>({
-    user_id: '',
-    experience: 0,
-    weekly_distance_goal_meters: 0,
-    weekly_duration_goal_minutes: 0,
-    created_at: null,
-    updated_at: null,
-  });
-  const [userId, setUserId] = useState<string | null>(null);
+  const router = useRouter();
+  const [userData, setUserData] = useState<ReturnGetUserData>(emptyUserData);
   const [workoutDays, setWorkoutDays] = useState<Record<string, boolean>>({});
   const [monthWorkouts, setMonthWorkouts] = useState<
     ReturnCompletedWorkoutData[]
   >([]);
   const [workoutCount, setWorkoutCount] = useState(0);
+  const [weeklyDistanceKm, setWeeklyDistanceKm] = useState(0);
+  const [weeklyDurationHours, setWeeklyDurationHours] = useState(0);
   const [activeWeeks, setActiveWeeks] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [isLoadingUserData, setIsLoadingUserData] = useState(true);
+  const [missingProfileItems, setMissingProfileItems] = useState<string[]>([]);
+  const [showProfilePrompt, setShowProfilePrompt] = useState(false);
   const [firstName, setFirstName] = useState<string | null>(null);
 
-  const gridGap = s(isMobile ? 12 : 24, scale);
-  const paddingX = s(isMobile ? 18 : 24, scale);
+  const gridGap = isMobile ? 12 : 24;
+  const paddingX = isMobile ? 18 : 24;
   const availableWidth = Math.max(0, width - paddingX * 2);
   const tileWidth = isMobile
     ? Math.round(availableWidth * 0.48)
-    : Math.min(s(290, scale), Math.floor((availableWidth - gridGap * 2) / 3));
-  const tileHeight = s(isMobile ? 180 : 250, scale);
+    : Math.min(290, Math.floor((availableWidth - gridGap * 2) / 3));
+  const tileHeight = isMobile ? 180 : 250;
   const halfTileHeight = (tileHeight - gridGap) / 2;
   const contentMaxWidth =
     tileWidth * (isMobile ? 2 : 3) + gridGap * (isMobile ? 1 : 2);
@@ -67,7 +74,6 @@ export default function DashboardPage() {
         return;
       }
 
-      setUserId(user.id);
       setFirstName(user.user_metadata?.first_name ?? null);
 
       const now = new Date();
@@ -76,12 +82,24 @@ export default function DashboardPage() {
       const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
       const monthEnd = `${nextMonth.getFullYear()}-${pad(nextMonth.getMonth() + 1)}-01`;
 
-      const [data, weekData, monthWorkouts] = await Promise.all([
+      const [data, weekData, monthWorkouts, weeklySummary] = await Promise.all([
         getUserData(user.id),
         getWorkoutDaysForWeek(user.id),
         getCompletedWorkouts(user.id, monthStart, monthEnd),
+        getWeeklyDataSummary({ userId: user.id }),
       ]);
       setUserData(data);
+
+      const missing = getMissingProfileItems(data);
+      setMissingProfileItems(missing);
+      if (
+        missing.length > 0 &&
+        !window.sessionStorage.getItem(PROFILE_PROMPT_DISMISSED_KEY)
+      ) {
+        setShowProfilePrompt(true);
+      }
+      setWeeklyDistanceKm(weeklySummary.distance_meters / 1000);
+      setWeeklyDurationHours(weeklySummary.duration_minutes / 60);
 
       const mapped: Record<string, boolean> = {};
       for (const d of weekData.workout_days) mapped[d.date] = true;
@@ -103,98 +121,80 @@ export default function DashboardPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const createOptions: ExpandableButtonOption[] = [
+    {
+      label: 'Workout',
+      icon: <IconBarbell size={22} stroke={1.75} />,
+      onClick: () => router.push('/workout/create'),
+    },
+    {
+      label: 'Template',
+      icon: <IconTemplate size={22} stroke={1.75} />,
+      onClick: () => router.push('/templates/new'),
+    },
+  ];
+
+  const metricsProps = {
+    tileHeight,
+    chartSize: tileWidth,
+    distance: weeklyDistanceKm,
+    distanceMax: userData.weekly_distance_goal_meters / 1000,
+    duration: weeklyDurationHours,
+    durationMax: userData.weekly_duration_goal_minutes / 60,
+  };
+
   return (
-    <main
-      style={{
-        minHeight: '100dvh',
-        background: 'transparent',
-        padding: s(isMobile ? 18 : 24, scale),
-        display: 'flex',
-        flexDirection: 'column',
-        gap: s(20, scale),
-        alignItems: isMobile ? 'stretch' : 'center',
-      }}
-    >
-      {/* STICKY HEADER */}
+    <main className="dashboard">
       <TopBar
         width={contentMaxWidth}
-        left={
-          <h1
-            style={{
-              margin: 0,
-              color: 'white',
-              fontSize: s(isMobile ? 22 : 32, scale),
-              fontWeight: 700,
-            }}
-          >
-            Mooscles
-          </h1>
-        }
+        left={<h1 className="dashboard-title">Mooscles</h1>}
         right={`Hello, ${firstName ?? ''}`}
       />
 
       {error && <ErrorPopUp onClose={() => setError(null)}>{error}</ErrorPopUp>}
 
-      {/* GRID */}
+      <ProfileSetupPrompt
+        open={showProfilePrompt}
+        missingItems={missingProfileItems}
+        onClose={() => {
+          window.sessionStorage.setItem(PROFILE_PROMPT_DISMISSED_KEY, '1');
+          setShowProfilePrompt(false);
+        }}
+      />
+
       {isLoadingUserData ? (
         <div
-          style={{
-            width: '100%',
-            maxWidth: contentMaxWidth,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            minHeight: s(300, scale),
-          }}
+          className="dashboard-loading"
+          style={{ maxWidth: contentMaxWidth }}
         >
           <LoadingCircle />
         </div>
       ) : isMobile ? (
         <div
-          style={{
-            width: '100%',
-            display: 'flex',
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-            gap: gridGap,
-            maxWidth: contentMaxWidth,
-          }}
+          className="dashboard-grid-mobile"
+          style={{ maxWidth: contentMaxWidth }}
         >
           <LevelGaugeTile
             experience={userData.experience}
             tileWidth={tileWidth}
             tileHeight={tileHeight}
           />
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: gridGap,
-              width: tileWidth,
-            }}
-          >
-            <div style={{ width: '100%', height: halfTileHeight }}>
-              <Button
-                width="full"
-                height={halfTileHeight * 1.2}
-                onClick={() => router.push('/workout/new/subgroup')}
-              >
-                <AddIcon />
-                {'Add workout'}
-              </Button>
-            </div>
-            <WaterTile tileWidth={tileWidth} tileHeight={halfTileHeight} />
+          <div className="dashboard-column" style={{ width: tileWidth }}>
+            <ExpandableButton
+              label="Create"
+              icon={<AddIcon />}
+              height={halfTileHeight}
+              options={createOptions}
+            />
+            <DailyWaterIntakeTile
+              tileWidth={tileWidth}
+              tileHeight={halfTileHeight}
+              goalMl={userData.daily_water_goal_ml}
+              onError={setError}
+            />
           </div>
-          <MetricsTile
-            tileWidth={contentMaxWidth}
-            tileHeight={tileHeight}
-            chartSize={tileWidth}
-            distanceMax={userData.weekly_distance_goal_meters / 1000}
-            distance={0}
-            durationMax={userData.weekly_duration_goal_minutes / 60}
-            duration={0}
-          />
-          <div style={{ width: '100%' }}>
+          <MetricsTile tileWidth={contentMaxWidth} {...metricsProps} />
+          <div className="w-full">
             <WorkoutActivityTile
               tileWidth={contentMaxWidth}
               tileHeight={tileHeight}
@@ -204,55 +204,33 @@ export default function DashboardPage() {
           </div>
         </div>
       ) : (
-        <div
-          style={{
-            width: '100%',
-            display: 'grid',
-            gridTemplateColumns: `repeat(3, minmax(0, 1fr))`,
-            gap: gridGap,
-            maxWidth: contentMaxWidth,
-          }}
-        >
+        <div className="dashboard-grid" style={{ maxWidth: contentMaxWidth }}>
           <LevelGaugeTile
             experience={userData.experience}
             tileWidth={tileWidth}
             tileHeight={tileHeight}
           />
-          <div style={{ gridColumn: 'span 2' }}>
+          <div className="col-span-2">
             <MetricsTile
               tileWidth={tileWidth * 2 + gridGap}
-              tileHeight={tileHeight}
-              chartSize={tileWidth}
-              distanceMax={userData.weekly_distance_goal_meters / 1000}
-              distance={0}
-              durationMax={userData.weekly_duration_goal_minutes / 60}
-              duration={0}
+              {...metricsProps}
             />
           </div>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: gridGap,
-            }}
-          >
-            <div style={{ width: '100%' }}>
-              <Button
-                width="full"
-                height={halfTileHeight}
-                onClick={() => router.push('/workout/new/subgroup')}
-              >
-                <AddIcon />
-                {'Add workout'}
-              </Button>
-            </div>
-            <WaterTile tileWidth={tileWidth} tileHeight={halfTileHeight} />
+          <div className="dashboard-column">
+            <ExpandableButton
+              label="Create"
+              icon={<AddIcon />}
+              height={halfTileHeight}
+              options={createOptions}
+            />
+            <DailyWaterIntakeTile
+              tileWidth={tileWidth}
+              tileHeight={halfTileHeight}
+              goalMl={userData.daily_water_goal_ml}
+              onError={setError}
+            />
           </div>
-          <div
-            style={{
-              gridColumn: 'span 2',
-            }}
-          >
+          <div className="col-span-2">
             <WeeklyWorkoutTile
               workoutDays={workoutDays}
               workoutsThisWeek={workoutCount}
@@ -261,13 +239,7 @@ export default function DashboardPage() {
               height={tileHeight}
             />
           </div>
-          <div
-            style={{
-              gridColumn: 'span 3',
-              display: 'flex',
-              justifyContent: 'center',
-            }}
-          >
+          <div className="dashboard-activity">
             <WorkoutActivityTile
               tileWidth={tileWidth}
               tileHeight={tileHeight}

@@ -1,8 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { s, useResponsive } from '@/lib/useResponsive';
 import { colors } from '@/theme/colors';
 
 type SuccessAnimationProps = {
@@ -11,137 +10,110 @@ type SuccessAnimationProps = {
   doneDelay?: number;
 };
 
+const SIZE = 80;
+const STROKE = 5;
+const RADIUS = (SIZE - STROKE * 2) / 2;
+const DRAW_DURATION_MS = 950;
+const EASE = [0.22, 1, 0.36, 1] as const;
+
 export default function SuccessAnimation({
   message = 'Saved!',
   onDone,
   doneDelay = 2000,
 }: SuccessAnimationProps) {
-  const { scale } = useResponsive();
-  const [phase, setPhase] = useState<'spinning' | 'success'>('spinning');
+  const [isVisible, setIsVisible] = useState(true);
+  const onDoneRef = useRef(onDone);
 
   useEffect(() => {
-    const spinTimer = setTimeout(() => setPhase('success'), 800);
-    return () => clearTimeout(spinTimer);
-  }, []);
+    onDoneRef.current = onDone;
+  }, [onDone]);
 
   useEffect(() => {
-    if (phase !== 'success' || !onDone) return;
-    const doneTimer = setTimeout(onDone, doneDelay);
-    return () => clearTimeout(doneTimer);
-  }, [phase, onDone, doneDelay]);
-
-  const SIZE = s(80, scale);
-  const STROKE = 5;
-  const RADIUS = (SIZE - STROKE * 2) / 2;
-  const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+    const hideTimer = setTimeout(
+      () => setIsVisible(false),
+      DRAW_DURATION_MS + doneDelay
+    );
+    return () => clearTimeout(hideTimer);
+  }, [doneDelay]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 200,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: s(16, scale),
-        background: 'rgba(0,0,0,0.5)',
-        backdropFilter: 'blur(4px)',
-        WebkitBackdropFilter: 'blur(4px)',
-      }}
-    >
-      <motion.div
-        style={{ position: 'relative', width: SIZE, height: SIZE }}
-        animate={{ rotate: phase === 'spinning' ? 360 : 0 }}
-        transition={
-          phase === 'spinning'
-            ? { rotate: { duration: 1, repeat: Infinity, ease: 'linear' } }
-            : { duration: 0.3, ease: 'easeOut' }
-        }
-      >
-        <svg
-          width={SIZE}
-          height={SIZE}
-          viewBox={`0 0 ${SIZE} ${SIZE}`}
-          style={{ transform: 'rotate(-90deg)' }}
+    <AnimatePresence onExitComplete={() => onDoneRef.current?.()}>
+      {isVisible && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.25, ease: 'easeOut' }}
+          className="success-overlay"
         >
-          <circle
-            cx={SIZE / 2}
-            cy={SIZE / 2}
-            r={RADIUS}
-            fill="none"
-            stroke={colors.border}
-            strokeWidth={STROKE}
-          />
-
-          <motion.circle
-            cx={SIZE / 2}
-            cy={SIZE / 2}
-            r={RADIUS}
-            fill="none"
-            stroke={phase === 'success' ? colors.accent : colors.text}
-            strokeWidth={STROKE}
-            strokeLinecap="round"
-            strokeDasharray={CIRCUMFERENCE}
-            initial={{ strokeDashoffset: CIRCUMFERENCE * 0.75 }}
-            animate={{
-              strokeDashoffset: phase === 'spinning' ? CIRCUMFERENCE * 0.75 : 0,
-            }}
-            transition={{ duration: 0.5, ease: 'easeOut' }}
-          />
-        </svg>
-
-        <AnimatePresence>
-          {phase === 'success' && (
-            <motion.svg
-              initial={{ opacity: 0, scale: 0.85 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3, ease: 'easeOut' }}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ type: 'spring', stiffness: 260, damping: 22 }}
+            className="success-ring"
+          >
+            <svg
               width={SIZE}
               height={SIZE}
               viewBox={`0 0 ${SIZE} ${SIZE}`}
-              style={{ position: 'absolute', top: 0, left: 0 }}
+              className="-rotate-90"
+            >
+              <circle
+                cx={SIZE / 2}
+                cy={SIZE / 2}
+                r={RADIUS}
+                fill="none"
+                stroke={colors.border}
+                strokeWidth={STROKE}
+              />
+              <motion.circle
+                cx={SIZE / 2}
+                cy={SIZE / 2}
+                r={RADIUS}
+                fill="none"
+                stroke={colors.accent}
+                strokeWidth={STROKE}
+                strokeLinecap="round"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 0.6, ease: EASE, delay: 0.1 }}
+              />
+            </svg>
+
+            <svg
+              width={SIZE}
+              height={SIZE}
+              viewBox={`0 0 ${SIZE} ${SIZE}`}
+              className="absolute top-0 left-0"
             >
               <motion.polyline
-                points={`${SIZE * 0.28},${SIZE * 0.52} ${SIZE * 0.44},${SIZE * 0.68} ${SIZE * 0.72},${SIZE * 0.36}`}
+                points={`${SIZE * 0.3},${SIZE * 0.52} ${SIZE * 0.45},${SIZE * 0.66} ${SIZE * 0.71},${SIZE * 0.38}`}
                 fill="none"
                 stroke={colors.accent}
                 strokeWidth={STROKE}
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeDasharray={60}
-                initial={{ strokeDashoffset: 60 }}
-                animate={{ strokeDashoffset: 0 }}
-                transition={{ duration: 0.35, ease: 'easeOut', delay: 0.1 }}
+                initial={{ pathLength: 0, opacity: 0 }}
+                animate={{ pathLength: 1, opacity: 1 }}
+                transition={{
+                  pathLength: { duration: 0.4, ease: EASE, delay: 0.55 },
+                  opacity: { duration: 0.01, delay: 0.55 },
+                }}
               />
-            </motion.svg>
-          )}
-        </AnimatePresence>
-      </motion.div>
+            </svg>
+          </motion.div>
 
-      <AnimatePresence>
-        {phase === 'success' && (
           <motion.p
-            initial={{ opacity: 0, y: 6 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.4, ease: 'easeOut' }}
-            style={{
-              margin: 0,
-              color: colors.text,
-              fontSize: s(16, scale),
-              fontWeight: 600,
-            }}
+            transition={{ duration: 0.4, ease: EASE, delay: 0.7 }}
+            className="success-message"
           >
             {message}
           </motion.p>
-        )}
-      </AnimatePresence>
-    </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

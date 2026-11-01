@@ -1,17 +1,21 @@
 'use client';
 
 import Button from '@/components/ui/buttons/Button';
+import ChoiceTile from '@/components/ui/tiles/ChoiceTile';
 import ErrorPopUp from '@/components/ui/feedback/ErrorPopUp';
 import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
-import StackPicker from '@/components/ui/stackPicker/StackPicker';
-import { s, useResponsive } from '@/lib/useResponsive';
-import { getWorkoutTypes, ReturnGetWorkoutTypeData } from '@/services/workoutTypes';
+import { useResponsive } from '@/lib/useResponsive';
+import { getWorkoutTypeIcon } from '@/lib/workoutTypeIcon';
+import {
+  getWorkoutTypes,
+  ReturnGetWorkoutTypeData,
+} from '@/services/workoutTypes';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useCallback, useEffect, useState } from 'react';
 import { useSetBackRoute, useSetText, useStartLeave } from '../layout';
 
 function TypeContent() {
-  const { isMobile, scale } = useResponsive();
+  const { isMobile } = useResponsive();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -90,50 +94,29 @@ function TypeContent() {
   };
 
   return (
-    <div
-      style={{
-        width: '100%',
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
+    <div className="wizard-step">
       {isLoading ? (
-        <div
-          style={{
-            flex: 1,
-            width: '100%',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
+        <div className="content-center">
           <LoadingCircle />
         </div>
       ) : (
-        <div
-          style={{
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: s(32, scale),
-            paddingTop: s(50, scale),
-          }}
-        >
-          <StackPicker
-            options={
-              workoutsTypes?.map((type, index) => ({
-                value: String(index),
-                label: type.name,
-              })) ?? []
-            }
-            value={String(selectedTypeIndex)}
-            onChange={(value) => {
-              setSelectedTypeIndex(Number(value));
-            }}
-          />
+        <div className="wizard-type">
+          {workoutsTypes && workoutsTypes.length === 0 ? (
+            <p className="muted-text text-center">No workout types found.</p>
+          ) : (
+            <div className="choice-grid" role="radiogroup">
+              {workoutsTypes?.map((type, index) => (
+                <ChoiceTile
+                  key={type.id}
+                  icon={getWorkoutTypeIcon(type.name, type.workout_group)}
+                  label={type.name}
+                  index={index}
+                  selected={index === selectedTypeIndex}
+                  onClick={() => setSelectedTypeIndex(index)}
+                />
+              ))}
+            </div>
+          )}
 
           <Button
             onClick={handleContinue}

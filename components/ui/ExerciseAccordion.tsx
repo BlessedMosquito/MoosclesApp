@@ -1,19 +1,16 @@
 'use client';
 
 import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
-import CloseIcon from '@/components/icons/CloseIcon';
-import DropDownIcon from '@/components/icons/DropDownIcon';
-import { s, useResponsive } from '@/lib/useResponsive';
-import { colors } from '@/theme/colors';
-import { fontSizes } from '@/theme/typography';
 import { ReturnGetExercisesData } from '@/services/exercises';
 import { ReturnGetSetsData } from '@/services/sets';
 import { Mode } from '@/types/common';
 import Button from './buttons/Button';
-import DeleteIcon from '../icons/DeleteIcon';
-import PopupWindow from './popups/PopUpWindow';
+import BottomDrawer from './drawer/BottomDrawer';
 import NumericInput from './inputs/NumericInput';
 import { useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
+import { IconChevronDown, IconPlus, IconTrash } from '@tabler/icons-react';
+import { cn } from '@/lib/utils';
 
 type SetDraft = {
   reps: string;
@@ -53,7 +50,6 @@ export default function ExerciseAccordion({
   onDeleteExercise,
   showDeletePopUp,
 }: ExerciseAccordionProps) {
-  const { scale } = useResponsive();
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
 
@@ -74,167 +70,147 @@ export default function ExerciseAccordion({
     }
   }
 
+  const canEdit = mode !== 'PREVIEW';
+  const totalVolume = exerciseSets.reduce(
+    (sum, setItem) => sum + Number(setItem.reps) * Number(setItem.weight),
+    0
+  );
+
   return (
-    <div
-      style={{
-        padding: s(14, scale),
-        borderRadius: s(14, scale),
-        border: `1px solid ${colors.border}`,
-        background: colors.componentsBg,
-        color: colors.text,
-        fontSize: fontSizes.body,
-      }}
-    >
+    <div className={cn('accordion', isExpanded && 'accordion-open')}>
       <button
         type="button"
         onClick={() => onToggle(exercise)}
-        style={{
-          width: '100%',
-          border: 'none',
-          background: colors.transparent,
-          color: colors.text,
-          padding: 0,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          gap: s(12, scale),
-          cursor: 'pointer',
-          textAlign: 'left',
-          fontSize: fontSizes.body,
-          fontWeight: 700,
-        }}
+        aria-expanded={isExpanded}
+        className="accordion-toggle"
       >
-        <span>
-          {index + 1}. {exercise.name}
+        <span className="accordion-index">{index + 1}</span>
+        <span className="accordion-title">
+          <span className="accordion-name">{exercise.name}</span>
+          {exerciseSets.length > 0 && (
+            <span className="accordion-meta">
+              {exerciseSets.length} {exerciseSets.length === 1 ? 'set' : 'sets'}
+              {totalVolume > 0 &&
+                ` · ${Math.round(totalVolume * 10) / 10} kg volume`}
+            </span>
+          )}
         </span>
-
-        <span>{isExpanded ? <CloseIcon /> : <DropDownIcon />}</span>
+        <motion.span
+          animate={{ rotate: isExpanded ? 180 : 0 }}
+          transition={{ duration: 0.25, ease: 'easeOut' }}
+          className="accordion-chevron"
+        >
+          <IconChevronDown size={20} stroke={2} />
+        </motion.span>
       </button>
 
-      {isExpanded && (
-        <div
-          style={{
-            marginTop: s(14, scale),
-            display: 'flex',
-            flexDirection: 'column',
-            gap: s(10, scale),
-          }}
-        >
-          {isLoadingSets ? (
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                padding: s(8, scale),
-              }}
-            >
-              <LoadingCircle size={18} />
-            </div>
-          ) : exerciseSets.length === 0 ? (
-            <p
-              style={{
-                margin: 0,
-                color: colors.textMuted,
-                fontSize: s(fontSizes.caption, scale),
-              }}
-            >
-              No sets yet.
-            </p>
-          ) : (
-            exerciseSets.map((setItem, setIndex) => (
-              <div
-                key={setItem.id}
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'auto 1fr 1fr auto',
-                  gap: s(10, scale),
-                  alignItems: 'center',
-                  padding: s(10, scale),
-                  borderRadius: s(12, scale),
-                  background: colors.componentsBg,
-                  border: `1px solid ${colors.border}`,
-                }}
-              >
-                <span style={{ color: colors.textMuted }}>{setIndex + 1}</span>
+      <AnimatePresence initial={false}>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            className="overflow-hidden"
+          >
+            <div className="accordion-content">
+              {isLoadingSets ? (
+                <div className="flex justify-center p-2">
+                  <LoadingCircle size={18} />
+                </div>
+              ) : exerciseSets.length === 0 ? (
+                <p className="accordion-empty">No sets yet.</p>
+              ) : (
+                <div className="set-table">
+                  <div className="set-row set-row-head">
+                    <span>Set</span>
+                    <span>Reps</span>
+                    <span>Weight</span>
+                    {canEdit && showDeletePopUp && <span />}
+                  </div>
+                  {exerciseSets.map((setItem, setIndex) => (
+                    <div key={setItem.id} className="set-row">
+                      <span className="set-number">{setIndex + 1}</span>
+                      <span>{setItem.reps}</span>
+                      <span>{setItem.weight} kg</span>
+                      {canEdit && showDeletePopUp && (
+                        <button
+                          type="button"
+                          aria-label={`Delete set ${setIndex + 1}`}
+                          onClick={() =>
+                            showDeletePopUp(setItem.id.toString(), exerciseId)
+                          }
+                          className="icon-btn set-delete"
+                        >
+                          <IconTrash size={18} stroke={1.75} />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
 
-                <span>{setItem.reps} reps</span>
-                <span>{setItem.weight} kg</span>
-                {mode !== 'PREVIEW' && showDeletePopUp && (
+              {canEdit && (
+                <div className="accordion-actions">
                   <Button
-                    onClick={() =>
-                      showDeletePopUp(setItem.id.toString(), exerciseId)
-                    }
+                    width="full"
+                    variant="secondary"
+                    onClick={handleAddClick}
                   >
-                    <DeleteIcon />
+                    <IconPlus size={18} stroke={2.25} />
+                    Add set
                   </Button>
-                )}
-              </div>
-            ))
-          )}
-
-          {mode !== 'PREVIEW' && (
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <Button width={'3/4'} onClick={handleAddClick}>
-                {'Add set'}
-              </Button>
+                  {onDeleteExercise && (
+                    <button
+                      type="button"
+                      onClick={onDeleteExercise}
+                      className="accordion-delete"
+                    >
+                      Delete exercise
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
-          )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-          {isPopupOpen && (
-            <PopupWindow
-              onClose={() => setIsPopupOpen(false)}
-              title="Add data to your set"
-            >
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '1fr 1fr',
-                  gap: s(10, scale),
-                  width: '100%',
-                }}
-              >
-                <NumericInput
-                  value={setDraft.reps}
-                  min={0}
-                  max={999}
-                  decimal={false}
-                  placeholder="Reps"
-                  onChange={(value) =>
-                    onDraftChange(exerciseId, 'reps', String(value))
-                  }
-                />
+      <BottomDrawer
+        open={isPopupOpen}
+        onClose={() => setIsPopupOpen(false)}
+        title="Add data to your set"
+      >
+        <div className="set-form">
+          <NumericInput
+            label="Reps"
+            value={setDraft.reps}
+            min={0}
+            max={999}
+            decimal={false}
+            placeholder="0"
+            onChange={(value) =>
+              onDraftChange(exerciseId, 'reps', String(value))
+            }
+          />
+          <NumericInput
+            label="Weight (kg)"
+            value={setDraft.weight}
+            min={0}
+            max={999}
+            decimal
+            step={2.5}
+            placeholder="0"
+            onChange={(value) =>
+              onDraftChange(exerciseId, 'weight', String(value))
+            }
+          />
 
-                <NumericInput
-                  value={setDraft.weight}
-                  min={0}
-                  max={999}
-                  decimal
-                  placeholder="Weight"
-                  onChange={(value) =>
-                    onDraftChange(exerciseId, 'weight', String(value))
-                  }
-                />
-              </div>
-
-              <Button
-                onClick={handleConfirmAdd}
-                width="full"
-                disabled={isAdding}
-              >
-                {isAdding ? <LoadingCircle size={18} /> : 'Add'}
-              </Button>
-            </PopupWindow>
-          )}
-
-          {mode !== 'PREVIEW' && isExpanded && onDeleteExercise && (
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <Button onClick={onDeleteExercise} width="3/4" color={colors.red}>
-                Delete exercise
-              </Button>
-            </div>
-          )}
+          <Button onClick={handleConfirmAdd} width="full" disabled={isAdding}>
+            {isAdding ? <LoadingCircle size={18} /> : 'Add'}
+          </Button>
         </div>
-      )}
+      </BottomDrawer>
     </div>
   );
 }

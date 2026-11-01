@@ -7,7 +7,8 @@ import Button from '@/components/ui/buttons/Button';
 import AuthLayout from '@/components/layout/AuthLayout';
 import TextInput from '@/components/ui/inputs/TextInput';
 import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
-import { fontSizes } from '@/theme/typography';
+import Link from 'next/link';
+import type { AuthChangeEvent, Session } from '@supabase/supabase-js';
 
 const PASSWORD_RE =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -22,19 +23,44 @@ export default function ResetPasswordPage() {
   const [authError, setAuthError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    const hash = window.location.hash;
-    const params = new URLSearchParams(hash.substring(1));
-    const accessToken = params.get('access_token');
-    const refreshToken = params.get('refresh_token');
+  const [linkError, setLinkError] = useState<string | null>(null);
 
-    if (accessToken && refreshToken) {
-      supabase.auth
-        .setSession({ access_token: accessToken, refresh_token: refreshToken })
-        .then(() => {
+  useEffect(() => {
+    let cancelled = false;
+    const url = new URL(window.location.href);
+    const hashParams = new URLSearchParams(url.hash.substring(1));
+    const urlError =
+      url.searchParams.get('error_description') ??
+      hashParams.get('error_description');
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(
+      (event: AuthChangeEvent, session: Session | null) => {
+        if (!cancelled && session && event === 'PASSWORD_RECOVERY') {
           setReady(true);
-        });
-    }
+        }
+      }
+    );
+
+    supabase.auth
+      .getSession()
+      .then(({ data: { session } }: { data: { session: Session | null } }) => {
+        if (cancelled) return;
+
+        if (urlError) {
+          setLinkError(urlError);
+        } else if (session) {
+          setReady(true);
+        } else {
+          setLinkError('This reset link is invalid or has expired.');
+        }
+      });
+
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
   }, [supabase]);
 
   function onBlurPassword() {
@@ -81,19 +107,24 @@ export default function ResetPasswordPage() {
   if (!ready) {
     return (
       <AuthLayout>
-        <h1 style={{ color: 'white', fontSize: fontSizes.heading1 }}>
-          Reset Password
-        </h1>
-        <LoadingCircle size={24} />
+        <h1 className="auth-title">Reset Password</h1>
+        {linkError ? (
+          <p className="auth-text">
+            {linkError}{' '}
+            <Link href="/forgot-password" className="auth-link-accent">
+              Request a new link
+            </Link>
+          </p>
+        ) : (
+          <LoadingCircle size={24} />
+        )}
       </AuthLayout>
     );
   }
 
   return (
     <AuthLayout error={authError} onDismissError={() => setAuthError(null)}>
-      <h1 style={{ color: 'white', fontSize: fontSizes.heading1 }}>
-        Reset Password
-      </h1>
+      <h1 className="auth-title">Reset Password</h1>
 
       <TextInput
         type="password"

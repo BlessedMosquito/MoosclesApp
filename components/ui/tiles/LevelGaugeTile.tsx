@@ -2,10 +2,10 @@
 
 import { Gauge } from '@/components/charts/gauge';
 import { getLevelProgress } from '@/lib/helpers';
-import { s, useResponsive } from '@/lib/useResponsive';
 import { colors } from '@/theme/colors';
-import { fontSizes } from '@/theme/typography';
 import Tile from './Tile';
+
+const TILE_PADDING = 14;
 
 type Props = {
   experience: number;
@@ -18,14 +18,11 @@ export default function LevelGaugeTile({
   tileWidth,
   tileHeight,
 }: Props) {
-  const { scale } = useResponsive();
-
   const levelData = getLevelProgress(experience);
   const percent = Math.round(levelData.progress * 100);
 
-  const padding = s(14, scale);
-  const gaugeWidth = Math.max(0, tileWidth - padding * 2);
-  const gaugeHeight = Math.max(0, tileHeight - padding * 2 - s(56, scale));
+  const gaugeWidth = Math.max(0, tileWidth - TILE_PADDING * 2);
+  const gaugeHeight = Math.max(0, tileHeight - TILE_PADDING * 2 - 56);
 
   return (
     <Tile
@@ -34,16 +31,7 @@ export default function LevelGaugeTile({
       width={tileWidth}
       height={tileHeight}
     >
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          height: '100%',
-          gap: s(8, scale),
-        }}
-      >
+      <div className="level-gauge">
         <Gauge
           activeFill={colors.accent}
           centerValue={levelData.level}
@@ -54,14 +42,7 @@ export default function LevelGaugeTile({
           width={gaugeWidth}
         />
 
-        <p
-          style={{
-            margin: 0,
-            fontSize: s(fontSizes.caption, scale),
-            color: colors.textMuted,
-            fontWeight: 700,
-          }}
-        >
+        <p className="level-gauge-caption">
           lvl {levelData.level} → lvl {levelData.level + 1}
         </p>
       </div>

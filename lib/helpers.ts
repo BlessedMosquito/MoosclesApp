@@ -19,6 +19,17 @@ export function getWeekRange(date = new Date()) {
   return { start, end };
 }
 
+export function toDateKey(date: Date) {
+  const pad = (value: number) => String(value).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+export function parseDateKey(value: string) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (!match) return new Date(value);
+  return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+}
+
 export type GetLevelProgressType = {
   level: number;
   currentExp: number;

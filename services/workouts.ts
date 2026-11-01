@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/client';
+import { toDateKey } from '@/lib/helpers';
 import { ReturnGetWorkoutTypeData } from './workoutTypes';
+import { toServiceError } from './serviceError';
 
 type CreateWorkoutProperties = {
   userId: string;
@@ -42,13 +44,15 @@ const supabase = createClient();
 
 const errorMessage = 'An error occurred while';
 
+const MISSING_FUNCTION_CODE = 'PGRST202';
+
 export async function createWorkout(props: CreateWorkoutProperties) {
   const { data, error } = await supabase
     .from('workouts')
     .insert({
       user_id: props.userId,
       name: props.name,
-      workout_date: props.date.toISOString(),
+      workout_date: toDateKey(props.date),
       workout_type_id: props.workoutType,
     })
     .select()
@@ -75,7 +79,7 @@ export async function getWorkouts(
     .eq('user_id', filters.userId);
 
   if (filters.date) {
-    query = query.eq('workout_date', filters.date.toISOString().split('T')[0]);
+    query = query.eq('workout_date', toDateKey(filters.date));
   }
 
   if (filters.name) {
@@ -116,6 +120,77 @@ export async function getWorkoutById(
   }
 
   return data as ReturnGetWorkoutsData | null;
+}
+
+export async function canEditWorkout(workoutId: string): Promise<boolean> {
+  const { data, error } = await supabase.rpc('can_edit_workout', {
+    p_workout_id: workoutId,
+  });
+
+  if (!error) return data === true;
+
+  if (error.code !== MISSING_FUNCTION_CODE) {
+    throw new Error(`${errorMessage} checking workout.`);
+  }
+
+  const workout = await getWorkoutById(workoutId);
+  return workout !== null && workout.completed_at === null;
+}
+
+export async function deleteWorkout(workoutId: string) {
+  if (!(await canEditWorkout(workoutId))) {
+    throw new Error('Completed workouts cannot be deleted.');
+  }
+
+  const { data: exercises, error: exercisesError } = await supabase
+    .from('exercises')
+    .select('id')
+    .eq('workout_id', workoutId);
+
+  if (exercisesError) {
+    throw new Error(`${errorMessage} deleting workout.`);
+  }
+
+  const exerciseIds = (exercises ?? []).map(
+    (exercise: { id: string }) => exercise.id
+  );
+
+  if (exerciseIds.length > 0) {
+    const { error: setsError } = await supabase
+      .from('sets')
+      .delete()
+      .in('exercise_id', exerciseIds);
+
+    if (setsError) {
+      throw toServiceError(setsError, `${errorMessage} deleting workout.`);
+    }
+  }
+
+  const [{ error: deleteExercisesError }, { error: metricsError }] =
+    await Promise.all([
+      supabase.from('exercises').delete().eq('workout_id', workoutId),
+      supabase.from('workout_metrics').delete().eq('workout_id', workoutId),
+    ]);
+
+  const childError = deleteExercisesError ?? metricsError;
+  if (childError) {
+    throw toServiceError(childError, `${errorMessage} deleting workout.`);
+  }
+
+  const { data, error } = await supabase
+    .from('workouts')
+    .delete()
+    .eq('id', workoutId)
+    .is('completed_at', null)
+    .select('id');
+
+  if (error) {
+    throw new Error(`${errorMessage} deleting workout.`);
+  }
+
+  if (!data || data.length === 0) {
+    throw new Error('Workout could not be deleted.');
+  }
 }
 
 export async function completeWorkout({ workoutId }: { workoutId: string }) {

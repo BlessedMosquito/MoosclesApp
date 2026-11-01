@@ -19,16 +19,8 @@ export default function DistanceInput({
   onChange,
 }: DistanceInputProps) {
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'flex-end',
-        justifyContent: 'center',
-        gap: 16,
-        width: '100%',
-      }}
-    >
-      <div style={{ flex: 1, minWidth: 0 }}>
+    <div className="split-input">
+      <div className="split-input-item">
         <NumericInput
           label="Kilometers"
           value={value.km}
@@ -40,7 +32,7 @@ export default function DistanceInput({
         />
       </div>
 
-      <div style={{ flex: 1, minWidth: 0 }}>
+      <div className="split-input-item">
         <NumericInput
           label="Meters"
           value={value.m}

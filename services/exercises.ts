@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/client';
+import { LOCKED_WORKOUT_MESSAGE, toServiceError } from './serviceError';
 
 type AddExerciseProperties = {
   workoutId: number | string;
@@ -31,7 +32,7 @@ export async function addExercise(props: AddExerciseProperties) {
     .single();
 
   if (error) {
-    throw error;
+    throw toServiceError(error, 'Could not add exercise.');
   }
 
   return data;
@@ -54,12 +55,17 @@ export async function getExercisesByWorkout(
 }
 
 export async function deleteExercise({ exerciseId }: { exerciseId: string }) {
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('exercises')
     .delete()
-    .eq('id', exerciseId);
+    .eq('id', exerciseId)
+    .select('id');
 
   if (error) {
-    throw new Error(error.message);
+    throw toServiceError(error, 'Could not delete exercise.');
+  }
+
+  if (!data || data.length === 0) {
+    throw new Error(LOCKED_WORKOUT_MESSAGE);
   }
 }

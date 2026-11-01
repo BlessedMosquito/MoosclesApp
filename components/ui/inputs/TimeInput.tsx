@@ -1,8 +1,5 @@
 'use client';
 
-import { s, useResponsive } from '@/lib/useResponsive';
-import { colors } from '@/theme/colors';
-import { fontSizes } from '@/theme/typography';
 import NumericInput from './NumericInput';
 
 type TimeInputProps = {
@@ -18,20 +15,9 @@ export default function TimeInput({
   disabled,
   onChange,
 }: TimeInputProps) {
-  const { scale } = useResponsive();
-
   return (
-    <div
-      style={{
-        position: 'relative',
-        display: 'flex',
-        alignItems: 'flex-end',
-        justifyContent: 'center',
-        gap: 16,
-        width: '100%',
-      }}
-    >
-      <div style={{ flex: 1, minWidth: 0 }}>
+    <div className="split-input">
+      <div className="split-input-item">
         <NumericInput
           label="Hours"
           value={hours}
@@ -43,22 +29,9 @@ export default function TimeInput({
         />
       </div>
 
-      <span
-        style={{
-          position: 'absolute',
-          left: '50%',
-          bottom: s(12, scale),
-          transform: 'translateX(-50%)',
-          color: colors.text,
-          fontWeight: 700,
-          fontSize: s(fontSizes.input, scale),
-          pointerEvents: 'none',
-        }}
-      >
-        :
-      </span>
+      <span className="split-input-separator">:</span>
 
-      <div style={{ flex: 1, minWidth: 0 }}>
+      <div className="split-input-item">
         <NumericInput
           label="Minutes"
           value={minutes}

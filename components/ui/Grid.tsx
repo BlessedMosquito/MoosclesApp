@@ -1,11 +1,8 @@
 'use client';
 
-import { Fragment, ReactNode, useMemo } from 'react';
+import { CSSProperties, Fragment, ReactNode, useMemo } from 'react';
 import { motion } from 'motion/react';
-import { s, useResponsive } from '@/lib/useResponsive';
-import { colors } from '@/theme/colors';
-import { fontSizes } from '@/theme/typography';
-import type { CSSProperties } from 'react';
+import { cn } from '@/lib/utils';
 
 type CellAlign = 'left' | 'center' | 'right';
 
@@ -14,7 +11,7 @@ export type GridColumn<T> = {
   header?: string;
   render?: (item: T, index: number) => ReactNode;
   align?: CellAlign;
-  width?: string | number;
+  width?: string;
 };
 
 type GridProps<T> = {
@@ -23,27 +20,16 @@ type GridProps<T> = {
   columnConfig?: GridColumn<T>[];
   keyExtractor?: (item: T, index: number) => string;
   showHeader?: boolean;
-  gap?: number;
-  columnGap?: number;
-  padding?: number;
-  contentPaddingBottom?: number;
   emptyMessage?: string;
   onRowClick?: (item: T, index: number) => void;
   numberedRows?: boolean;
   rowBorderColor?: (item: T, index: number) => string | undefined;
-  style?: CSSProperties;
 };
 
-const alignMap: Record<CellAlign, string> = {
-  left: 'flex-start',
-  center: 'center',
-  right: 'flex-end',
-};
-
-const textAlignMap: Record<CellAlign, CSSProperties['textAlign']> = {
-  left: 'left',
-  center: 'center',
-  right: 'right',
+const alignClass: Record<CellAlign, string> = {
+  left: 'grid-cell-left',
+  center: 'grid-cell-center',
+  right: 'grid-cell-right',
 };
 
 export default function Grid<T>({
@@ -52,22 +38,11 @@ export default function Grid<T>({
   columnConfig,
   keyExtractor,
   showHeader = true,
-  gap,
-  columnGap,
-  padding,
-  contentPaddingBottom,
   emptyMessage = 'No data',
   onRowClick,
   numberedRows = false,
   rowBorderColor,
-  style,
 }: GridProps<T>) {
-  const { isMobile, scale } = useResponsive();
-
-  const resolvedGap = gap ?? 0;
-  const resolvedColumnGap = columnGap ?? (isMobile ? 8 : 12);
-  const resolvedPadding = padding ?? (isMobile ? 10 : 14);
-
   const resolvedColumns = useMemo<GridColumn<T>[]>(() => {
     if (columnConfig && columnConfig.length > 0) {
       return columnConfig;
@@ -81,10 +56,11 @@ export default function Grid<T>({
     .map((column) => column.width ?? 'minmax(0, 1fr)')
     .join(' ');
 
-  const rowNumberWidth = s(28, scale);
-  const gridTemplateColumns = numberedRows
-    ? `${rowNumberWidth}px ${templateColumns}`
-    : templateColumns;
+  const gridStyle = {
+    '--grid-columns': numberedRows
+      ? `28px ${templateColumns}`
+      : templateColumns,
+  } as CSSProperties;
 
   const renderCell = (item: T, column: GridColumn<T>, index: number) => {
     if (column.render) {
@@ -96,93 +72,28 @@ export default function Grid<T>({
     return value === null || value === undefined ? '' : String(value);
   };
 
-  const headerLabels = resolvedColumns.map(
-    (column) => column.header ?? column.key
-  );
-
   return (
-    <div
-      style={{
-        width: '100%',
-        boxSizing: 'border-box',
-        flex: '1 1 auto',
-        minHeight: 0,
-        display: 'flex',
-        flexDirection: 'column',
-        ...style,
-      }}
-    >
+    <div className="data-grid" style={gridStyle}>
       {showHeader && data.length > 0 && (
-        <div
-          style={{
-            flexShrink: 0,
-            display: 'grid',
-            gridTemplateColumns,
-            columnGap: s(resolvedColumnGap, scale),
-            padding: `0 ${s(resolvedPadding, scale)}px ${s(
-              resolvedPadding,
-              scale
-            )}px`,
-            borderBottom: `1px solid ${colors.border}`,
-            background: colors.bg,
-          }}
-        >
+        <div className="data-grid-header">
           {numberedRows && <div />}
-          {resolvedColumns.map((column, index) => (
+          {resolvedColumns.map((column) => (
             <div
               key={column.key}
-              style={{
-                minWidth: 0,
-                display: 'flex',
-                justifyContent: alignMap[column.align ?? 'left'],
-                color: colors.textMuted,
-                fontSize: s(fontSizes.caption, scale),
-                fontWeight: 600,
-                letterSpacing: '0.06em',
-                textTransform: 'uppercase',
-                textAlign: textAlignMap[column.align ?? 'left'],
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
+              className={cn(
+                'data-grid-header-cell',
+                alignClass[column.align ?? 'left']
+              )}
             >
-              {headerLabels[index]}
+              {column.header ?? column.key}
             </div>
           ))}
         </div>
       )}
 
-      <div
-        style={{
-          flex: '1 1 auto',
-          minHeight: 0,
-          overflowY: 'auto',
-          WebkitOverflowScrolling: 'touch',
-          overscrollBehavior: 'contain',
-          display: 'flex',
-          flexDirection: 'column',
-          rowGap: s(resolvedGap, scale),
-          paddingBottom: contentPaddingBottom,
-        }}
-      >
+      <div className="data-grid-body">
         {data.length === 0 ? (
-          <div
-            style={{
-              flex: '1 0 auto',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: `${s(resolvedPadding * 2, scale)}px ${s(
-                resolvedPadding,
-                scale
-              )}px`,
-              color: colors.textMuted,
-              fontSize: s(fontSizes.bodySmall, scale),
-              textAlign: 'center',
-            }}
-          >
-            {emptyMessage}
-          </div>
+          <div className="data-grid-empty">{emptyMessage}</div>
         ) : (
           data.map((item, rowIndex) => (
             <Fragment
@@ -190,15 +101,7 @@ export default function Grid<T>({
                 keyExtractor ? keyExtractor(item, rowIndex) : String(rowIndex)
               }
             >
-              {rowIndex > 0 && (
-                <div
-                  style={{
-                    flexShrink: 0,
-                    height: 2,
-                    background: 'transparent',
-                  }}
-                />
-              )}
+              {rowIndex > 0 && <div className="data-grid-spacer" />}
               <motion.div
                 onClick={
                   onRowClick ? () => onRowClick(item, rowIndex) : undefined
@@ -216,51 +119,23 @@ export default function Grid<T>({
                 }}
                 whileTap={onRowClick ? { scale: 0.98 } : undefined}
                 transition={{ duration: 0.12, ease: 'easeOut' }}
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: gridTemplateColumns,
-                  columnGap: s(resolvedColumnGap, scale),
-                  padding: `${s(resolvedPadding * 1.5, scale)}px ${s(
-                    resolvedPadding,
-                    scale
-                  )}px`,
-                  border: `1px solid ${
-                    rowBorderColor?.(item, rowIndex) ?? 'transparent'
-                  }`,
-                  borderRadius: s(10, scale),
-                  boxSizing: 'border-box',
-                  background:
-                    rowIndex % 2 === 1 ? colors.componentsBg : 'transparent',
-                  color: colors.text,
-                  fontSize: s(fontSizes.bodySmall, scale),
-                  cursor: onRowClick ? 'pointer' : 'default',
-                }}
+                className={cn(
+                  'data-grid-row',
+                  rowIndex % 2 === 1 && 'bg-surface',
+                  onRowClick && 'cursor-pointer'
+                )}
+                style={{ borderColor: rowBorderColor?.(item, rowIndex) }}
               >
                 {numberedRows && (
-                  <div
-                    style={{
-                      minWidth: 0,
-                      display: 'flex',
-                      justifyContent: 'flex-start',
-                      color: colors.textMuted,
-                      fontVariantNumeric: 'tabular-nums',
-                    }}
-                  >
-                    {rowIndex + 1}
-                  </div>
+                  <div className="data-grid-row-number">{rowIndex + 1}</div>
                 )}
                 {resolvedColumns.map((column) => (
                   <div
                     key={column.key}
-                    style={{
-                      minWidth: 0,
-                      display: 'flex',
-                      justifyContent: alignMap[column.align ?? 'left'],
-                      textAlign: textAlignMap[column.align ?? 'left'],
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                    }}
+                    className={cn(
+                      'data-grid-cell',
+                      alignClass[column.align ?? 'left']
+                    )}
                   >
                     {renderCell(item, column, rowIndex)}
                   </div>
