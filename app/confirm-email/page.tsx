@@ -32,6 +32,7 @@ function ConfirmEmailForm() {
   const [code, setCode] = useState('');
   const [authError, setAuthError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isResent, setIsResent] = useState(false);
 
   async function verifyCode() {
     setAuthError(null);
@@ -65,6 +66,7 @@ function ConfirmEmailForm() {
 
   async function resendCode() {
     setAuthError(null);
+    setIsResent(false);
 
     if (!email.trim()) {
       setAuthError('Email is required.');
@@ -85,50 +87,76 @@ function ConfirmEmailForm() {
 
     if (error) {
       setAuthError(error.message);
+      return;
     }
+
+    setIsResent(true);
   }
 
   return (
-    <AuthLayout error={authError} onDismissError={() => setAuthError(null)}>
-      <h1 className="auth-title">MOOSCLES</h1>
+    <AuthLayout
+      title="Check your email"
+      subtitle={
+        initialEmail ? (
+          <>
+            We sent a confirmation code to <b>{initialEmail}</b>.
+          </>
+        ) : (
+          'We sent a confirmation code to your email.'
+        )
+      }
+      error={authError}
+      onDismissError={() => setAuthError(null)}
+      onSubmit={verifyCode}
+      footer={
+        <p className="m-0">
+          Didn&apos;t get the code?{' '}
+          <button
+            type="button"
+            className="auth-link"
+            onClick={resendCode}
+            disabled={isLoading}
+          >
+            Resend
+          </button>
+        </p>
+      }
+    >
+      {isResent && <p className="auth-notice">A new code is on its way.</p>}
 
-      <p className="auth-hint">We sent a confirmation code to your email.</p>
+      {!initialEmail && (
+        <label className="field">
+          <span className="field-label">Email</span>
+          <TextInput
+            type="email"
+            autoComplete="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={setEmail}
+            disabled={isLoading}
+          />
+        </label>
+      )}
 
-      <TextInput
-        type="email"
-        autoComplete="email"
-        placeholder="Email"
-        value={email}
-        onChange={setEmail}
-        disabled={isLoading}
-      />
-
-      <TextInput
-        type="text"
-        inputMode="numeric"
-        autoComplete="one-time-code"
-        placeholder="Confirmation code"
-        value={code}
-        onChange={setCode}
-        disabled={isLoading}
-        className="input-code"
-      />
-
-      <Button onClick={verifyCode} disabled={isLoading}>
-        {isLoading ? <LoadingCircle size={18} /> : 'Confirm email'}
-      </Button>
-
-      <p className="auth-hint">
-        Didn&apos;t get the code?{' '}
-        <button
-          type="button"
-          className="auth-link-accent"
-          onClick={resendCode}
+      <label className="field">
+        <span className="field-label">Confirmation code</span>
+        <TextInput
+          type="text"
+          inputMode="numeric"
+          autoComplete="one-time-code"
+          placeholder="000000"
+          value={code}
+          onChange={setCode}
           disabled={isLoading}
-        >
-          Resend
-        </button>
-      </p>
+          className="input-code"
+        />
+      </label>
+
+      <div className="auth-submit">
+        <Button type="submit" width="full" disabled={isLoading}>
+          {isLoading ? <LoadingCircle size={18} /> : 'Confirm email'}
+        </Button>
+      </div>
     </AuthLayout>
   );
 }

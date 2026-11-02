@@ -3,12 +3,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'motion/react';
-import { IconPencil, IconPlus } from '@tabler/icons-react';
+import { IconPlus } from '@tabler/icons-react';
 import BackButton from '@/components/ui/buttons/BackButton';
 import Button from '@/components/ui/buttons/Button';
 import ErrorPopUp from '@/components/ui/feedback/ErrorPopUp';
 import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
 import SuccessAnimation from '@/components/ui/feedback/SuccessAnimation';
+import QuestionPopUp from '@/components/ui/popups/QuestionPopUp';
 import TopBar from '@/components/ui/topBar/TopBar';
 import { createClient } from '@/lib/supabase/client';
 import { getWorkoutTypeIcon } from '@/lib/workoutTypeIcon';
@@ -17,13 +18,19 @@ import {
   getTemplates,
   WorkoutTemplate,
 } from '@/services/workoutTemplates';
+import { cn } from '@/lib/utils';
 import { Mode } from '@/types/common';
+
+function isEmptyTemplate(template: WorkoutTemplate) {
+  return template.workout_template_exercises.length === 0;
+}
 
 function describeTemplate(template: WorkoutTemplate) {
   const count = template.workout_template_exercises.length;
   const parts = [template.workout_types?.name];
   if (count > 0)
     parts.push(`${count} ${count === 1 ? 'exercise' : 'exercises'}`);
+  else if (isEmptyTemplate(template)) parts.push('No exercises');
   return parts.filter(Boolean).join(' · ');
 }
 
@@ -31,6 +38,8 @@ export default function ChooseTemplatePage() {
   const router = useRouter();
   const [templates, setTemplates] = useState<WorkoutTemplate[] | null>(null);
   const [creatingId, setCreatingId] = useState<string | null>(null);
+  const [pendingTemplate, setPendingTemplate] =
+    useState<WorkoutTemplate | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const pendingNavRef = useRef<string | null>(null);
@@ -84,7 +93,7 @@ export default function ChooseTemplatePage() {
         workoutId: String(workout.id),
         mode: 'NEW' as Mode,
       });
-      pendingNavRef.current = `/add-workout-data/question?${params.toString()}`;
+      pendingNavRef.current = `/add-workout-data/repetition-based?${params.toString()}`;
       setShowSuccess(true);
     } catch (createError) {
       setError(
@@ -134,7 +143,7 @@ export default function ChooseTemplatePage() {
                   <button
                     type="button"
                     disabled={creatingId !== null}
-                    onClick={() => startFromTemplate(template)}
+                    onClick={() => setPendingTemplate(template)}
                     className="template-card-main"
                   >
                     <span className="template-card-icon">
@@ -148,21 +157,15 @@ export default function ChooseTemplatePage() {
                       <span className="template-card-title">
                         {template.name}
                       </span>
-                      <span className="template-card-meta">
+                      <span
+                        className={cn(
+                          'template-card-meta',
+                          isEmptyTemplate(template) && 'template-card-empty'
+                        )}
+                      >
                         {describeTemplate(template)}
                       </span>
                     </span>
-                  </button>
-                  <button
-                    type="button"
-                    aria-label={`Edit ${template.name}`}
-                    disabled={creatingId !== null}
-                    onClick={() =>
-                      router.push(`/templates/edit?templateId=${template.id}`)
-                    }
-                    className="icon-btn template-card-edit"
-                  >
-                    <IconPencil size={18} stroke={1.75} />
                   </button>
                 </motion.div>
               );
@@ -181,6 +184,26 @@ export default function ChooseTemplatePage() {
           </Button>
         </div>
       </div>
+
+      {pendingTemplate && (
+        <QuestionPopUp
+          title="Start workout?"
+          text={`Create a workout for today from "${pendingTemplate.name}"?`}
+          warning={
+            isEmptyTemplate(pendingTemplate)
+              ? 'This template has no exercises. The workout will be created empty and you will need to add exercises yourself.'
+              : undefined
+          }
+          noLabel="Cancel"
+          yesLabel="Create"
+          onNo={() => setPendingTemplate(null)}
+          onYes={() => {
+            const template = pendingTemplate;
+            setPendingTemplate(null);
+            startFromTemplate(template);
+          }}
+        />
+      )}
 
       {showSuccess && (
         <SuccessAnimation

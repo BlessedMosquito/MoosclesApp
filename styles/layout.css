@@ -112,23 +112,59 @@
   }
 
   .home {
-    @apply flex min-h-dvh flex-col items-center justify-center p-6;
+    @apply flex min-h-dvh flex-col items-center justify-between p-6;
+  }
+
+  .home-hero {
+    @apply my-auto flex w-full max-w-[420px] flex-col items-center gap-5 text-center;
   }
 
   .home-title {
-    @apply m-0 bg-content bg-clip-text p-2.5 text-6xl font-extrabold text-transparent sm:text-[90px];
+    @apply m-0 flex text-content;
+  }
+
+  .home-tagline {
+    @apply m-0 text-body text-content-muted;
+  }
+
+  .home-features {
+    @apply m-0 mt-1 grid w-full list-none grid-cols-3 gap-3 p-0;
+  }
+
+  .home-feature {
+    @apply flex flex-col items-center gap-2 text-caption font-semibold text-content-muted;
+  }
+
+  .home-feature-icon {
+    @apply flex size-12 items-center justify-center rounded-full bg-tile text-accent;
   }
 
   .home-actions {
-    @apply mt-10 flex w-full max-w-[280px] flex-col gap-3 sm:w-auto sm:max-w-none sm:flex-row;
+    @apply mt-4 flex w-full flex-col items-center gap-4;
   }
 
-  .home-link {
-    @apply inline-flex h-[52px] items-center justify-center rounded-2xl border border-line bg-surface px-7 text-body font-semibold text-content no-underline;
+  .home-cta {
+    @apply flex h-14 w-full items-center justify-center gap-2 rounded-full bg-accent px-7 text-body font-bold text-app no-underline shadow-[0_10px_30px_rgba(52,211,153,0.25)] transition-colors hover:bg-accent-light;
   }
 
-  .home-link-primary {
-    @apply border-transparent bg-accent font-bold text-app;
+  .home-cta-arrow {
+    @apply transition-transform;
+  }
+
+  .home-cta:hover .home-cta-arrow {
+    @apply translate-x-1;
+  }
+
+  .home-login {
+    @apply m-0 text-body-sm text-content-muted;
+  }
+
+  .home-login-link {
+    @apply font-semibold text-accent no-underline hover:underline;
+  }
+
+  .home-footer {
+    @apply pt-6 text-caption text-content-muted;
   }
 
   .not-found-code {

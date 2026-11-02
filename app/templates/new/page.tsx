@@ -13,8 +13,7 @@ import { cn } from '@/lib/utils';
 import { getWorkoutTypeIcon } from '@/lib/workoutTypeIcon';
 import { createTemplate } from '@/services/workoutTemplates';
 import {
-  getWorkoutTypes,
-  getWorkoutTypesSubGroups,
+  getWorkoutTypesByGroup,
   ReturnGetWorkoutTypeData,
 } from '@/services/workoutTypes';
 
@@ -22,30 +21,33 @@ export default function NewTemplatePage() {
   const router = useRouter();
 
   const [name, setName] = useState('');
-  const [subgroups, setSubgroups] = useState<string[] | null>(null);
+  const [allTypes, setAllTypes] = useState<ReturnGetWorkoutTypeData[] | null>(
+    null
+  );
   const [subgroup, setSubgroup] = useState<string | null>(null);
-  const [typesResult, setTypesResult] = useState<{
-    subgroup: string;
-    types: ReturnGetWorkoutTypeData[];
-  } | null>(null);
   const [typeId, setTypeId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const types = typesResult?.subgroup === subgroup ? typesResult.types : null;
+  const subgroups = allTypes
+    ? [...new Set(allTypes.map((type) => type.workout_subgroup ?? 'Other'))]
+    : null;
+  const activeSubgroup = subgroup ?? subgroups?.[0] ?? null;
+  const types =
+    allTypes?.filter(
+      (type) => (type.workout_subgroup ?? 'Other') === activeSubgroup
+    ) ?? null;
 
   useEffect(() => {
     let cancelled = false;
 
-    getWorkoutTypesSubGroups()
+    getWorkoutTypesByGroup('RepetitionBased')
       .then((data) => {
-        if (cancelled) return;
-        setSubgroups(data);
-        setSubgroup((current) => current ?? data[0] ?? null);
+        if (!cancelled) setAllTypes(data);
       })
       .catch(() => {
         if (cancelled) return;
-        setSubgroups([]);
+        setAllTypes([]);
         setError('Could not load workout types.');
       });
 
@@ -53,26 +55,6 @@ export default function NewTemplatePage() {
       cancelled = true;
     };
   }, []);
-
-  useEffect(() => {
-    if (!subgroup) return;
-
-    let cancelled = false;
-
-    getWorkoutTypes({ subgroup })
-      .then((data) => {
-        if (!cancelled) setTypesResult({ subgroup, types: data });
-      })
-      .catch(() => {
-        if (cancelled) return;
-        setTypesResult({ subgroup, types: [] });
-        setError('Could not load workout types.');
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [subgroup]);
 
   async function handleCreate() {
     const trimmed = name.trim();
@@ -135,32 +117,35 @@ export default function NewTemplatePage() {
 
           <div className="field">
             <span className="field-label">Workout type</span>
+            <span className="field-hint">
+              Templates are available for strength workouts only.
+            </span>
             {subgroups === null ? (
               <div className="flex justify-center py-6">
                 <LoadingCircle />
               </div>
             ) : (
               <>
-                <div className="template-subgroups">
-                  {subgroups.map((item) => (
-                    <button
-                      key={item}
-                      type="button"
-                      onClick={() => setSubgroup(item)}
-                      className={cn(
-                        'chip shrink-0',
-                        item === subgroup && 'chip-active'
-                      )}
-                    >
-                      {item}
-                    </button>
-                  ))}
-                </div>
-
-                {types === null ? (
-                  <div className="flex justify-center py-6">
-                    <LoadingCircle />
+                {subgroups.length > 1 && (
+                  <div className="template-subgroups">
+                    {subgroups.map((item) => (
+                      <button
+                        key={item}
+                        type="button"
+                        onClick={() => setSubgroup(item)}
+                        className={cn(
+                          'chip shrink-0',
+                          item === activeSubgroup && 'chip-active'
+                        )}
+                      >
+                        {item}
+                      </button>
+                    ))}
                   </div>
+                )}
+
+                {types === null || types.length === 0 ? (
+                  <p className="muted-text">No strength workout types found.</p>
                 ) : (
                   <div className="choice-grid" role="radiogroup">
                     {types.map((type, index) => (

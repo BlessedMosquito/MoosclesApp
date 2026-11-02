@@ -17,10 +17,12 @@ import {
   getWorkoutDaysForWeek,
   type ReturnCompletedWorkoutData,
 } from '@/services/workouts';
-import { getWeeklyDataSummary } from '@/services/workoutMetrics';
+import { getMonthlyDataSummary } from '@/services/workoutMetrics';
 import { useEffect, useState } from 'react';
 import TopBar from '@/components/ui/topBar/TopBar';
 import AddIcon from '@/components/icons/AddIcon';
+import LogoV2 from '@/components/brand/LogoV2';
+import Greeting from '@/components/ui/topBar/Greeting';
 import { useRouter } from 'next/navigation';
 import MetricsTile from '@/components/ui/tiles/MetricsTile';
 import WorkoutActivityTile from '@/components/ui/tiles/WorkoutActivityTile';
@@ -43,8 +45,8 @@ export default function DashboardPage() {
     ReturnCompletedWorkoutData[]
   >([]);
   const [workoutCount, setWorkoutCount] = useState(0);
-  const [weeklyDistanceKm, setWeeklyDistanceKm] = useState(0);
-  const [weeklyDurationHours, setWeeklyDurationHours] = useState(0);
+  const [monthlyDistanceKm, setMonthlyDistanceKm] = useState(0);
+  const [monthlyDurationHours, setMonthlyDurationHours] = useState(0);
   const [activeWeeks, setActiveWeeks] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [isLoadingUserData, setIsLoadingUserData] = useState(true);
@@ -82,12 +84,14 @@ export default function DashboardPage() {
       const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
       const monthEnd = `${nextMonth.getFullYear()}-${pad(nextMonth.getMonth() + 1)}-01`;
 
-      const [data, weekData, monthWorkouts, weeklySummary] = await Promise.all([
-        getUserData(user.id),
-        getWorkoutDaysForWeek(user.id),
-        getCompletedWorkouts(user.id, monthStart, monthEnd),
-        getWeeklyDataSummary({ userId: user.id }),
-      ]);
+      const [data, weekData, monthWorkouts, monthlySummary] = await Promise.all(
+        [
+          getUserData(user.id),
+          getWorkoutDaysForWeek(user.id),
+          getCompletedWorkouts(user.id, monthStart, monthEnd),
+          getMonthlyDataSummary({ userId: user.id }),
+        ]
+      );
       setUserData(data);
 
       const missing = getMissingProfileItems(data);
@@ -98,8 +102,8 @@ export default function DashboardPage() {
       ) {
         setShowProfilePrompt(true);
       }
-      setWeeklyDistanceKm(weeklySummary.distance_meters / 1000);
-      setWeeklyDurationHours(weeklySummary.duration_minutes / 60);
+      setMonthlyDistanceKm(monthlySummary.distance_meters / 1000);
+      setMonthlyDurationHours(monthlySummary.duration_minutes / 60);
 
       const mapped: Record<string, boolean> = {};
       for (const d of weekData.workout_days) mapped[d.date] = true;
@@ -134,21 +138,30 @@ export default function DashboardPage() {
     },
   ];
 
+  const today = new Date();
+  const weeksInMonth =
+    new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate() / 7;
+
   const metricsProps = {
     tileHeight,
-    chartSize: tileWidth,
-    distance: weeklyDistanceKm,
-    distanceMax: userData.weekly_distance_goal_meters / 1000,
-    duration: weeklyDurationHours,
-    durationMax: userData.weekly_duration_goal_minutes / 60,
+    chartSize: isMobile ? Math.round(tileWidth * 0.78) : tileWidth,
+    distance: monthlyDistanceKm,
+    distanceMax: (userData.weekly_distance_goal_meters / 1000) * weeksInMonth,
+    duration: monthlyDurationHours,
+    durationMax: (userData.weekly_duration_goal_minutes / 60) * weeksInMonth,
   };
 
   return (
     <main className="dashboard">
       <TopBar
+        variant="brand"
         width={contentMaxWidth}
-        left={<h1 className="dashboard-title">Mooscles</h1>}
-        right={`Hello, ${firstName ?? ''}`}
+        left={
+          <h1 className="dashboard-title">
+            <LogoV2 height={isMobile ? 34 : 44} />
+          </h1>
+        }
+        right={<Greeting name={firstName} />}
       />
 
       {error && <ErrorPopUp onClose={() => setError(null)}>{error}</ErrorPopUp>}
@@ -231,17 +244,8 @@ export default function DashboardPage() {
             />
           </div>
           <div className="col-span-2">
-            <WeeklyWorkoutTile
-              workoutDays={workoutDays}
-              workoutsThisWeek={workoutCount}
-              activeWeeks={activeWeeks}
-              width={tileWidth * 2 + gridGap}
-              height={tileHeight}
-            />
-          </div>
-          <div className="dashboard-activity">
             <WorkoutActivityTile
-              tileWidth={tileWidth}
+              tileWidth={tileWidth * 2 + gridGap}
               tileHeight={tileHeight}
               workouts={monthWorkouts}
               weeklyWorkouts={workoutCount}

@@ -116,7 +116,7 @@ function EditTemplateContent() {
     setIsDeleting(true);
     try {
       await deleteTemplate(templateId);
-      router.replace('/workout/create/template');
+      router.replace('/library?tab=templates');
     } catch (deleteError) {
       setError(
         deleteError instanceof Error
@@ -141,9 +141,7 @@ function EditTemplateContent() {
       <div className="page-content page-content-narrow">
         <TopBar
           left={
-            <BackButton
-              onClick={() => router.push('/workout/create/template')}
-            />
+            <BackButton onClick={() => router.push('/library?tab=templates')} />
           }
           center={template?.name ?? 'Template'}
         />
@@ -231,7 +229,7 @@ function EditTemplateContent() {
             <div className="template-actions">
               <Button
                 width="full"
-                onClick={() => router.push('/workout/create/template')}
+                onClick={() => router.push('/library?tab=templates')}
               >
                 Done
               </Button>

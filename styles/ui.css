@@ -24,7 +24,11 @@
   }
 
   .expandable-trigger-open {
-    @apply fixed border-line bg-surface text-content hover:bg-surface;
+    @apply fixed overflow-hidden border-line bg-surface text-content hover:bg-surface;
+  }
+
+  .expandable-trigger-fill {
+    @apply absolute inset-0 bg-accent;
   }
 
   .expandable-layer {
@@ -32,11 +36,11 @@
   }
 
   .expandable-backdrop {
-    @apply absolute inset-0 bg-black/40 backdrop-blur-md;
+    @apply absolute inset-0 bg-black/45 backdrop-blur-md;
   }
 
   .expandable-pills {
-    @apply fixed flex -translate-x-1/2 flex-col items-center gap-2.5;
+    @apply fixed flex -translate-x-1/2 flex-col items-stretch gap-2.5;
   }
 
   .expandable-pills-up {
@@ -44,7 +48,11 @@
   }
 
   .expandable-pill {
-    @apply flex h-12 cursor-pointer items-center gap-2 rounded-full border border-accent-border bg-surface px-5 text-body font-semibold whitespace-nowrap text-content shadow-[0_10px_30px_rgba(0,0,0,0.35)] transition-colors hover:border-accent hover:text-accent [&_svg]:text-accent;
+    @apply flex h-14 min-w-[200px] cursor-pointer items-center gap-3 rounded-full border border-white/10 bg-surface/95 py-1.5 pr-6 pl-1.5 text-body font-semibold whitespace-nowrap text-content shadow-[0_12px_32px_rgba(0,0,0,0.45)] backdrop-blur-xl transition-colors hover:border-accent-border;
+  }
+
+  .expandable-pill-icon {
+    @apply flex size-11 shrink-0 items-center justify-center rounded-full bg-accent text-app;
   }
 
   .btn-danger {
@@ -140,11 +148,47 @@
   }
 
   .top-bar {
-    @apply sticky top-0 z-10 mx-auto box-border grid w-full shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-2 rounded-[18px] border border-accent bg-surface px-4 py-3 text-content backdrop-blur-md;
+    @apply sticky top-0 z-10 mx-auto box-border grid min-h-14 w-full shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-2 rounded-[18px] border border-white/10 bg-surface/85 px-2.5 py-2 text-content shadow-[0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-md;
+  }
+
+  .top-bar-brand {
+    @apply border-accent bg-surface px-4 py-3 shadow-none;
+  }
+
+  .top-bar-title {
+    @apply block max-w-[55vw] truncate text-body font-semibold tracking-tight sm:max-w-md sm:text-h2;
+  }
+
+  .back-btn {
+    @apply flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-white/10 bg-tile text-content transition-colors hover:border-accent-border hover:text-accent sm:size-10;
+
+    &:disabled {
+      @apply cursor-not-allowed opacity-40 hover:border-white/10 hover:text-content;
+    }
   }
 
   .top-bar-slot {
     @apply flex items-center;
+  }
+
+  .greeting {
+    @apply mr-1.5 flex min-w-0 cursor-pointer items-center gap-2 border-none bg-transparent p-0 text-right text-content sm:mr-0 sm:gap-2.5;
+  }
+
+  .greeting-text {
+    @apply flex min-w-0 flex-col items-end leading-tight;
+  }
+
+  .greeting-hello {
+    @apply text-caption whitespace-nowrap text-content-muted;
+  }
+
+  .greeting-name {
+    @apply max-w-[110px] truncate text-body-sm font-semibold sm:max-w-[200px] sm:text-body;
+  }
+
+  .greeting-avatar {
+    @apply flex size-9 shrink-0 items-center justify-center rounded-full border border-accent-border bg-accent-surface text-body-sm font-bold text-accent sm:size-10;
   }
 
   .top-bar-center {
@@ -217,6 +261,14 @@
 
   .question-card {
     @apply items-stretch gap-5 p-6;
+  }
+
+  .question-title {
+    @apply m-0 -mb-2 text-center text-h2 font-bold text-content;
+  }
+
+  .question-warning {
+    @apply flex items-start gap-2 rounded-xl border border-amber-400/40 bg-amber-400/10 px-3 py-2.5 text-body-sm leading-snug text-amber-300;
   }
 
   .question-text {

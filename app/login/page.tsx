@@ -34,7 +34,6 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [failedAttempts, setFailedAttempts] = useState(0);
 
   function onBlurEmail() {
     if (email.trim() && !EMAIL_RE.test(email)) {
@@ -75,7 +74,6 @@ export default function LoginPage() {
     if (error) {
       setAuthError(error.message);
       setIsLoading(false);
-      setFailedAttempts((prev) => prev + 1);
       return;
     }
 
@@ -84,50 +82,59 @@ export default function LoginPage() {
   }
 
   return (
-    <AuthLayout error={authError} onDismissError={() => setAuthError(null)}>
-      <h1 className="auth-title">MOOSCLES</h1>
-
-      <TextInput
-        type="email"
-        autoComplete="email"
-        placeholder="Email"
-        value={email}
-        onChange={setEmail}
-        onBlur={onBlurEmail}
-        disabled={isLoading}
-      />
-
-      <TextInput
-        type="password"
-        autoComplete="current-password"
-        placeholder="Password"
-        value={password}
-        onChange={setPassword}
-        disabled={isLoading}
-      />
-
-      <Button onClick={signIn} disabled={isLoading}>
-        {isLoading ? <LoadingCircle size={18} /> : 'Sign in'}
-      </Button>
-
-      {failedAttempts >= 3 && (
-        <p className="auth-hint">
-          Forgot your password?{' '}
-          <Link
-            className="auth-link"
-            href={`/forgot-password?email=${encodeURIComponent(email)}`}
-          >
-            Reset it
+    <AuthLayout
+      title="Welcome back"
+      subtitle="Log in to continue your training."
+      error={authError}
+      onDismissError={() => setAuthError(null)}
+      onSubmit={signIn}
+      footer={
+        <p className="m-0">
+          New to Mooscles?{' '}
+          <Link className="auth-link" href="/register">
+            Create an account
           </Link>
         </p>
-      )}
+      }
+    >
+      <label className="field">
+        <span className="field-label">Email</span>
+        <TextInput
+          type="email"
+          autoComplete="email"
+          placeholder="you@example.com"
+          value={email}
+          onChange={setEmail}
+          onBlur={onBlurEmail}
+          disabled={isLoading}
+        />
+      </label>
 
-      <p className="auth-hint">
-        New to MOOSCLES?{' '}
-        <Link className="auth-link" href="/register">
-          Create an account
-        </Link>
-      </p>
+      <label className="field">
+        <span className="auth-label-row">
+          <span className="field-label">Password</span>
+          <Link
+            className="auth-link-muted"
+            href={`/forgot-password?email=${encodeURIComponent(email)}`}
+          >
+            Forgot password?
+          </Link>
+        </span>
+        <TextInput
+          type="password"
+          autoComplete="current-password"
+          placeholder="Your password"
+          value={password}
+          onChange={setPassword}
+          disabled={isLoading}
+        />
+      </label>
+
+      <div className="auth-submit">
+        <Button type="submit" width="full" disabled={isLoading}>
+          {isLoading ? <LoadingCircle size={18} /> : 'Log in'}
+        </Button>
+      </div>
     </AuthLayout>
   );
 }

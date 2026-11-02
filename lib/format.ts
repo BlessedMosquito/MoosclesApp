@@ -46,3 +46,7 @@ export function formatPace(
     .round(2)
     .toNumber();
 }
+
+export function formatWeight(weight: number) {
+  return `${Number.isInteger(weight) ? weight : weight.toFixed(1)} kg`;
+}

@@ -52,23 +52,51 @@
   }
 
   .question-page {
-    @apply flex min-h-[80dvh] w-full flex-col items-center justify-center;
+    @apply box-border flex min-h-dvh w-full flex-col items-center justify-center p-[18px] sm:p-7;
   }
 
   .question-panel {
-    @apply box-border flex w-[85%] flex-col items-center gap-4 self-center rounded-[20px] border border-content bg-surface p-8 text-center;
+    @apply box-border flex w-full max-w-md flex-col gap-6 rounded-3xl border border-white/10 bg-surface p-5 shadow-[0_16px_48px_rgba(0,0,0,0.45)] sm:p-7;
+  }
+
+  .question-workout {
+    @apply flex items-center gap-3 rounded-2xl border border-white/10 bg-tile p-3;
+  }
+
+  .question-workout-icon {
+    @apply flex size-12 shrink-0 items-center justify-center rounded-xl border border-accent-border bg-accent-surface text-accent;
+  }
+
+  .question-workout-text {
+    @apply flex min-w-0 flex-col gap-0.5;
+  }
+
+  .question-workout-name {
+    @apply truncate text-body font-semibold text-content;
+  }
+
+  .question-workout-meta {
+    @apply truncate text-body-sm text-content-muted;
+  }
+
+  .question-panel-copy {
+    @apply flex flex-col gap-2;
+  }
+
+  .question-panel-badge {
+    @apply flex w-fit items-center gap-1.5 rounded-full border border-accent-border bg-accent-surface px-2.5 py-1 text-caption font-semibold text-accent;
   }
 
   .question-panel-title {
-    @apply m-0 text-h2 font-bold text-content;
+    @apply m-0 text-h1 leading-tight font-bold tracking-tight text-content;
   }
 
   .question-panel-text {
-    @apply m-0 text-body-sm leading-normal text-content-muted;
+    @apply m-0 text-body-sm leading-normal text-content-muted sm:text-body;
   }
 
   .question-panel-actions {
-    @apply mt-1 flex w-full flex-col items-center gap-3;
+    @apply flex w-full flex-col gap-2.5;
   }
 
   .workout-data-fields {
@@ -336,7 +364,7 @@
   }
 
   .template-card {
-    @apply flex items-center gap-2 rounded-[18px] border border-line bg-surface pr-2 transition-colors hover:border-accent-border;
+    @apply flex items-center gap-2 rounded-[18px] border border-line bg-surface transition-colors hover:border-accent-border;
   }
 
   .template-card-main {
@@ -359,8 +387,8 @@
     @apply truncate text-caption text-content-muted;
   }
 
-  .template-card-edit {
-    @apply size-10 shrink-0 rounded-full text-content-muted transition-colors hover:text-accent;
+  .template-card-empty {
+    @apply text-amber-300;
   }
 
   .template-form {

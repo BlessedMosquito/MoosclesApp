@@ -3,22 +3,6 @@ import StraightFaceIcon from '@/components/icons/StraightFaceIcon';
 import HappyFaceIcon from '@/components/icons/HappyFaceIcon';
 import { createElement, type JSX } from 'react';
 
-export function getWeekRange(date = new Date()) {
-  const start = new Date(date);
-
-  // JS: niedziela = 0, poniedziałek = 1
-  const day = start.getDay();
-  const daysFromMonday = day === 0 ? 6 : day - 1;
-
-  start.setDate(start.getDate() - daysFromMonday);
-  start.setHours(0, 0, 0, 0);
-
-  const end = new Date(start);
-  end.setDate(end.getDate() + 7);
-
-  return { start, end };
-}
-
 export function toDateKey(date: Date) {
   const pad = (value: number) => String(value).padStart(2, '0');
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;

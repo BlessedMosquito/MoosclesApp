@@ -21,7 +21,7 @@ const alignClass: Record<ButtonAlign, string> = {
 
 type ButtonProps = {
   children: ReactNode;
-  onClick: () => void;
+  onClick?: () => void;
   disabled?: boolean;
   width?: ButtonWidth;
   height?: number;

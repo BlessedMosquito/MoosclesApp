@@ -10,6 +10,7 @@ type TopBarProps = {
   center?: TopBarItem;
   right?: TopBarItem;
   width?: number;
+  variant?: 'page' | 'brand';
 };
 
 function Slot({ slot, align }: { slot: TopBarItem; align: 'left' | 'right' }) {
@@ -24,11 +25,26 @@ function Slot({ slot, align }: { slot: TopBarItem; align: 'left' | 'right' }) {
   );
 }
 
-export default function TopBar({ left, center, right, width }: TopBarProps) {
+export default function TopBar({
+  left,
+  center,
+  right,
+  width,
+  variant = 'page',
+}: TopBarProps) {
   return (
-    <nav className="top-bar" style={{ maxWidth: width }}>
+    <nav
+      className={cn('top-bar', variant === 'brand' && 'top-bar-brand')}
+      style={{ maxWidth: width }}
+    >
       <Slot slot={left} align="left" />
-      <div className="top-bar-center">{center}</div>
+      <div className="top-bar-center">
+        {typeof center === 'string' ? (
+          <span className="top-bar-title">{center}</span>
+        ) : (
+          center
+        )}
+      </div>
       <Slot slot={right} align="right" />
     </nav>
   );

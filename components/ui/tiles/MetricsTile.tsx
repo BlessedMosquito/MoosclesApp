@@ -31,6 +31,7 @@ type MetricItem = {
   maxValue: number;
   color: string;
   unit: string;
+  format: (value: number) => string;
 };
 
 type MetricsTileProps = {
@@ -43,6 +44,7 @@ type MetricsTileProps = {
   chartSize: number;
   distanceUnit?: string;
   durationUnit?: string;
+  title?: string;
 };
 
 const statFormat: ChartStatFlowFormat = {
@@ -50,12 +52,30 @@ const statFormat: ChartStatFlowFormat = {
   maximumFractionDigits: 1,
 };
 
+const distanceFormat = new Intl.NumberFormat('en', {
+  maximumFractionDigits: 1,
+});
+
+function formatHours(hours: number) {
+  const totalMinutes = Math.round(hours * 60);
+  const h = Math.floor(totalMinutes / 60);
+  const m = totalMinutes % 60;
+  if (h === 0) return `${m} min`;
+  if (m === 0) return `${h} h`;
+  return `${h} h ${m} min`;
+}
+
 function goalOrFallback(goal: number, value: number) {
   return goal > 0 ? goal : Math.max(value, 1);
 }
 
 const INACTIVE_RING_ALPHA = 0.4;
 const TILE_PADDING = 14;
+
+const monthFormat = new Intl.DateTimeFormat('en', {
+  month: 'long',
+  year: 'numeric',
+});
 
 function withAlpha(hex: string, alpha: number) {
   const value = hex.replace('#', '');
@@ -87,14 +107,28 @@ function MetricsCenter({
       className={cn(chartCenterContainerClassName, 'metrics-center')}
       style={{ width: centerSize, height: centerSize }}
     >
-      <ChartStatFlow
-        formatOptions={statFormat}
-        label={item.label}
-        labelClassName={chartCenterLabelClassName}
-        suffix={`\u00A0${item.unit}`}
-        value={item.value}
-        valueClassName={chartCenterValueClassName}
-      />
+      {item.unit === 'h' ? (
+        <>
+          <span
+            className={cn(
+              'text-foreground tabular-nums',
+              chartCenterValueClassName
+            )}
+          >
+            {item.format(item.value)}
+          </span>
+          <span className={chartCenterLabelClassName}>{item.label}</span>
+        </>
+      ) : (
+        <ChartStatFlow
+          formatOptions={statFormat}
+          label={item.label}
+          labelClassName={chartCenterLabelClassName}
+          suffix={`\u00A0${item.unit}`}
+          value={item.value}
+          valueClassName={chartCenterValueClassName}
+        />
+      )}
     </div>
   );
 }
@@ -102,8 +136,10 @@ function MetricsCenter({
 MetricsCenter.displayName = 'RingCenter';
 
 function SelectableLegendRow({
+  items,
   onSelect,
 }: {
+  items: MetricItem[];
   onSelect: (index: number) => void;
 }) {
   const { index } = useLegendItem();
@@ -114,7 +150,7 @@ function SelectableLegendRow({
         <div className="metrics-legend-row">
           <LegendMarker />
           <LegendLabel className="metrics-legend-label" />
-          <LegendValue showPercentage />
+          <LegendValue showPercentage formatValue={items[index].format} />
         </div>
         <LegendProgress />
       </LegendItem>
@@ -132,8 +168,9 @@ export default function MetricsTile({
   chartSize,
   distanceUnit = 'km',
   durationUnit = 'h',
+  title = 'Monthly progress',
 }: MetricsTileProps) {
-  const [activeIndex, setActiveIndex] = useState<number | null>(0);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   const data: MetricItem[] = [
     {
@@ -142,6 +179,7 @@ export default function MetricsTile({
       maxValue: goalOrFallback(distanceMax, distance),
       color: '#0ea5e9',
       unit: distanceUnit,
+      format: (value) => `${distanceFormat.format(value)} ${distanceUnit}`,
     },
     {
       label: 'Duration',
@@ -149,6 +187,7 @@ export default function MetricsTile({
       maxValue: goalOrFallback(durationMax, duration),
       color: '#a855f7',
       unit: durationUnit,
+      format: formatHours,
     },
   ];
 
@@ -158,7 +197,7 @@ export default function MetricsTile({
   );
 
   function handleSelect(index: number) {
-    setActiveIndex((current) => (current === index ? null : index));
+    setActiveIndex(index);
   }
 
   return (
@@ -191,9 +230,15 @@ export default function MetricsTile({
           <MetricsCenter activeIndex={activeIndex} items={data} />
         </RingChart>
 
-        <div className="min-w-0 flex-1">
+        <div className="metrics-side">
+          <div className="metrics-heading">
+            <span className="metrics-title">{title}</span>
+            <span className="metrics-subtitle">
+              {monthFormat.format(new Date())}
+            </span>
+          </div>
           <Legend items={data} hoveredIndex={activeIndex}>
-            <SelectableLegendRow onSelect={handleSelect} />
+            <SelectableLegendRow items={data} onSelect={handleSelect} />
           </Legend>
         </div>
       </div>

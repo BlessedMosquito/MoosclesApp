@@ -1,28 +1,66 @@
-import { Children, ReactNode } from 'react';
+'use client';
+
+import { FormEvent, ReactNode } from 'react';
+import Link from 'next/link';
+import { motion } from 'motion/react';
+import Emblem from '@/components/brand/Emblem';
 import ErrorPopUp from '../ui/feedback/ErrorPopUp';
 
 type AuthLayoutProps = {
-  children: ReactNode;
+  title: string;
+  subtitle?: ReactNode;
+  children?: ReactNode;
+  footer?: ReactNode;
   error?: string | null;
   onDismissError?: () => void;
+  onSubmit?: () => void;
 };
 
 export default function AuthLayout({
+  title,
+  subtitle,
   children,
+  footer,
   error,
   onDismissError,
+  onSubmit,
 }: AuthLayoutProps) {
-  const [title, ...content] = Children.toArray(children);
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    onSubmit?.();
+  }
 
   return (
     <main className="auth-page">
-      <div className="auth-card">
-        {title}
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        className="auth-card"
+      >
+        <Link href="/" aria-label="Mooscles home" className="auth-brand">
+          <Emblem size={64} />
+        </Link>
+
+        <header className="auth-header">
+          <h1 className="auth-title">{title}</h1>
+          {subtitle && <p className="auth-subtitle">{subtitle}</p>}
+        </header>
+
         {error && (
           <ErrorPopUp onClose={() => onDismissError?.()}>{error}</ErrorPopUp>
         )}
-        {content}
-      </div>
+
+        {onSubmit ? (
+          <form className="auth-form" onSubmit={handleSubmit} noValidate>
+            {children}
+          </form>
+        ) : (
+          children && <div className="auth-form">{children}</div>
+        )}
+
+        {footer && <div className="auth-footer">{footer}</div>}
+      </motion.div>
     </main>
   );
 }

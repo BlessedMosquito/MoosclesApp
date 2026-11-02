@@ -327,7 +327,7 @@ export default function AddWorkoutDataRepetitionBased() {
       if (window.history.length > 1) {
         router.back();
       } else {
-        router.replace('/workouts-list');
+        router.replace('/library');
       }
     } catch (deleteError) {
       setError(
@@ -343,7 +343,7 @@ export default function AddWorkoutDataRepetitionBased() {
     <main className="page-section">
       <div className="page-content page-content-narrow">
         <TopBar
-          left={<BackButton onClick={() => router.push('/workouts-list')} />}
+          left={<BackButton onClick={() => router.push('/library')} />}
           center={workoutName}
         />
 

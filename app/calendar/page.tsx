@@ -193,6 +193,11 @@ export default function CalendarPage() {
         <CalendarGrid
           workoutsByDay={workoutsByDay}
           isLoading={isLoading}
+          selectedDateKey={
+            selectedWorkout
+              ? getWorkoutDateKey(selectedWorkout.workout_date)
+              : null
+          }
           onSelectWorkout={openWorkout}
           onClosePreview={onWorkoutPreviewClose}
         />

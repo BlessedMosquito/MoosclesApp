@@ -106,48 +106,68 @@ export default function ResetPasswordPage() {
 
   if (!ready) {
     return (
-      <AuthLayout>
-        <h1 className="auth-title">Reset Password</h1>
-        {linkError ? (
-          <p className="auth-text">
-            {linkError}{' '}
-            <Link href="/forgot-password" className="auth-link-accent">
+      <AuthLayout
+        title="Reset password"
+        subtitle={linkError ?? 'Checking your reset link…'}
+        footer={
+          linkError ? (
+            <Link href="/forgot-password" className="auth-link">
               Request a new link
             </Link>
-          </p>
-        ) : (
-          <LoadingCircle size={24} />
+          ) : undefined
+        }
+      >
+        {!linkError && (
+          <div className="flex justify-center">
+            <LoadingCircle size={24} />
+          </div>
         )}
       </AuthLayout>
     );
   }
 
   return (
-    <AuthLayout error={authError} onDismissError={() => setAuthError(null)}>
-      <h1 className="auth-title">Reset Password</h1>
+    <AuthLayout
+      title="Set a new password"
+      subtitle="Choose a strong password you haven't used before."
+      error={authError}
+      onDismissError={() => setAuthError(null)}
+      onSubmit={updatePassword}
+    >
+      <label className="field">
+        <span className="field-label">New password</span>
+        <TextInput
+          type="password"
+          autoComplete="new-password"
+          placeholder="Create a password"
+          value={password}
+          onChange={setPassword}
+          onBlur={onBlurPassword}
+          disabled={isLoading}
+        />
+        <span className="field-hint">
+          At least 8 characters, an uppercase letter, a number and a special
+          character.
+        </span>
+      </label>
 
-      <TextInput
-        type="password"
-        autoComplete="new-password"
-        placeholder="New password"
-        value={password}
-        onChange={setPassword}
-        onBlur={onBlurPassword}
-        disabled={isLoading}
-      />
+      <label className="field">
+        <span className="field-label">Repeat password</span>
+        <TextInput
+          type="password"
+          autoComplete="new-password"
+          placeholder="Repeat your password"
+          value={repeatedPassword}
+          onChange={setRepeatedPassword}
+          disabled={isLoading}
+        />
+      </label>
 
-      <TextInput
-        type="password"
-        autoComplete="new-password"
-        placeholder="Repeat password"
-        value={repeatedPassword}
-        onChange={setRepeatedPassword}
-        disabled={isLoading}
-      />
-
-      <Button onClick={updatePassword} disabled={isLoading}>
-        {isLoading ? <LoadingCircle size={18} /> : 'Reset password'}
-      </Button>
+      <div className="auth-submit">
+        <Button type="submit" width="full" disabled={isLoading}>
+          {isLoading ? <LoadingCircle size={18} /> : 'Save new password'}
+        </Button>
+      </div>
     </AuthLayout>
   );
 }

@@ -109,57 +109,81 @@ export default function RegisterPage() {
   }
 
   return (
-    <AuthLayout error={authError} onDismissError={() => setAuthError(null)}>
-      <h1 className="auth-title">MOOSCLES</h1>
+    <AuthLayout
+      title="Create account"
+      subtitle="Start tracking your workouts in a minute."
+      error={authError}
+      onDismissError={() => setAuthError(null)}
+      onSubmit={signUp}
+      footer={
+        <p className="m-0">
+          Already have an account?{' '}
+          <Link className="auth-link" href="/login">
+            Log in
+          </Link>
+        </p>
+      }
+    >
+      <label className="field">
+        <span className="field-label">First name</span>
+        <TextInput
+          type="text"
+          autoComplete="given-name"
+          placeholder="Your name"
+          value={firstName}
+          onChange={setFirstName}
+          disabled={isLoading}
+        />
+      </label>
 
-      <TextInput
-        type="text"
-        autoComplete="given-name"
-        placeholder="First name"
-        value={firstName}
-        onChange={setFirstName}
-        disabled={isLoading}
-      />
+      <label className="field">
+        <span className="field-label">Email</span>
+        <TextInput
+          type="email"
+          autoComplete="email"
+          placeholder="you@example.com"
+          value={email}
+          onChange={setEmail}
+          onBlur={onBlurEmail}
+          disabled={isLoading}
+        />
+      </label>
 
-      <TextInput
-        type="email"
-        autoComplete="email"
-        placeholder="Email"
-        value={email}
-        onChange={setEmail}
-        onBlur={onBlurEmail}
-        disabled={isLoading}
-      />
+      <label className="field">
+        <span className="field-label">Password</span>
+        <TextInput
+          type="password"
+          autoComplete="new-password"
+          placeholder="Create a password"
+          value={password}
+          onChange={setPassword}
+          onBlur={() => onBlurPassword(password)}
+          disabled={isLoading}
+        />
+        <span className="field-hint">
+          At least 8 characters, an uppercase letter, a number and a special
+          character.
+        </span>
+      </label>
 
-      <TextInput
-        type="password"
-        autoComplete="new-password"
-        placeholder="Password"
-        value={password}
-        onChange={setPassword}
-        onBlur={() => onBlurPassword(password)}
-        disabled={isLoading}
-      />
+      <label className="field">
+        <span className="field-label">Repeat password</span>
+        <TextInput
+          type="password"
+          autoComplete="new-password"
+          placeholder="Repeat your password"
+          value={repeatedPassword}
+          onChange={setRepeatedPassword}
+          onBlur={() => onBlurPassword(repeatedPassword)}
+          disabled={isLoading}
+        />
+      </label>
 
-      <TextInput
-        type="password"
-        autoComplete="new-password"
-        placeholder="Repeat Password"
-        value={repeatedPassword}
-        onChange={setRepeatedPassword}
-        onBlur={() => onBlurPassword(repeatedPassword)}
-        disabled={isLoading}
-      />
-
-      <Button onClick={signUp} disabled={isLoading}>
-        {isLoading ? <LoadingCircle size={18} /> : 'Sign up'}
-      </Button>
-      <p className="auth-hint">
-        Already have an account?{' '}
-        <Link className="auth-link" href="/login">
-          Sign In
-        </Link>
-      </p>
+      <div className="auth-submit">
+        <Button type="submit" width="full" disabled={isLoading}>
+          {isLoading ? <LoadingCircle size={18} /> : 'Create account'}
+        </Button>
+      </div>
     </AuthLayout>
   );
 }

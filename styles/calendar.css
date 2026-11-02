@@ -1,38 +1,66 @@
 @layer components {
   .calendar {
-    @apply mt-4 w-full sm:mt-6;
+    @apply mt-4 box-border flex w-full flex-col gap-4 px-3 sm:mt-6 sm:gap-5 sm:px-0;
   }
 
-  .calendar-nav {
-    @apply mx-2.5 mb-2.5 flex items-center justify-between sm:mb-4;
+  .calendar-header {
+    @apply flex items-end justify-between gap-3 px-1;
   }
 
-  .calendar-nav-title {
-    @apply flex flex-col items-center gap-1;
-  }
-
-  .calendar-year {
-    @apply cursor-pointer border-none bg-transparent p-0 text-h1 leading-none font-bold text-content sm:text-display;
+  .calendar-heading {
+    @apply flex min-w-0 flex-col gap-0.5;
   }
 
   .calendar-month {
-    @apply m-0 text-body font-semibold text-content sm:text-h2;
+    @apply m-0 truncate text-h1 leading-none font-bold tracking-tight text-content sm:text-display;
+  }
+
+  .calendar-year {
+    @apply flex w-fit cursor-pointer items-center gap-1 border-none bg-transparent p-0 text-body-sm font-semibold text-content-muted transition-colors hover:text-content sm:text-body;
+  }
+
+  .calendar-controls {
+    @apply flex shrink-0 items-center gap-2;
+  }
+
+  .calendar-today-btn {
+    @apply h-9 cursor-pointer rounded-full border border-accent-border bg-accent-surface px-3 text-body-sm font-semibold text-accent sm:h-10;
+  }
+
+  .calendar-stats {
+    @apply flex flex-wrap gap-2 px-1;
+  }
+
+  .calendar-stat {
+    @apply rounded-full border border-white/10 bg-surface px-3 py-1 text-body-sm text-content-muted;
+
+    & strong {
+      @apply font-bold text-content;
+    }
+  }
+
+  .calendar-board {
+    @apply flex flex-col gap-2 rounded-[20px] border border-white/10 bg-surface p-2 sm:gap-3 sm:p-4;
+  }
+
+  .calendar-weekdays {
+    @apply grid grid-cols-7 gap-1 sm:gap-2;
+  }
+
+  .calendar-weekday {
+    @apply text-center text-caption font-semibold tracking-wide text-content-muted uppercase;
   }
 
   .calendar-years {
-    @apply grid grid-cols-3 gap-2 sm:gap-3;
+    @apply grid grid-cols-3 gap-2 rounded-[20px] border border-white/10 bg-surface p-3 sm:grid-cols-4 sm:gap-3 sm:p-4;
   }
 
   .calendar-year-option {
-    @apply min-h-[54px] cursor-pointer rounded-[14px] border-2 border-line bg-surface text-body font-medium text-content sm:min-h-[72px] sm:text-h2;
+    @apply min-h-12 cursor-pointer rounded-xl border border-white/10 bg-tile text-body font-semibold text-content transition-colors hover:border-accent-border sm:min-h-14;
   }
 
   .calendar-year-option-active {
-    @apply border-content font-bold;
-  }
-
-  .calendar-loading {
-    @apply min-h-60 sm:min-h-[360px];
+    @apply border-accent bg-accent text-black hover:border-accent;
   }
 
   .calendar-loading-spinner {
@@ -40,26 +68,118 @@
   }
 
   .calendar-days {
-    @apply grid grid-cols-7 gap-[3px] transition-opacity duration-150 sm:gap-1.5;
-  }
-
-  .calendar-weekday {
-    @apply pb-0.5 text-center text-body text-content sm:pb-1;
+    @apply grid grid-cols-7 gap-1 transition-opacity duration-150 sm:gap-2;
   }
 
   .calendar-day {
-    @apply flex min-h-[54px] cursor-default flex-col items-start justify-start overflow-hidden rounded-lg border border-line bg-surface p-[3px] text-left text-body-sm text-content sm:min-h-28 sm:rounded-xl sm:p-1.5 sm:text-body;
-
-    & p {
-      @apply m-0 self-start;
-    }
+    @apply relative flex aspect-square min-w-0 cursor-default flex-col items-center justify-between overflow-hidden rounded-xl border border-transparent bg-tile p-1 text-content sm:aspect-auto sm:min-h-24 sm:items-stretch sm:p-2;
   }
 
   .calendar-day-empty {
-    @apply border-transparent bg-transparent;
+    @apply bg-transparent;
+  }
+
+  .calendar-day-number {
+    @apply flex size-6 items-center justify-center rounded-full text-body-sm font-semibold sm:size-7 sm:text-body;
   }
 
   .calendar-day-active {
-    @apply cursor-pointer bg-accent text-black;
+    @apply cursor-pointer border-accent-border bg-accent-surface transition-colors hover:border-accent;
+  }
+
+  .calendar-day-today .calendar-day-number {
+    @apply bg-accent text-black;
+  }
+
+  .calendar-day-selected {
+    @apply border-accent ring-2 ring-accent/40;
+  }
+
+  .calendar-day-names {
+    @apply hidden min-w-0 flex-col gap-0.5 sm:flex;
+  }
+
+  .calendar-day-name {
+    @apply truncate rounded-md bg-black/25 px-1.5 py-0.5 text-left text-caption font-medium text-content;
+  }
+
+  .calendar-day-more {
+    @apply px-1.5 text-left text-caption text-content-muted;
+  }
+
+  .calendar-day-dots {
+    @apply flex items-center justify-center gap-1 pb-0.5 sm:hidden;
+  }
+
+  .calendar-dot {
+    @apply inline-block size-1.5 shrink-0 rounded-full border border-accent bg-transparent;
+  }
+
+  .calendar-dot-done {
+    @apply bg-accent;
+  }
+
+  .calendar-legend {
+    @apply flex items-center justify-center gap-4 pt-1 text-caption text-content-muted sm:justify-end;
+  }
+
+  .calendar-legend-item {
+    @apply flex items-center gap-1.5;
+  }
+
+  .day-workouts {
+    @apply flex max-h-[80dvh] w-full max-w-sm flex-col gap-4 overflow-hidden rounded-[20px] border border-line bg-surface p-4 shadow-[0_16px_48px_rgba(0,0,0,0.8)] sm:p-5;
+  }
+
+  .day-workouts-header {
+    @apply flex items-start justify-between gap-3;
+  }
+
+  .day-workouts-title {
+    @apply m-0 text-body font-bold text-content;
+  }
+
+  .day-workouts-subtitle {
+    @apply m-0 mt-0.5 text-body-sm text-content-muted;
+  }
+
+  .day-workouts-close {
+    @apply flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full border border-line bg-tile text-content-muted transition-colors hover:text-content;
+  }
+
+  .day-workouts-list {
+    @apply m-0 flex list-none flex-col gap-2 overflow-y-auto p-0;
+  }
+
+  .day-workout {
+    @apply flex w-full cursor-pointer items-center gap-3 rounded-2xl border border-line bg-tile p-3 text-left transition-colors hover:border-accent-border;
+  }
+
+  .day-workout-icon {
+    @apply flex size-10 shrink-0 items-center justify-center rounded-xl border border-accent-border bg-accent-surface text-accent;
+  }
+
+  .day-workout-text {
+    @apply flex min-w-0 flex-1 flex-col;
+  }
+
+  .day-workout-name {
+    @apply truncate text-body font-semibold text-content;
+  }
+
+  .day-workout-meta {
+    @apply truncate text-body-sm text-content-muted;
+  }
+
+  .day-workout-status {
+    @apply shrink-0 rounded-full border border-line px-2 py-0.5 text-caption font-medium text-content-muted;
+  }
+
+  .day-workout-status-done {
+    @apply border-accent-border bg-accent-surface text-accent;
+  }
+
+  .day-workout-chevron {
+    @apply shrink-0 text-content-muted;
   }
 }

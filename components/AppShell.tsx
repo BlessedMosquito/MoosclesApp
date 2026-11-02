@@ -12,12 +12,7 @@ import BottomBarItem from './ui/bottomBar/BottomBarItem';
 import LoadingCircle from './ui/feedback/LoadingCircle';
 import { cn } from '@/lib/utils';
 
-const AUTHENTICATED_PATHS = [
-  '/dashboard',
-  '/calendar',
-  '/workouts-list',
-  '/profile',
-];
+const AUTHENTICATED_PATHS = ['/dashboard', '/calendar', '/library', '/profile'];
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -82,10 +77,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           />
 
           <BottomBarItem
-            activePath="/workouts-list"
-            onClick={() => router.push('/workouts-list')}
+            activePath="/library"
+            onClick={() => router.push('/library')}
             icon={<LayersIcon size={iconSize} />}
-            label="Workouts"
+            label="Library"
           />
 
           <BottomBarItem
