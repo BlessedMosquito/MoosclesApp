@@ -24,7 +24,11 @@ export type WorkoutTemplate = {
 export const TEMPLATES_NOT_SET_UP_MESSAGE =
   'Templates are not set up in the database yet.';
 
+export const STRENGTH_ONLY_MESSAGE =
+  'Templates are available for strength workouts only.';
+
 const MISSING_TABLE_CODES = ['PGRST205', '42P01'];
+const STRENGTH_ONLY_CODE = 'MS001';
 
 const TEMPLATE_SELECT = `
   *,
@@ -37,6 +41,9 @@ const supabase = createClient();
 function toTemplateError(error: PostgrestError, fallback: string) {
   if (MISSING_TABLE_CODES.includes(error.code)) {
     return new Error(TEMPLATES_NOT_SET_UP_MESSAGE);
+  }
+  if (error.code === STRENGTH_ONLY_CODE) {
+    return new Error(STRENGTH_ONLY_MESSAGE);
   }
   return toServiceError(error, fallback);
 }
@@ -60,7 +67,11 @@ export async function getTemplates(): Promise<WorkoutTemplate[]> {
     throw toTemplateError(error, 'Could not load templates.');
   }
 
-  return ((data ?? []) as WorkoutTemplate[]).map(sortExercises);
+  return ((data ?? []) as WorkoutTemplate[])
+    .filter(
+      (template) => template.workout_types?.workout_group === 'RepetitionBased'
+    )
+    .map(sortExercises);
 }
 
 export async function getTemplateById(

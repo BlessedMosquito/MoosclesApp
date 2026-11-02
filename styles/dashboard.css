@@ -1,10 +1,10 @@
 @layer components {
   .dashboard {
-    @apply box-border flex min-h-dvh flex-col items-stretch gap-5 bg-transparent p-[18px] sm:items-center sm:p-6;
+    @apply box-border flex min-h-full flex-col items-stretch gap-5 bg-transparent p-[18px] sm:items-center sm:p-6;
   }
 
   .dashboard-title {
-    @apply m-0 text-h2 font-bold text-white sm:text-[2rem];
+    @apply m-0 flex items-center text-white;
   }
 
   .dashboard-loading {
@@ -71,12 +71,40 @@
     @apply mt-2 mb-0 text-center text-[9px] text-content sm:text-[11px];
   }
 
-  .level-gauge {
-    @apply flex h-full flex-col items-center justify-between gap-2;
+  .level-tile {
+    @apply flex h-full flex-col gap-2;
   }
 
-  .level-gauge-caption {
-    @apply m-0 text-caption font-bold text-content-muted;
+  .level-tile-header {
+    @apply flex h-5 items-center justify-between gap-2;
+  }
+
+  .level-tile-caption {
+    @apply flex items-center gap-1 text-caption font-semibold tracking-[0.04em] text-accent uppercase;
+  }
+
+  .level-tile-total {
+    @apply truncate text-caption text-content-muted tabular-nums;
+  }
+
+  .level-tile-gauge {
+    @apply flex min-h-0 flex-1 items-center justify-center;
+  }
+
+  .level-tile-footer {
+    @apply flex h-9 flex-col items-center justify-center gap-0.5 border-t border-line pt-1.5 text-center;
+  }
+
+  .level-tile-progress {
+    @apply text-body-sm leading-none font-bold text-content tabular-nums;
+  }
+
+  .level-tile-progress-max {
+    @apply font-medium text-content-muted;
+  }
+
+  .level-tile-next {
+    @apply text-[11px] leading-none text-content-muted;
   }
 
   .activity-tile {
@@ -84,39 +112,71 @@
   }
 
   .activity-content {
-    @apply flex min-h-0 w-full flex-1 items-center justify-center gap-3;
+    @apply flex min-h-0 w-full flex-1 items-center justify-between gap-3 sm:px-2;
   }
 
   .activity-summary {
-    @apply flex w-[92px] shrink-0 flex-col gap-1.5;
+    @apply flex w-[104px] shrink-0 flex-col justify-start gap-4 self-stretch pt-1;
+  }
+
+  .activity-date-block {
+    @apply flex flex-col gap-0.5;
+  }
+
+  .activity-weekday {
+    @apply text-caption font-semibold tracking-[0.04em] text-accent uppercase;
   }
 
   .activity-date {
-    @apply m-0 text-base font-bold text-content;
+    @apply m-0 text-body leading-tight font-bold text-content sm:text-lg;
   }
 
-  .activity-muted {
-    @apply text-caption leading-[1.3] text-content-muted;
+  .activity-stats {
+    @apply flex flex-col gap-2.5 border-t border-line pt-3;
   }
 
-  .activity-label {
-    @apply mt-[5px] text-[11px] leading-[1.3] text-content-muted;
+  .activity-stat {
+    @apply flex items-baseline gap-1.5;
   }
 
   .activity-count {
-    @apply text-h2 leading-none font-semibold text-content;
+    @apply text-h2 leading-none font-extrabold text-content tabular-nums;
+  }
+
+  .activity-count-accent {
+    @apply text-accent;
+  }
+
+  .activity-label {
+    @apply text-caption leading-tight text-content-muted;
   }
 
   .metrics-content {
-    @apply flex h-full w-full min-w-0 items-center gap-6;
+    @apply flex h-full w-full min-w-0 items-center gap-3 sm:gap-6;
   }
 
   .metrics-center {
     @apply flex flex-col items-center justify-center text-center;
   }
 
+  .metrics-side {
+    @apply flex min-w-0 flex-1 flex-col gap-2;
+  }
+
+  .metrics-heading {
+    @apply flex min-w-0 flex-col gap-0.5 px-1 sm:px-2;
+  }
+
+  .metrics-title {
+    @apply truncate text-body-sm font-bold whitespace-nowrap text-content sm:text-body;
+  }
+
+  .metrics-subtitle {
+    @apply text-caption text-content-muted;
+  }
+
   .metrics-legend-item {
-    @apply flex cursor-pointer flex-col gap-1.5 px-2 py-1.5;
+    @apply flex cursor-pointer flex-col gap-1.5 px-1 py-1.5 sm:px-2;
   }
 
   .metrics-legend-row {
@@ -128,23 +188,39 @@
   }
 
   .water-tile-card {
-    @apply p-2;
+    @apply relative p-3 sm:p-3.5;
+  }
+
+  .water-tile-fill {
+    @apply pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t from-[color-mix(in_srgb,var(--color-water)_32%,var(--color-surface))] to-[color-mix(in_srgb,var(--color-water)_14%,var(--color-surface))];
+  }
+
+  .water-tile-wave {
+    @apply absolute bottom-full left-0 -mb-px h-2 w-[200%] fill-[color-mix(in_srgb,var(--color-water)_14%,var(--color-surface))];
   }
 
   .water-tile {
-    @apply flex h-full w-full items-center justify-between gap-2;
+    @apply relative flex h-full w-full items-center justify-between gap-2;
   }
 
-  .water-tile-ring {
-    @apply relative flex shrink-0 items-center justify-center;
+  .water-tile-info {
+    @apply flex min-w-0 cursor-pointer flex-col items-start gap-0.5 border-none bg-transparent p-0 text-left text-content select-none;
   }
 
-  .water-tile-label {
-    @apply absolute inset-[22%] flex cursor-pointer items-center justify-center rounded-full border-none bg-transparent p-0 text-center text-body-sm leading-none font-bold text-water tabular-nums select-none sm:text-body lg:text-h2;
+  .water-tile-caption {
+    @apply flex items-center gap-1 text-caption font-semibold tracking-[0.04em] text-water uppercase;
+  }
+
+  .water-tile-value {
+    @apply text-h2 leading-none font-extrabold tabular-nums sm:text-[1.75rem];
+  }
+
+  .water-tile-goal {
+    @apply truncate text-caption text-content-muted tabular-nums;
   }
 
   .water-tile-add {
-    @apply flex size-12 shrink-0 cursor-pointer items-center justify-center rounded-full border-none bg-water text-white shadow-[0_6px_20px_rgba(14,165,233,0.35)] transition-transform active:scale-90 sm:size-14;
+    @apply flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full border-none bg-water text-white shadow-[0_6px_20px_rgba(14,165,233,0.35)] transition-transform active:scale-90 sm:size-12;
   }
 
   .water-form {

@@ -1,4 +1,3 @@
-import { getWeekRange } from '@/lib/helpers';
 import { createClient } from '@/lib/supabase/client';
 import { toServiceError } from './serviceError';
 
@@ -20,8 +19,9 @@ export type ReturnGetMetricsData = {
   user_id: string;
 };
 
-type GetWeeklyDataSummaryProps = {
+type GetMonthlyDataSummaryProps = {
   userId: string;
+  date?: Date;
 };
 
 const supabase = createClient();
@@ -58,10 +58,12 @@ export async function getWorkoutMetrics(
   return data as ReturnGetMetricsData;
 }
 
-export async function getWeeklyDataSummary(
-  props: GetWeeklyDataSummaryProps
+export async function getMonthlyDataSummary(
+  props: GetMonthlyDataSummaryProps
 ): Promise<{ duration_minutes: number; distance_meters: number }> {
-  const { start, end } = getWeekRange();
+  const date = props.date ?? new Date();
+  const start = new Date(date.getFullYear(), date.getMonth(), 1);
+  const end = new Date(date.getFullYear(), date.getMonth() + 1, 1);
 
   const { data, error } = await supabase
     .from('workout_metrics')

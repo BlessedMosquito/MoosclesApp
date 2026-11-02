@@ -36,7 +36,8 @@ export default function BottomBarItem({
   const setActiveEl = useBottomBar();
   const ref = useRef<HTMLButtonElement>(null);
 
-  const isActive = pathname === activePath;
+  const isActive =
+    pathname === activePath || pathname.startsWith(`${activePath}/`);
 
   useLayoutEffect(() => {
     if (!isActive || !setActiveEl) return;

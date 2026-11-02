@@ -16,7 +16,7 @@ import Tile from './Tile';
 import { getFormatedDate, parseDateKey, toDateKey } from '@/lib/helpers';
 
 const WEEKDAYS = 7;
-const SUMMARY_WIDTH = 92;
+const SUMMARY_WIDTH = 104;
 const CONTENT_GAP = 12;
 const CHART_MARGIN = { top: 10, right: 10, bottom: 30, left: 50 };
 const CELL_GAP = 4;
@@ -31,6 +31,8 @@ const LEVEL_COLORS = [
 ] as const;
 
 const WEEKDAY_LABELS = getHeatmapDayLabels(1);
+
+const weekdayFormat = new Intl.DateTimeFormat('en', { weekday: 'long' });
 
 type WorkoutActivityTileProps = {
   tileWidth: number;
@@ -141,7 +143,8 @@ export default function WorkoutActivityTile({
     showYear: false,
     nameMonth: true,
   });
-  const yearLabel = today.getFullYear().toString();
+  const weekdayLabel = weekdayFormat.format(today);
+  const monthlyWorkouts = workouts.length;
 
   const weekCount = columns[0]?.bins.length ?? 1;
 
@@ -176,10 +179,23 @@ export default function WorkoutActivityTile({
       <Tile width={tileWidth} height={tileHeight}>
         <div className="activity-content">
           <div className="activity-summary">
-            <p className="activity-date">{dayMonthLabel}</p>
-            <span className="activity-muted">{yearLabel}</span>
-            <span className="activity-label">Workouts done:</span>
-            <span className="activity-count">{weeklyWorkouts}</span>
+            <div className="activity-date-block">
+              <span className="activity-weekday">{weekdayLabel}</span>
+              <p className="activity-date">{dayMonthLabel}</p>
+            </div>
+
+            <div className="activity-stats">
+              <div className="activity-stat">
+                <span className="activity-count activity-count-accent">
+                  {weeklyWorkouts}
+                </span>
+                <span className="activity-label">this week</span>
+              </div>
+              <div className="activity-stat">
+                <span className="activity-count">{monthlyWorkouts}</span>
+                <span className="activity-label">this month</span>
+              </div>
+            </div>
           </div>
 
           <div style={{ width: chartWidth, height: chartHeight }}>

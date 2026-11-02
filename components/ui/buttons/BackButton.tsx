@@ -1,5 +1,4 @@
-import ChevronIcon from '@/components/icons/ChevronIcon';
-import { cn } from '@/lib/utils';
+import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 
 type BackButtonProps = {
   onClick: () => void;
@@ -20,9 +19,13 @@ export default function BackButton({
       aria-label={label}
       onClick={onClick}
       disabled={disabled}
-      className={cn('icon-btn', direction === 'back' && 'rotate-180')}
+      className="back-btn"
     >
-      <ChevronIcon />
+      {direction === 'back' ? (
+        <IconChevronLeft size={20} stroke={2.25} />
+      ) : (
+        <IconChevronRight size={20} stroke={2.25} />
+      )}
     </button>
   );
 }

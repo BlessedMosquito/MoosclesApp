@@ -6,6 +6,7 @@
 @import '../styles/calendar.css';
 @import '../styles/workout.css';
 @import '../styles/profile.css';
+@import '../styles/library.css';
 
 @custom-variant dark (&:is(.dark *));
 

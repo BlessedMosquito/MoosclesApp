@@ -1,0 +1,222 @@
+@layer components {
+  .library-header {
+    @apply mt-7 mb-6 flex flex-col gap-1;
+  }
+
+  .library-subtitle {
+    @apply m-0 text-body-sm text-content-muted;
+  }
+
+  .library-section {
+    @apply flex flex-col gap-4;
+  }
+
+  .library-filters {
+    @apply -mx-1 flex gap-2 overflow-x-auto px-1 pb-1;
+  }
+
+  .library-empty {
+    @apply flex min-h-40 items-center justify-center px-6 text-center;
+  }
+
+  .library-list {
+    @apply m-0 flex list-none flex-col gap-2.5 p-0;
+  }
+
+  .library-card {
+    @apply flex w-full cursor-pointer items-center gap-3 rounded-[18px] border border-white/10 bg-surface p-3 text-left text-content transition-colors hover:border-accent-border;
+  }
+
+  .library-card-split {
+    @apply cursor-default p-0 pr-2;
+  }
+
+  .library-card-main {
+    @apply flex min-w-0 flex-1 cursor-pointer items-center gap-3 border-none bg-transparent p-3 text-left text-content;
+  }
+
+  .library-card-icon {
+    @apply flex size-11 shrink-0 items-center justify-center rounded-xl border border-accent-border bg-accent-surface text-accent;
+  }
+
+  .library-card-icon-muscle {
+    @apply border-white/10 bg-tile;
+  }
+
+  .library-card-text {
+    @apply flex min-w-0 flex-1 flex-col gap-0.5;
+  }
+
+  .library-card-title {
+    @apply truncate text-body font-semibold;
+  }
+
+  .library-card-meta {
+    @apply truncate text-body-sm text-content-muted;
+  }
+
+  .library-card-chevron {
+    @apply shrink-0 text-content-muted;
+  }
+
+  .library-card-actions {
+    @apply flex shrink-0 items-center gap-1;
+  }
+
+  .library-icon-btn {
+    @apply flex size-9 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-content-muted transition-colors hover:bg-tile hover:text-accent disabled:cursor-default disabled:opacity-50;
+  }
+
+  .library-icon-btn-danger {
+    @apply hover:text-danger-light;
+  }
+
+  .library-badge {
+    @apply shrink-0 rounded-full border border-white/15 px-2 py-0.5 text-caption font-medium text-content-muted;
+  }
+
+  .library-badge-accent {
+    @apply border-accent-border bg-accent-surface text-accent;
+  }
+
+  .library-panel {
+    @apply flex flex-col gap-4 rounded-[20px] border border-white/10 bg-surface p-4 sm:p-5;
+  }
+
+  .library-panel-title {
+    @apply m-0 text-body font-bold text-content;
+  }
+
+  .trend-badge {
+    @apply flex shrink-0 items-center gap-1 rounded-full border px-1.5 py-1 text-caption font-semibold;
+  }
+
+  .trend-badge-up {
+    @apply border-accent-border bg-accent-surface text-accent;
+  }
+
+  .trend-badge-down {
+    @apply border-danger-border bg-danger/10 text-danger-light;
+  }
+
+  .trend-badge-same {
+    @apply border-white/15 text-content-muted;
+  }
+
+  .trend-badge-new {
+    @apply border-sky-400/40 bg-sky-400/10 text-sky-300;
+  }
+
+  .exercise-progress {
+    @apply mt-5 flex flex-col gap-4 pb-6;
+  }
+
+  .exercise-summary {
+    @apply grid grid-cols-3 gap-2;
+  }
+
+  .exercise-summary-item {
+    @apply flex min-w-0 flex-col gap-1 rounded-2xl border border-white/10 bg-surface p-3;
+  }
+
+  .exercise-summary-label {
+    @apply truncate text-caption text-content-muted;
+  }
+
+  .exercise-summary-value {
+    @apply truncate text-body font-bold text-content tabular-nums sm:text-h2;
+  }
+
+  .progress-chart {
+    @apply relative w-full;
+  }
+
+  .progress-chart-readout {
+    @apply mb-1 flex items-baseline gap-2;
+  }
+
+  .progress-chart-value {
+    @apply text-h2 font-bold text-content tabular-nums;
+  }
+
+  .progress-chart-date {
+    @apply text-body-sm text-content-muted;
+  }
+
+  .progress-chart-svg {
+    @apply block touch-pan-y select-none;
+  }
+
+  .progress-chart-grid {
+    @apply stroke-white/10;
+    stroke-dasharray: 3 4;
+  }
+
+  .progress-chart-crosshair {
+    @apply stroke-white/25;
+  }
+
+  .progress-chart-axis {
+    @apply fill-content-muted text-[11px];
+  }
+
+  .records-grid {
+    @apply grid grid-cols-2 gap-2;
+  }
+
+  .record-tile {
+    @apply flex min-w-0 flex-col gap-0.5 rounded-2xl border border-white/10 bg-tile p-3;
+  }
+
+  .record-label {
+    @apply text-caption text-content-muted;
+  }
+
+  .record-value {
+    @apply truncate text-body font-bold text-content tabular-nums;
+  }
+
+  .record-date {
+    @apply truncate text-caption text-content-muted;
+  }
+
+  .session-list {
+    @apply m-0 flex list-none flex-col p-0;
+  }
+
+  .session-item {
+    @apply flex flex-col gap-2 border-t border-white/10 py-3 first:border-t-0 first:pt-0 last:pb-0;
+  }
+
+  .session-header {
+    @apply flex items-start justify-between gap-3;
+  }
+
+  .session-heading {
+    @apply flex min-w-0 flex-col;
+  }
+
+  .session-date {
+    @apply text-body-sm font-semibold text-content;
+  }
+
+  .session-workout {
+    @apply truncate text-caption text-content-muted;
+  }
+
+  .session-sets {
+    @apply flex flex-wrap gap-1.5;
+  }
+
+  .session-set {
+    @apply rounded-lg border border-white/10 bg-tile px-2 py-1 text-caption font-medium text-content tabular-nums;
+  }
+
+  .session-set-top {
+    @apply border-accent-border bg-accent-surface text-accent;
+  }
+
+  .session-volume {
+    @apply text-caption text-content-muted;
+  }
+}

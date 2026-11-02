@@ -7,6 +7,7 @@ import Button from '@/components/ui/buttons/Button';
 import AuthLayout from '@/components/layout/AuthLayout';
 import TextInput from '@/components/ui/inputs/TextInput';
 import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
+import Link from 'next/link';
 
 function ForgotPasswordForm() {
   const supabase = createClient();
@@ -42,32 +43,45 @@ function ForgotPasswordForm() {
   }
 
   return (
-    <AuthLayout error={authError} onDismissError={() => setAuthError(null)}>
-      <h1 className="auth-title">Forgot Password</h1>
-
-      {success ? (
-        <p className="auth-text">
-          We sent a password reset link to <b>{email}</b>. Check your inbox.
-        </p>
-      ) : (
+    <AuthLayout
+      title={success ? 'Check your inbox' : 'Forgot password?'}
+      subtitle={
+        success ? (
+          <>
+            We sent a password reset link to <b>{email}</b>.
+          </>
+        ) : (
+          "Enter your email and we'll send you a link to reset your password."
+        )
+      }
+      error={authError}
+      onDismissError={() => setAuthError(null)}
+      onSubmit={success ? undefined : sendReset}
+      footer={
+        <Link className="auth-link" href="/login">
+          Back to log in
+        </Link>
+      }
+    >
+      {!success && (
         <>
-          <p className="auth-text">
-            Enter your email and we&apos;ll send you a link to reset your
-            password.
-          </p>
+          <label className="field">
+            <span className="field-label">Email</span>
+            <TextInput
+              type="email"
+              autoComplete="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={setEmail}
+              disabled={isLoading}
+            />
+          </label>
 
-          <TextInput
-            type="email"
-            autoComplete="email"
-            placeholder="Email"
-            value={email}
-            onChange={setEmail}
-            disabled={isLoading}
-          />
-
-          <Button onClick={sendReset} disabled={isLoading}>
-            {isLoading ? <LoadingCircle size={18} /> : 'Send reset link'}
-          </Button>
+          <div className="auth-submit">
+            <Button type="submit" width="full" disabled={isLoading}>
+              {isLoading ? <LoadingCircle size={18} /> : 'Send reset link'}
+            </Button>
+          </div>
         </>
       )}
     </AuthLayout>

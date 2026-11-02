@@ -1,9 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import RingChart from '@/components/charts/ring-chart';
-import { RingData } from '@/components/charts/ring-context';
-import Ring from '@/components/charts/ring';
+import { motion } from 'motion/react';
+import { IconDropletFilled } from '@tabler/icons-react';
 import AddIcon from '@/components/icons/AddIcon';
 import DeleteIcon from '@/components/icons/DeleteIcon';
 import Button from '@/components/ui/buttons/Button';
@@ -29,10 +28,8 @@ type DailyWaterIntakeTileProps = CommonTileProps & {
   onError?: (message: string) => void;
 };
 
-const WATER_COLOR = '#0ea5e9';
-const TILE_PADDING = 8;
-const ADD_BUTTON_SIZE = 56;
-const CONTENT_GAP = 8;
+const WAVE_PATH =
+  'M0 6 C 25 0, 50 0, 75 6 S 125 12, 150 6 S 200 0, 225 6 S 275 12, 300 6 V 14 H 0 Z';
 const STEP_ML = 100;
 const DEFAULT_AMOUNT_ML = 200;
 const MAX_AMOUNT_ML = 5000;
@@ -157,23 +154,8 @@ export default function DailyWaterIntakeTile({
     }
   }
 
-  const ringSize = Math.max(
-    0,
-    Math.min(
-      tileWidth - TILE_PADDING * 2 - ADD_BUTTON_SIZE - CONTENT_GAP,
-      tileHeight - TILE_PADDING * 2
-    )
-  );
   const percent = goalMl > 0 ? Math.round((totalMl / goalMl) * 100) : 0;
-
-  const data: RingData[] = [
-    {
-      label: 'Water',
-      value: Math.min(totalMl, goalMl),
-      maxValue: goalMl,
-      color: WATER_COLOR,
-    },
-  ];
+  const fillRatio = Math.min(percent, 100) / 100;
 
   const historyWithToday = history.map((day, index) =>
     index === history.length - 1 ? { ...day, totalMl } : day
@@ -182,30 +164,51 @@ export default function DailyWaterIntakeTile({
   return (
     <>
       <Tile width={tileWidth} height={tileHeight} className="water-tile-card">
+        <motion.div
+          aria-hidden="true"
+          initial={false}
+          animate={{
+            height: `${fillRatio * 100}%`,
+            opacity: fillRatio > 0 ? 1 : 0,
+          }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+          className="water-tile-fill"
+        >
+          <svg
+            viewBox="0 0 150 14"
+            preserveAspectRatio="none"
+            className="water-tile-wave"
+          >
+            <motion.path
+              d={WAVE_PATH}
+              animate={{ x: [0, -150] }}
+              transition={{ duration: 6, ease: 'linear', repeat: Infinity }}
+            />
+          </svg>
+        </motion.div>
+
         <div className="water-tile">
-          <div className="water-tile-ring">
-            <RingChart
-              data={data}
-              endAngle={Math.PI / 2}
-              size={ringSize}
-              startAngle={-Math.PI}
-              strokeWidth={Math.max(5, Math.round(ringSize * 0.13))}
-            >
-              {data.map((item, index) => (
-                <Ring index={index} key={item.label} />
-              ))}
-            </RingChart>
-            <button
-              type="button"
-              aria-label={
-                showPercent ? 'Show amount in liters' : 'Show percent of goal'
-              }
-              onClick={() => setShowPercent((current) => !current)}
-              className="water-tile-label"
-            >
+          <button
+            type="button"
+            aria-label={
+              showPercent ? 'Show amount in liters' : 'Show percent of goal'
+            }
+            onClick={() => setShowPercent((current) => !current)}
+            className="water-tile-info"
+          >
+            <span className="water-tile-caption">
+              <IconDropletFilled size={14} />
+              Water
+            </span>
+            <span className="water-tile-value">
               {showPercent ? `${percent}%` : formatLiters(totalMl)}
-            </button>
-          </div>
+            </span>
+            <span className="water-tile-goal">
+              {showPercent
+                ? `${formatLiters(totalMl)} of ${formatLiters(goalMl)}`
+                : `of ${formatLiters(goalMl)}`}
+            </span>
+          </button>
 
           <button
             type="button"

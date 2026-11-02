@@ -1,29 +1,57 @@
 @layer components {
   .auth-page {
-    @apply flex min-h-dvh items-stretch justify-start bg-transparent sm:items-center sm:justify-center sm:p-6;
+    @apply flex min-h-dvh items-stretch justify-center bg-transparent sm:items-center sm:p-6;
   }
 
   .auth-card {
-    @apply flex h-full w-full flex-col gap-[18px] bg-transparent p-6 text-center sm:h-auto sm:max-w-[420px] sm:rounded-[28px] sm:border-2 sm:border-line sm:bg-surface sm:p-8 sm:shadow-[0_20px_60px_var(--shadow)] sm:backdrop-blur-[20px];
+    @apply flex w-full max-w-[420px] flex-col gap-6 p-6 pt-12 sm:rounded-[28px] sm:border sm:border-line sm:bg-surface sm:p-8 sm:shadow-[0_20px_60px_var(--shadow)] sm:backdrop-blur-[20px];
+  }
+
+  .auth-brand {
+    @apply mx-auto flex rounded-2xl transition-transform hover:scale-105;
+  }
+
+  .auth-header {
+    @apply flex flex-col items-center gap-2 text-center;
   }
 
   .auth-title {
-    @apply my-[0.67em] text-h1 font-bold text-white;
+    @apply m-0 text-h1 font-bold text-content;
   }
 
-  .auth-hint {
-    @apply m-0 text-caption text-[#888];
+  .auth-subtitle {
+    @apply m-0 text-body-sm text-content-muted;
+
+    & b {
+      @apply font-semibold text-content;
+    }
   }
 
-  .auth-text {
-    @apply m-0 text-left text-body text-[#888];
+  .auth-form {
+    @apply flex flex-col gap-4;
+  }
+
+  .auth-label-row {
+    @apply flex items-center justify-between gap-2;
+  }
+
+  .auth-submit {
+    @apply mt-2;
+  }
+
+  .auth-footer {
+    @apply flex flex-col items-center gap-2 text-center text-body-sm text-content-muted;
   }
 
   .auth-link {
-    @apply text-white no-underline hover:underline;
+    @apply cursor-pointer border-none bg-transparent p-0 font-semibold text-accent no-underline hover:underline disabled:cursor-default disabled:opacity-60;
   }
 
-  .auth-link-accent {
-    @apply cursor-pointer border-none bg-transparent p-0 text-inherit text-accent no-underline hover:underline;
+  .auth-link-muted {
+    @apply text-body-sm font-medium text-content-muted no-underline hover:text-accent;
+  }
+
+  .auth-notice {
+    @apply m-0 rounded-2xl border border-accent-border bg-accent-surface px-4 py-3 text-center text-body-sm text-accent-light;
   }
 }
