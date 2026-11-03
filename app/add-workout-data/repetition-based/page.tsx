@@ -48,6 +48,7 @@ export default function AddWorkoutDataRepetitionBased() {
   const mode = searchParams.get('mode') as Mode;
   const isPreview = mode === 'PREVIEW';
   const isEditing = isPreview && searchParams.get('edit') === '1';
+  const returnTo = searchParams.get('returnTo');
 
   const [workoutName, setWorkoutName] = useState('Workout');
   const [workoutType, setWorkoutType] = useState('');
@@ -305,6 +306,12 @@ export default function AddWorkoutDataRepetitionBased() {
     }
   }
 
+  function leave(fallback: string) {
+    if (returnTo?.startsWith('/')) router.replace(returnTo);
+    else if (window.history.length > 1) router.back();
+    else router.replace(fallback);
+  }
+
   function setEditing(editing: boolean) {
     const params = new URLSearchParams(searchParams.toString());
     if (editing) {
@@ -343,7 +350,7 @@ export default function AddWorkoutDataRepetitionBased() {
     <main className="page-section">
       <div className="page-content page-content-narrow">
         <TopBar
-          left={<BackButton onClick={() => router.push('/library')} />}
+          left={<BackButton onClick={() => leave('/library')} />}
           center={workoutName}
         />
 

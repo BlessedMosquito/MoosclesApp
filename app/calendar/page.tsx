@@ -142,6 +142,7 @@ export default function CalendarPage() {
     const params = new URLSearchParams({
       workoutId: String(selectedWorkout.id),
       mode: 'EDIT' as Mode,
+      returnTo: `/calendar?workoutId=${selectedWorkout.id}`,
     });
 
     const workoutDataView: Record<WorkoutTypeGroup, string> = {

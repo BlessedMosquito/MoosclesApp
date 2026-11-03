@@ -3,6 +3,7 @@
 import Button from '@/components/ui/buttons/Button';
 import ErrorPopUp from '@/components/ui/feedback/ErrorPopUp';
 import SuccessAnimation from '@/components/ui/feedback/SuccessAnimation';
+import SaveIcon from '@/components/icons/SaveIcon';
 import { formatDistance, formatDuration } from '@/lib/format';
 import {
   getWorkoutMetrics,
@@ -33,7 +34,8 @@ export default function AddWorkoutDataDuration() {
 
   const workoutId = searchParams.get('workoutId');
   const mode = searchParams.get('mode') as Mode;
-  const pendingNavRef = useRef<string | null>(null);
+  const returnTo = searchParams.get('returnTo');
+  const pendingNavRef = useRef<(() => void) | null>(null);
 
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -193,7 +195,11 @@ export default function AddWorkoutDataDuration() {
         userId: user.id,
       });
 
-      pendingNavRef.current = isPreview ? null : '/dashboard';
+      pendingNavRef.current = isPreview
+        ? null
+        : mode === 'EDIT'
+          ? () => leave('/library')
+          : () => router.push('/dashboard');
       setShowSuccess(true);
       return true;
     } catch (saveError) {
@@ -208,24 +214,32 @@ export default function AddWorkoutDataDuration() {
     }
   }
 
+  function leave(fallback: string) {
+    if (returnTo?.startsWith('/')) router.replace(returnTo);
+    else if (window.history.length > 1) router.back();
+    else router.replace(fallback);
+  }
+
   function renderButton() {
-    const buttonText = isEditing ? 'Save' : 'Edit';
     const onClick = async () => {
-      if (isEditing) {
-        const saved = await handleAddWorkoutData();
-        if (saved) setIsEditing(false);
-        return;
-      }
-      setIsEditing(true);
+      const saved = await handleAddWorkoutData();
+      if (saved && isEditing) setIsEditing(false);
     };
     return (
       <Button
         onClick={onClick}
         disabled={isSaving || isCompleted}
-        width="3/4"
+        width="full"
         align="center"
       >
-        {isSaving ? <LoadingCircle size={18} /> : buttonText}
+        {isSaving ? (
+          <LoadingCircle size={18} />
+        ) : (
+          <>
+            <SaveIcon />
+            Save
+          </>
+        )}
       </Button>
     );
   }
@@ -287,7 +301,7 @@ export default function AddWorkoutDataDuration() {
     <main className="page-section">
       <div className="page-content page-content-narrow">
         <TopBar
-          left={<BackButton onClick={() => router.push('/library')} />}
+          left={<BackButton onClick={() => leave('/library')} />}
           center={workoutName}
         />
 
@@ -425,7 +439,7 @@ export default function AddWorkoutDataDuration() {
           message="Data saved successfully"
           onDone={() => {
             setShowSuccess(false);
-            if (pendingNavRef.current) router.push(pendingNavRef.current);
+            pendingNavRef.current?.();
           }}
           doneDelay={1500}
         />
