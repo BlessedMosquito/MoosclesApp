@@ -256,7 +256,7 @@ export default function AddWorkoutDataRepetitionBased() {
   }
 
   async function handleAddSet(exercise: ReturnGetExercisesData) {
-    if (isReadOnly) return;
+    if (isReadOnly) return false;
 
     const exerciseId = String(exercise.id);
     const draft = setDrafts[exerciseId] ?? { reps: '', weight: '' };
@@ -266,18 +266,18 @@ export default function AddWorkoutDataRepetitionBased() {
 
     if (!Number.isFinite(reps) || reps <= 0) {
       setError('Reps must be greater than 0.');
-      return;
+      return false;
     }
     if (
       draft.weight.trim() !== '' &&
       (!decimalWeightPattern.test(draft.weight) || !Number.isFinite(weight))
     ) {
       setError('Weight must have up to 2 decimal places.');
-      return;
+      return false;
     }
     if (weight < 0) {
       setError('Weight cannot be negative.');
-      return;
+      return false;
     }
 
     setError(null);
@@ -299,10 +299,12 @@ export default function AddWorkoutDataRepetitionBased() {
         [exerciseId]: [...existingSets, newSet as ReturnGetSetsData],
       }));
       setSetDrafts((c) => ({ ...c, [exerciseId]: { reps: '', weight: '' } }));
+      return true;
     } catch (saveError) {
       setError(
         saveError instanceof Error ? saveError.message : 'Could not add set.'
       );
+      return false;
     }
   }
 

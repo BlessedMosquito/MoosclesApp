@@ -28,6 +28,7 @@ type ButtonProps = {
   align?: ButtonAlign;
   type?: 'button' | 'submit' | 'reset';
   variant?: ButtonVariant;
+  keepFocus?: boolean;
 };
 
 export default function Button({
@@ -39,11 +40,13 @@ export default function Button({
   align,
   type = 'button',
   variant = 'primary',
+  keepFocus = false,
 }: ButtonProps) {
   const button = (
     <motion.button
       type={type}
       onClick={onClick}
+      onPointerDown={keepFocus ? (event) => event.preventDefault() : undefined}
       disabled={disabled}
       whileHover={disabled ? undefined : { scale: 1.05 }}
       whileTap={disabled ? undefined : { scale: 0.9 }}

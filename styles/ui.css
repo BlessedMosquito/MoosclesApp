@@ -36,7 +36,52 @@
   }
 
   .expandable-backdrop {
-    @apply absolute inset-0 bg-black/45 backdrop-blur-md;
+    @apply absolute -inset-x-[10%] -inset-y-[20%] bg-black/45 backdrop-blur-md;
+  }
+
+  .expandable-edges {
+    @apply pointer-events-none absolute inset-0;
+  }
+
+  .expandable-edge {
+    @apply absolute inset-x-0;
+  }
+
+  .expandable-edge-top {
+    position: fixed;
+    top: 0;
+    height: calc(env(safe-area-inset-top) + 8px);
+    background-color: #0d0d0d;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      height: 64px;
+      background: linear-gradient(to bottom, #0d0d0d, transparent);
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      bottom: 100%;
+      left: 0;
+      right: 0;
+      height: 6rem;
+      background-color: #0d0d0d;
+    }
+  }
+
+  .expandable-edge-bottom {
+    bottom: -6rem;
+    height: calc(6rem + env(safe-area-inset-bottom) + 72px);
+    background: linear-gradient(
+      to top,
+      #0d0d0d calc(6rem + env(safe-area-inset-bottom)),
+      transparent
+    );
   }
 
   .expandable-pills {

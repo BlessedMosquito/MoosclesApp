@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import AppShell from '@/components/AppShell';
@@ -20,6 +20,17 @@ export const metadata: Metadata = {
     default: 'Mooscles — Track Your Training',
   },
   description: 'Track your workouts, progress, and weekly goals.',
+  appleWebApp: {
+    capable: true,
+    title: 'Mooscles',
+    statusBarStyle: 'black-translucent',
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#171717',
+  colorScheme: 'dark',
+  viewportFit: 'cover',
 };
 
 export default function RootLayout({

@@ -31,7 +31,9 @@ type ExerciseAccordionProps = {
     field: keyof SetDraft,
     value: string
   ) => void;
-  onAddSet: (exercise: ReturnGetExercisesData) => void | Promise<void>;
+  onAddSet: (
+    exercise: ReturnGetExercisesData
+  ) => boolean | void | Promise<boolean | void>;
   onDeleteExercise?: () => void;
   showDeletePopUp?: (setId: string, exerciseId: string) => void;
 };
@@ -61,12 +63,15 @@ export default function ExerciseAccordion({
 
   async function handleConfirmAdd() {
     if (isAdding) return;
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
     setIsAdding(true);
     try {
-      await onAddSet(exercise);
+      const added = await onAddSet(exercise);
+      if (added !== false) setIsPopupOpen(false);
     } finally {
       setIsAdding(false);
-      setIsPopupOpen(false);
     }
   }
 
@@ -206,7 +211,12 @@ export default function ExerciseAccordion({
             }
           />
 
-          <Button onClick={handleConfirmAdd} width="full" disabled={isAdding}>
+          <Button
+            onClick={handleConfirmAdd}
+            width="full"
+            disabled={isAdding}
+            keepFocus
+          >
             {isAdding ? <LoadingCircle size={18} /> : 'Add'}
           </Button>
         </div>
