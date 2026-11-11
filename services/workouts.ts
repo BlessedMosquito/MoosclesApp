@@ -199,7 +199,7 @@ export async function completeWorkout({ workoutId }: { workoutId: string }) {
   });
 
   if (error) {
-    throw new Error(`${errorMessage} completing workout.`);
+    throw toServiceError(error, `${errorMessage} completing workout.`);
   }
 
   return data as CompleteWorkoutResult;

@@ -17,6 +17,7 @@ import {
   useMotionValue,
   useTransform,
 } from 'motion/react';
+import { fade, spring, springMomentum } from '@/lib/motion';
 
 type DrawerSnap = 'half' | 'full';
 
@@ -34,9 +35,21 @@ type DrawerSheetProps = Omit<BottomDrawerProps, 'open'> & {
   halfRatio: number;
 };
 
-const SPRING = { type: 'spring', stiffness: 380, damping: 40 } as const;
-const FLICK_VELOCITY = 500;
+const SPRING = spring;
+const RELEASE_SPRING = { ...springMomentum, duration: 0.3 } as const;
+const DECELERATION_RATE = 0.998;
 const TOP_GAP = 16;
+
+function projectMomentum(velocity: number) {
+  return ((velocity / 1000) * DECELERATION_RATE) / (1 - DECELERATION_RATE);
+}
+
+function rubberband(overshoot: number, dimension: number, constant = 0.55) {
+  return (
+    (overshoot * dimension * constant) /
+    (dimension + constant * Math.abs(overshoot))
+  );
+}
 
 function subscribeNoop() {
   return () => {};
@@ -64,21 +77,35 @@ function DrawerSheet({
   const panStartHeight = useRef(0);
   const isClosing = useRef(false);
   const didPan = useRef(false);
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   const fullHeight = viewportHeight - TOP_GAP;
   const halfHeight = Math.min(Math.round(layoutHeight * halfRatio), fullHeight);
   const backdropOpacity = useTransform(height, [0, halfHeight], [0, 1]);
 
-  const close = useCallback(() => {
-    if (isClosing.current) return;
-    isClosing.current = true;
-    animate(height, 0, SPRING).then(onClose);
-  }, [height, onClose]);
+  const close = useCallback(
+    (velocity = 0) => {
+      if (isClosing.current) return;
+      isClosing.current = true;
+      animate(height, 0, { ...SPRING, velocity }).then(() =>
+        onCloseRef.current()
+      );
+    },
+    [height]
+  );
 
   const snapTo = useCallback(
-    (next: DrawerSnap) => {
+    (next: DrawerSnap, velocity?: number) => {
       setSnap(next);
-      animate(height, next === 'full' ? fullHeight : halfHeight, SPRING);
+      animate(
+        height,
+        next === 'full' ? fullHeight : halfHeight,
+        velocity === undefined ? SPRING : { ...RELEASE_SPRING, velocity }
+      );
     },
     [fullHeight, halfHeight, height]
   );
@@ -129,40 +156,39 @@ function DrawerSheet({
   }, [close, keyboardInset]);
 
   function handlePanStart() {
+    if (isClosing.current) return;
     didPan.current = true;
     height.stop();
     panStartHeight.current = height.get();
   }
 
   function handlePan(_: PointerEvent, info: PanInfo) {
+    if (isClosing.current) return;
     const next = panStartHeight.current - info.offset.y;
-    height.set(Math.min(fullHeight, Math.max(0, next)));
+    height.set(
+      next > fullHeight
+        ? fullHeight + rubberband(next - fullHeight, fullHeight)
+        : Math.max(0, next)
+    );
   }
 
   function handlePanEnd(_: PointerEvent, info: PanInfo) {
+    if (isClosing.current) return;
     const current = height.get();
-    const velocity = info.velocity.y;
-    const points = [0, halfHeight, fullHeight];
-
-    let target: number;
-    if (velocity > FLICK_VELOCITY) {
-      target = [...points].reverse().find((point) => point < current - 1) ?? 0;
-    } else if (velocity < -FLICK_VELOCITY) {
-      target = points.find((point) => point > current + 1) ?? fullHeight;
-    } else {
-      target = points.reduce((closest, point) =>
-        Math.abs(point - current) < Math.abs(closest - current)
-          ? point
-          : closest
-      );
-    }
+    const velocity = -info.velocity.y;
+    const projected = current + projectMomentum(velocity);
+    const target = [0, halfHeight, fullHeight].reduce((closest, point) =>
+      Math.abs(point - projected) < Math.abs(closest - projected)
+        ? point
+        : closest
+    );
 
     if (target === 0) {
-      close();
+      close(velocity);
       return;
     }
 
-    snapTo(target === fullHeight ? 'full' : 'half');
+    snapTo(target === fullHeight ? 'full' : 'half', velocity);
   }
 
   return (
@@ -170,7 +196,7 @@ function DrawerSheet({
       <motion.div
         className="drawer-backdrop"
         style={{ opacity: backdropOpacity }}
-        onClick={close}
+        onClick={() => close()}
       />
 
       <motion.div
@@ -222,6 +248,13 @@ export default function BottomDrawer({
     () => true,
     () => false
   );
+  const [session, setSession] = useState(0);
+  const [wasOpen, setWasOpen] = useState(open);
+
+  if (open !== wasOpen) {
+    setWasOpen(open);
+    if (open) setSession((current) => current + 1);
+  }
 
   if (!isClient) return null;
 
@@ -229,9 +262,9 @@ export default function BottomDrawer({
     <AnimatePresence>
       {open && (
         <motion.div
-          key="bottom-drawer"
+          key={`bottom-drawer-${session}`}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.15 }}
+          transition={fade}
         >
           <DrawerSheet
             onClose={onClose}

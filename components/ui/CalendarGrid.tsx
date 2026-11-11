@@ -9,11 +9,11 @@ import { toDateKey } from '@/lib/helpers';
 import { cn } from '@/lib/utils';
 import { ReturnGetWorkoutsData } from '@/services/workouts';
 import BackButton from './buttons/BackButton';
+import { spring } from '@/lib/motion';
 
 const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const yearOptions = Array.from({ length: 21 }, (_, i) => 2010 + i);
 const MAX_DOTS = 3;
-const EASE_OUT = [0.22, 1, 0.36, 1] as const;
 
 function getMonthDays(monthDate: Date) {
   const year = monthDate.getFullYear();
@@ -164,7 +164,7 @@ export default function CalendarGrid({
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25, ease: EASE_OUT }}
+          transition={spring}
           className="calendar-years"
         >
           {yearOptions.map((year) => (

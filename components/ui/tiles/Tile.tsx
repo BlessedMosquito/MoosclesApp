@@ -2,6 +2,7 @@
 
 import { KeyboardEvent, ReactNode } from 'react';
 import { motion } from 'motion/react';
+import { press, PRESS_SCALE } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 
 type TileProps = {
@@ -42,9 +43,8 @@ export default function Tile({
       tabIndex={onClick ? 0 : undefined}
       onClick={onClick}
       onKeyDown={handleKeyDown}
-      whileHover={{ scale: 0.97 }}
-      whileTap={{ scale: 0.95 }}
-      transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+      whileTap={onClick ? { scale: PRESS_SCALE } : undefined}
+      transition={press}
       className={cn('tile', onClick && 'cursor-pointer', className)}
       style={{ width, height }}
     >

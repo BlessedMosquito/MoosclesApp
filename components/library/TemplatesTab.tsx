@@ -15,6 +15,7 @@ import {
   getTemplates,
   WorkoutTemplate,
 } from '@/services/workoutTemplates';
+import { spring } from '@/lib/motion';
 
 export default function TemplatesTab() {
   const router = useRouter();
@@ -108,16 +109,13 @@ export default function TemplatesTab() {
                 key={template.id}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  duration: 0.25,
-                  delay: Math.min(index, 10) * 0.03,
-                }}
+                transition={{ ...spring, delay: Math.min(index, 10) * 0.03 }}
                 className="library-card library-card-split"
               >
                 <button
                   type="button"
                   onClick={() => openEditor(template)}
-                  className="library-card-main"
+                  className="library-card-main pressable"
                 >
                   <span className="library-card-icon">
                     {createElement(
@@ -177,6 +175,7 @@ export default function TemplatesTab() {
           text={`"${pendingDelete.name}" will be removed. Workouts already created from it stay untouched.`}
           noLabel="Cancel"
           yesLabel="Delete"
+          tone="danger"
           onNo={() => setPendingDelete(null)}
           onYes={() => handleDelete(pendingDelete)}
         />

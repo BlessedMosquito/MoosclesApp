@@ -10,7 +10,9 @@ import NumericInput from './inputs/NumericInput';
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { IconChevronDown, IconPlus, IconTrash } from '@tabler/icons-react';
+import { haptic } from '@/lib/haptics';
 import { cn } from '@/lib/utils';
+import { spring } from '@/lib/motion';
 
 type SetDraft = {
   reps: string;
@@ -56,20 +58,26 @@ export default function ExerciseAccordion({
   const [isAdding, setIsAdding] = useState(false);
 
   const exerciseId = String(exercise.id);
+  const repsValue = Number(setDraft.reps);
+  const hasReps = setDraft.reps.trim() !== '' && repsValue > 0;
+  const showRepsHint = setDraft.reps.trim() !== '' && !hasReps;
 
   function handleAddClick() {
     setIsPopupOpen(true);
   }
 
   async function handleConfirmAdd() {
-    if (isAdding) return;
+    if (isAdding || !hasReps) return;
     if (document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
     setIsAdding(true);
     try {
       const added = await onAddSet(exercise);
-      if (added !== false) setIsPopupOpen(false);
+      if (added !== false) {
+        haptic();
+        setIsPopupOpen(false);
+      }
     } finally {
       setIsAdding(false);
     }
@@ -102,7 +110,7 @@ export default function ExerciseAccordion({
         </span>
         <motion.span
           animate={{ rotate: isExpanded ? 180 : 0 }}
-          transition={{ duration: 0.25, ease: 'easeOut' }}
+          transition={spring}
           className="accordion-chevron"
         >
           <IconChevronDown size={20} stroke={2} />
@@ -115,7 +123,7 @@ export default function ExerciseAccordion({
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            transition={spring}
             className="overflow-hidden"
           >
             <div className="accordion-content">
@@ -198,6 +206,11 @@ export default function ExerciseAccordion({
               onDraftChange(exerciseId, 'reps', String(value))
             }
           />
+          {showRepsHint && (
+            <p role="alert" className="set-form-hint">
+              Reps must be at least 1.
+            </p>
+          )}
           <NumericInput
             label="Weight (kg)"
             value={setDraft.weight}
@@ -214,7 +227,7 @@ export default function ExerciseAccordion({
           <Button
             onClick={handleConfirmAdd}
             width="full"
-            disabled={isAdding}
+            disabled={isAdding || !hasReps}
             keepFocus
           >
             {isAdding ? <LoadingCircle size={18} /> : 'Add'}

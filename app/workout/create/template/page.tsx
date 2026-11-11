@@ -20,6 +20,7 @@ import {
 } from '@/services/workoutTemplates';
 import { cn } from '@/lib/utils';
 import { Mode } from '@/types/common';
+import { spring } from '@/lib/motion';
 
 function isEmptyTemplate(template: WorkoutTemplate) {
   return template.workout_template_exercises.length === 0;
@@ -137,14 +138,14 @@ export default function ChooseTemplatePage() {
                   key={template.id}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.25, delay: index * 0.04 }}
+                  transition={{ ...spring, delay: Math.min(index, 10) * 0.03 }}
                   className="template-card"
                 >
                   <button
                     type="button"
                     disabled={creatingId !== null}
                     onClick={() => setPendingTemplate(template)}
-                    className="template-card-main"
+                    className="template-card-main pressable"
                   >
                     <span className="template-card-icon">
                       {creatingId === template.id ? (

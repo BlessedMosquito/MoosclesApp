@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion } from 'motion/react';
 import Emblem from '@/components/brand/Emblem';
 import ErrorPopUp from '../ui/feedback/ErrorPopUp';
+import { spring } from '@/lib/motion';
 
 type AuthLayoutProps = {
   title: string;
@@ -35,7 +36,7 @@ export default function AuthLayout({
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        transition={spring}
         className="auth-card"
       >
         <Link href="/" aria-label="Mooscles home" className="auth-brand">

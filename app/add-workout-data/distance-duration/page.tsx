@@ -1,8 +1,9 @@
 'use client';
 
+import { getSafeInternalPath } from '@/lib/utils';
 import Button from '@/components/ui/buttons/Button';
 import ErrorPopUp from '@/components/ui/feedback/ErrorPopUp';
-import SuccessAnimation from '@/components/ui/feedback/SuccessAnimation';
+import { useToast } from '@/lib/toast-context';
 import SaveIcon from '@/components/icons/SaveIcon';
 import { formatDistance, formatDuration } from '@/lib/format';
 import {
@@ -13,7 +14,7 @@ import { deleteWorkout, getWorkoutById } from '@/services/workouts';
 import { WorkoutTypeGroup } from '@/services/workoutTypes';
 import { Mode } from '@/types/common';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import Slider from '@/components/ui/slider/Slider';
 import { iconBasedOnRange } from '@/lib/helpers';
@@ -34,12 +35,11 @@ export default function AddWorkoutDataDuration() {
 
   const workoutId = searchParams.get('workoutId');
   const mode = searchParams.get('mode') as Mode;
-  const returnTo = searchParams.get('returnTo');
-  const pendingNavRef = useRef<(() => void) | null>(null);
+  const returnTo = getSafeInternalPath(searchParams.get('returnTo'));
+  const { showSuccess } = useToast();
 
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
   const [workoutName, setWorkoutName] = useState('Workout');
   const [workoutType, setWorkoutType] = useState('');
   const [workoutGroupType, setWorkoutGroupType] =
@@ -195,12 +195,9 @@ export default function AddWorkoutDataDuration() {
         userId: user.id,
       });
 
-      pendingNavRef.current = isPreview
-        ? null
-        : mode === 'EDIT'
-          ? () => leave('/library')
-          : () => router.push('/dashboard');
-      setShowSuccess(true);
+      showSuccess('Results saved');
+      if (mode === 'EDIT') leave('/library');
+      else if (!isPreview) router.push('/dashboard');
       return true;
     } catch (saveError) {
       setError(
@@ -215,7 +212,7 @@ export default function AddWorkoutDataDuration() {
   }
 
   function leave(fallback: string) {
-    if (returnTo?.startsWith('/')) router.replace(returnTo);
+    if (returnTo) router.replace(returnTo);
     else if (window.history.length > 1) router.back();
     else router.replace(fallback);
   }
@@ -428,20 +425,13 @@ export default function AddWorkoutDataDuration() {
 
       {showDeletePopUp && (
         <QuestionPopUp
-          text="Do you really want to delete this workout?"
+          title="Delete workout?"
+          text="This can't be undone."
+          noLabel="Cancel"
+          yesLabel="Delete"
+          tone="danger"
           onYes={handleDeleteWorkout}
           onNo={() => setShowDeletePopUp(false)}
-        />
-      )}
-
-      {showSuccess && (
-        <SuccessAnimation
-          message="Data saved successfully"
-          onDone={() => {
-            setShowSuccess(false);
-            pendingNavRef.current?.();
-          }}
-          doneDelay={1500}
         />
       )}
     </main>

@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'motion/react';
+import { spring } from '@/lib/motion';
 import {
   createContext,
   useContext,
@@ -27,11 +28,7 @@ type Rect = {
 export const ITEM_COLLAPSED_WIDTH = 48;
 export const ITEM_ACTIVE_WIDTH = 132;
 export const ITEM_HEIGHT = 48;
-export const BAR_SPRING = {
-  type: 'spring',
-  stiffness: 420,
-  damping: 38,
-} as const;
+export const BAR_SPRING = spring;
 
 const NAV_PADDING = 8;
 const NAV_GAP = 6;

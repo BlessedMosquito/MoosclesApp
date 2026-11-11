@@ -44,7 +44,6 @@ type WorkoutPreviewProps = {
   onEdit: () => void;
   onConfirm: () => void;
   onClose: () => void;
-  previewRef: React.RefObject<HTMLElement | null>;
   mode?: 'EDIT' | 'PREVIEW';
 };
 
@@ -83,7 +82,6 @@ export default function WorkoutPreview({
   onEdit,
   onConfirm,
   onClose,
-  previewRef,
   mode = 'PREVIEW',
 }: WorkoutPreviewProps) {
   const [expandedExerciseId, setExpandedExerciseId] = useState<string | null>(
@@ -286,14 +284,7 @@ export default function WorkoutPreview({
   }
 
   return (
-    <motion.section
-      ref={previewRef as React.RefObject<HTMLElement>}
-      key={workout.id}
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, ease: EASE_OUT }}
-      className="workout-preview"
-    >
+    <section className="workout-preview">
       <div className="workout-preview-header">
         <span className="workout-preview-icon">
           {createElement(
@@ -360,6 +351,6 @@ export default function WorkoutPreview({
           </>
         )}
       </div>
-    </motion.section>
+    </section>
   );
 }

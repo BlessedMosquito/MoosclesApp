@@ -4,25 +4,45 @@ import {
   createContext,
   useCallback,
   useContext,
+  useMemo,
   useRef,
   useState,
 } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
+import { IconAlertCircle, IconCircleCheck, IconX } from '@tabler/icons-react';
+import { fade, spring } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 
-type ToastVariant = 'error' | 'success';
+type ToastVariant = 'error' | 'success' | 'info';
+
+type ToastAction = {
+  label: string;
+  onClick: () => void;
+};
+
+type ToastOptions = {
+  variant?: ToastVariant;
+  action?: ToastAction;
+  duration?: number;
+};
 
 type Toast = {
   id: number;
   message: string;
   variant: ToastVariant;
+  action?: ToastAction;
 };
 
 type ToastContextValue = {
+  showToast: (message: string, options?: ToastOptions) => number;
+  dismissToast: (id: number) => void;
   showError: (message: string) => void;
   showSuccess: (message: string) => void;
 };
 
 const ToastContext = createContext<ToastContextValue | null>(null);
+
+const DEFAULT_DURATION = 4000;
 
 let nextId = 0;
 
@@ -41,26 +61,51 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
-  const show = useCallback(
-    (message: string, variant: ToastVariant) => {
+  const showToast = useCallback(
+    (message: string, options: ToastOptions = {}) => {
       const id = nextId++;
-      setToasts((prev) => [...prev, { id, message, variant }]);
+      const toast: Toast = {
+        id,
+        message,
+        variant: options.variant ?? 'info',
+        action: options.action,
+      };
+      setToasts((prev) => [...prev.slice(-2), toast]);
 
-      const timer = setTimeout(() => dismiss(id), 4000);
+      const timer = setTimeout(
+        () => dismiss(id),
+        options.duration ?? DEFAULT_DURATION
+      );
       timerRef.current.set(id, timer);
+      return id;
     },
     [dismiss]
   );
 
-  const contextValue: ToastContextValue = {
-    showError: (msg) => show(msg, 'error'),
-    showSuccess: (msg) => show(msg, 'success'),
-  };
+  const contextValue = useMemo<ToastContextValue>(
+    () => ({
+      showToast,
+      dismissToast: dismiss,
+      showError: (message) => showToast(message, { variant: 'error' }),
+      showSuccess: (message) => showToast(message, { variant: 'success' }),
+    }),
+    [dismiss, showToast]
+  );
 
   return (
     <ToastContext.Provider value={contextValue}>
       {children}
-      <ToastContainer toasts={toasts} onDismiss={dismiss} />
+      <div className="toast-stack" aria-live="polite">
+        <AnimatePresence initial={false}>
+          {toasts.map((toast) => (
+            <ToastItem
+              key={toast.id}
+              toast={toast}
+              onDismiss={() => dismiss(toast.id)}
+            />
+          ))}
+        </AnimatePresence>
+      </div>
     </ToastContext.Provider>
   );
 }
@@ -73,28 +118,6 @@ export function useToast(): ToastContextValue {
   return ctx;
 }
 
-function ToastContainer({
-  toasts,
-  onDismiss,
-}: {
-  toasts: Toast[];
-  onDismiss: (id: number) => void;
-}) {
-  if (toasts.length === 0) return null;
-
-  return (
-    <div className="toast-stack">
-      {toasts.map((toast) => (
-        <ToastItem
-          key={toast.id}
-          toast={toast}
-          onDismiss={() => onDismiss(toast.id)}
-        />
-      ))}
-    </div>
-  );
-}
-
 function ToastItem({
   toast,
   onDismiss,
@@ -102,22 +125,42 @@ function ToastItem({
   toast: Toast;
   onDismiss: () => void;
 }) {
-  const isError = toast.variant === 'error';
+  const Icon = toast.variant === 'error' ? IconAlertCircle : IconCircleCheck;
 
   return (
-    <div
-      role="alert"
-      className={cn('toast', isError ? 'toast-error' : 'toast-success')}
+    <motion.div
+      layout
+      role={toast.variant === 'error' ? 'alert' : 'status'}
+      initial={{ opacity: 0, y: 16, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 16, scale: 0.96, transition: fade }}
+      transition={spring}
+      className={cn('toast', `toast-${toast.variant}`)}
     >
-      <span>{toast.message}</span>
+      {toast.variant !== 'info' && (
+        <Icon size={18} stroke={2} className="toast-icon" />
+      )}
+      <span className="toast-message">{toast.message}</span>
+      {toast.action && (
+        <button
+          type="button"
+          onClick={() => {
+            toast.action?.onClick();
+            onDismiss();
+          }}
+          className="toast-action"
+        >
+          {toast.action.label}
+        </button>
+      )}
       <button
         type="button"
         aria-label="Dismiss"
         onClick={onDismiss}
         className="toast-close"
       >
-        x
+        <IconX size={16} stroke={2} />
       </button>
-    </div>
+    </motion.div>
   );
 }

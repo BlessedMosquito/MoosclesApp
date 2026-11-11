@@ -4,6 +4,7 @@ import CalendarGrid from '@/components/ui/CalendarGrid';
 import ErrorPopUp from '@/components/ui/feedback/ErrorPopUp';
 import QuestionPopUp from '@/components/ui/popups/QuestionPopUp';
 import WorkoutPreview from '@/components/ui/WorkoutPreview';
+import BottomDrawer from '@/components/ui/drawer/BottomDrawer';
 import {
   getExercisesByWorkout,
   ReturnGetExercisesData,
@@ -25,6 +26,7 @@ import { Mode } from '@/types/common';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { haptic } from '@/lib/haptics';
 
 function getWorkoutDateKey(workoutDate: string) {
   if (/^\d{4}-\d{2}-\d{2}$/.test(workoutDate)) return workoutDate;
@@ -35,7 +37,6 @@ function getWorkoutDateKey(workoutDate: string) {
 export default function CalendarPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const previewRef = useRef<HTMLElement>(null);
   const supabase = createClient();
 
   const [workouts, setWorkouts] = useState<ReturnGetWorkoutsData[]>([]);
@@ -55,6 +56,7 @@ export default function CalendarPage() {
   );
 
   const selectedWorkoutFromParams = searchParams.get('workoutId');
+  const consumedWorkoutParam = useRef<string | null>(null);
 
   const workoutsByDay = useMemo(() => {
     return workouts.reduce<Record<string, ReturnGetWorkoutsData[]>>(
@@ -94,13 +96,19 @@ export default function CalendarPage() {
   }, []);
 
   useEffect(() => {
-    if (!selectedWorkoutFromParams || workouts.length === 0 || selectedWorkout)
+    if (
+      !selectedWorkoutFromParams ||
+      selectedWorkoutFromParams === consumedWorkoutParam.current ||
+      workouts.length === 0
+    )
       return;
     const workout = workouts.find(
       (w) => String(w.id) === selectedWorkoutFromParams
     );
-    if (workout) openWorkout(workout);
-  }, [selectedWorkoutFromParams, workouts, selectedWorkout]);
+    if (!workout) return;
+    consumedWorkoutParam.current = selectedWorkoutFromParams;
+    openWorkout(workout);
+  }, [selectedWorkoutFromParams, workouts]);
 
   async function openWorkout(workout: ReturnGetWorkoutsData) {
     setSelectedWorkout(workout);
@@ -109,13 +117,6 @@ export default function CalendarPage() {
     setMetrics(null);
     setIsLoadingPreviewData(true);
     setError(null);
-
-    window.setTimeout(() => {
-      previewRef.current?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
-    }, 80);
 
     try {
       const group = (await getWorkoutTypeGroup(
@@ -161,6 +162,7 @@ export default function CalendarPage() {
 
     try {
       const result = await completeWorkout({ workoutId: selectedWorkout.id });
+      haptic([12, 40, 24]);
       setExpResult(result);
       setSelectedWorkout((prev) =>
         prev ? { ...prev, completed_at: new Date().toISOString() } : null
@@ -178,6 +180,8 @@ export default function CalendarPage() {
   }
 
   function onWorkoutPreviewClose() {
+    if (selectedWorkoutFromParams)
+      router.replace('/calendar', { scroll: false });
     setSelectedWorkout(null);
     setSelectedWorkoutGroup(null);
     setExercises([]);
@@ -202,9 +206,16 @@ export default function CalendarPage() {
           onSelectWorkout={openWorkout}
           onClosePreview={onWorkoutPreviewClose}
         />
+      </div>
 
+      <BottomDrawer
+        open={selectedWorkout !== null}
+        onClose={onWorkoutPreviewClose}
+        halfRatio={0.62}
+      >
         {selectedWorkout && (
           <WorkoutPreview
+            key={selectedWorkout.id}
             workout={selectedWorkout}
             workoutGroup={selectedWorkoutGroup}
             exercises={exercises}
@@ -213,14 +224,16 @@ export default function CalendarPage() {
             onEdit={goToAddWorkoutData}
             onConfirm={() => setShowConfirmPopUp(true)}
             onClose={onWorkoutPreviewClose}
-            previewRef={previewRef}
           />
         )}
-      </div>
+      </BottomDrawer>
 
       {showConfirmPopUp && (
         <QuestionPopUp
-          text="Are you sure you want to complete this workout? You won't be able to edit it once completed."
+          title="Complete workout?"
+          text="You won't be able to edit it once it's completed."
+          noLabel="Cancel"
+          yesLabel="Complete"
           onYes={() => {
             setShowConfirmPopUp(false);
             handleConfirmWorkout();

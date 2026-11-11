@@ -3,6 +3,7 @@
 import { Icon } from '@tabler/icons-react';
 import { ReactNode } from 'react';
 import { motion } from 'motion/react';
+import { press, PRESS_SCALE, spring } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 
 type ChoiceTileProps = {
@@ -29,8 +30,8 @@ export default function ChoiceTile({
       aria-checked={selected}
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
-      whileTap={{ scale: 0.96 }}
-      transition={{ duration: 0.25, delay: index * 0.04 }}
+      whileTap={{ scale: PRESS_SCALE, transition: press }}
+      transition={{ ...spring, delay: index * 0.04 }}
       onClick={onClick}
       className={cn('choice-tile', selected && 'choice-tile-active')}
     >

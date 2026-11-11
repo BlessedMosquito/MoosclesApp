@@ -20,6 +20,7 @@ import {
   getPersonalRecords,
   getSessionTrend,
 } from '@/services/exerciseStats';
+import { spring } from '@/lib/motion';
 
 type ChartMetric = 'weight' | 'volume' | 'oneRepMax';
 
@@ -124,7 +125,7 @@ function ExerciseContent() {
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, ease: 'easeOut' }}
+            transition={spring}
             className="exercise-progress"
           >
             <section className="exercise-summary">

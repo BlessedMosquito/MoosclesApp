@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { colors } from '@/theme/colors';
+import { fade, spring } from '@/lib/motion';
 
 type SuccessAnimationProps = {
   message?: string;
@@ -43,14 +44,14 @@ export default function SuccessAnimation({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.25, ease: 'easeOut' }}
+          transition={fade}
           className="success-overlay"
         >
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ type: 'spring', stiffness: 260, damping: 22 }}
+            transition={spring}
             className="success-ring"
           >
             <svg

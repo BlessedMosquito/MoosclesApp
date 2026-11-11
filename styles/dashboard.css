@@ -64,7 +64,7 @@
   }
 
   .streak-day-number {
-    @apply text-caption leading-none font-extrabold text-content;
+    @apply text-caption leading-none font-extrabold text-content tabular-nums;
   }
 
   .streak-footer {
@@ -236,7 +236,7 @@
   }
 
   .water-form-summary {
-    @apply m-0 text-center text-body-sm text-content-muted;
+    @apply m-0 text-center text-body-sm text-content-muted tabular-nums;
   }
 
   .water-quick {

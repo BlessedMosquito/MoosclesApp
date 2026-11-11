@@ -7,6 +7,7 @@ import ExercisesTab from '@/components/library/ExercisesTab';
 import TemplatesTab from '@/components/library/TemplatesTab';
 import WorkoutsTab from '@/components/library/WorkoutsTab';
 import Tabs from '@/components/ui/tabs/Tabs';
+import { fade } from '@/lib/motion';
 
 type LibraryTab = 'workouts' | 'exercises' | 'templates';
 
@@ -53,7 +54,7 @@ function LibraryContent() {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: 0.18, ease: 'easeOut' }}
+            transition={fade}
             className="mt-5"
           >
             {activeTab === 'workouts' && <WorkoutsTab />}

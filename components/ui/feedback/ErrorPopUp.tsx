@@ -1,6 +1,7 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { useEffect, useState } from 'react';
 import CloseIcon from '@/components/icons/CloseIcon';
+import { spring } from '@/lib/motion';
 
 const DURATION_MS = 10000;
 
@@ -29,7 +30,7 @@ export default function ErrorPopUp({ children, onClose }: ErrorPopUpProps) {
           initial={{ y: -80, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -80, opacity: 0 }}
-          transition={{ duration: 0.4, ease: 'easeOut' }}
+          transition={spring}
           className="error-toast"
         >
           <div className="error-toast-header">

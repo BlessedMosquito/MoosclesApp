@@ -9,7 +9,6 @@ import SaveIcon from '@/components/icons/SaveIcon';
 import Button from '@/components/ui/buttons/Button';
 import ErrorPopUp from '@/components/ui/feedback/ErrorPopUp';
 import LoadingCircle from '@/components/ui/feedback/LoadingCircle';
-import SuccessAnimation from '@/components/ui/feedback/SuccessAnimation';
 import DistanceInput from '@/components/ui/inputs/DistanceInput';
 import NumericInput from '@/components/ui/inputs/NumericInput';
 import TextInput from '@/components/ui/inputs/TextInput';
@@ -17,6 +16,7 @@ import TimeInput from '@/components/ui/inputs/TimeInput';
 import Tabs from '@/components/ui/tabs/Tabs';
 import { formatDistance, formatDuration } from '@/lib/format';
 import { createClient } from '@/lib/supabase/client';
+import { useToast } from '@/lib/toast-context';
 import {
   DEFAULT_DAILY_WATER_GOAL_ML,
   getAgeFromBirthYear,
@@ -25,6 +25,7 @@ import {
   upsertUserData,
 } from '@/services/userData';
 import { PROFILE_PROMPT_DISMISSED_KEY } from '@/app/constants/storageConstants';
+import { fade } from '@/lib/motion';
 
 type ProfileTab = 'account' | 'body' | 'goals';
 
@@ -71,6 +72,7 @@ function ProfileContent() {
   const supabase = createClient();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { showSuccess } = useToast();
   const initialTab = searchParams.get('tab');
 
   const [activeTab, setActiveTab] = useState<ProfileTab>(
@@ -78,7 +80,6 @@ function ProfileContent() {
   );
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [email, setEmail] = useState('');
   const [form, setForm] = useState<ProfileForm>(EMPTY_FORM);
@@ -217,7 +218,7 @@ function ProfileContent() {
       });
 
       setSavedForm(form);
-      setShowSuccess(true);
+      showSuccess('Profile saved');
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not save changes.');
     } finally {
@@ -242,7 +243,7 @@ function ProfileContent() {
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.18, ease: 'easeOut' }}
+            transition={fade}
             className="profile-form"
           >
             {activeTab === 'account' ? (
@@ -386,16 +387,6 @@ function ProfileContent() {
       )}
 
       {error && <ErrorPopUp onClose={() => setError(null)}>{error}</ErrorPopUp>}
-
-      {showSuccess && (
-        <SuccessAnimation
-          message="Data successfully saved!"
-          onDone={() => {
-            setShowSuccess(false);
-          }}
-          doneDelay={1500}
-        />
-      )}
     </main>
   );
 }

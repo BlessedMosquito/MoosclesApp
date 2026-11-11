@@ -11,10 +11,6 @@
     @apply pb-[calc(90px+env(safe-area-inset-bottom))];
   }
 
-  .route-loader {
-    @apply pointer-events-none fixed inset-0 z-[500] flex items-center justify-center bg-(--background);
-  }
-
   .bottom-bar {
     @apply pointer-events-none fixed inset-x-0 bottom-[calc(1.25rem+env(safe-area-inset-bottom))] z-40 flex justify-center;
   }
@@ -45,26 +41,6 @@
 
   .bottom-bar-label {
     @apply ml-2 inline-block text-body-sm font-semibold whitespace-nowrap;
-  }
-
-  .toast-stack {
-    @apply fixed bottom-[100px] left-1/2 z-[300] flex w-[90%] max-w-[400px] -translate-x-1/2 flex-col gap-2;
-  }
-
-  .toast {
-    @apply flex items-center justify-between rounded-xl border px-4 py-3 text-sm backdrop-blur-md;
-  }
-
-  .toast-error {
-    @apply border-danger-border bg-danger text-on-danger;
-  }
-
-  .toast-success {
-    @apply border-accent-border bg-accent-surface text-accent-light;
-  }
-
-  .toast-close {
-    @apply cursor-pointer border-none bg-transparent py-0 pr-0 pl-3 text-base text-inherit;
   }
 
   .page {
