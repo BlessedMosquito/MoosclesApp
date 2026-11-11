@@ -1,8 +1,10 @@
 'use client';
 
+import { getSafeInternalPath } from '@/lib/utils';
 import Button from '@/components/ui/buttons/Button';
 import ErrorPopUp from '@/components/ui/feedback/ErrorPopUp';
-import SuccessAnimation from '@/components/ui/feedback/SuccessAnimation';
+import { useToast } from '@/lib/toast-context';
+import SaveIcon from '@/components/icons/SaveIcon';
 import { formatDistance, formatDuration } from '@/lib/format';
 import {
   getWorkoutMetrics,
@@ -12,7 +14,7 @@ import { deleteWorkout, getWorkoutById } from '@/services/workouts';
 import { WorkoutTypeGroup } from '@/services/workoutTypes';
 import { Mode } from '@/types/common';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import Slider from '@/components/ui/slider/Slider';
 import { iconBasedOnRange } from '@/lib/helpers';
@@ -33,11 +35,11 @@ export default function AddWorkoutDataDuration() {
 
   const workoutId = searchParams.get('workoutId');
   const mode = searchParams.get('mode') as Mode;
-  const pendingNavRef = useRef<string | null>(null);
+  const returnTo = getSafeInternalPath(searchParams.get('returnTo'));
+  const { showSuccess } = useToast();
 
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
   const [workoutName, setWorkoutName] = useState('Workout');
   const [workoutType, setWorkoutType] = useState('');
   const [workoutGroupType, setWorkoutGroupType] =
@@ -193,8 +195,9 @@ export default function AddWorkoutDataDuration() {
         userId: user.id,
       });
 
-      pendingNavRef.current = isPreview ? null : '/dashboard';
-      setShowSuccess(true);
+      showSuccess('Results saved');
+      if (mode === 'EDIT') leave('/library');
+      else if (!isPreview) router.push('/dashboard');
       return true;
     } catch (saveError) {
       setError(
@@ -208,24 +211,32 @@ export default function AddWorkoutDataDuration() {
     }
   }
 
+  function leave(fallback: string) {
+    if (returnTo) router.replace(returnTo);
+    else if (window.history.length > 1) router.back();
+    else router.replace(fallback);
+  }
+
   function renderButton() {
-    const buttonText = isEditing ? 'Save' : 'Edit';
     const onClick = async () => {
-      if (isEditing) {
-        const saved = await handleAddWorkoutData();
-        if (saved) setIsEditing(false);
-        return;
-      }
-      setIsEditing(true);
+      const saved = await handleAddWorkoutData();
+      if (saved && isEditing) setIsEditing(false);
     };
     return (
       <Button
         onClick={onClick}
         disabled={isSaving || isCompleted}
-        width="3/4"
+        width="full"
         align="center"
       >
-        {isSaving ? <LoadingCircle size={18} /> : buttonText}
+        {isSaving ? (
+          <LoadingCircle size={18} />
+        ) : (
+          <>
+            <SaveIcon />
+            Save
+          </>
+        )}
       </Button>
     );
   }
@@ -287,7 +298,7 @@ export default function AddWorkoutDataDuration() {
     <main className="page-section">
       <div className="page-content page-content-narrow">
         <TopBar
-          left={<BackButton onClick={() => router.push('/library')} />}
+          left={<BackButton onClick={() => leave('/library')} />}
           center={workoutName}
         />
 
@@ -414,20 +425,13 @@ export default function AddWorkoutDataDuration() {
 
       {showDeletePopUp && (
         <QuestionPopUp
-          text="Do you really want to delete this workout?"
+          title="Delete workout?"
+          text="This can't be undone."
+          noLabel="Cancel"
+          yesLabel="Delete"
+          tone="danger"
           onYes={handleDeleteWorkout}
           onNo={() => setShowDeletePopUp(false)}
-        />
-      )}
-
-      {showSuccess && (
-        <SuccessAnimation
-          message="Data saved successfully"
-          onDone={() => {
-            setShowSuccess(false);
-            if (pendingNavRef.current) router.push(pendingNavRef.current);
-          }}
-          doneDelay={1500}
         />
       )}
     </main>

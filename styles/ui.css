@@ -1,9 +1,15 @@
 @layer components {
+  .pressable {
+    @apply transition-transform duration-100 ease-out select-none active:scale-[0.97];
+  }
+
   .btn {
     @apply flex h-12 cursor-pointer items-center justify-center gap-2 rounded-[20px] border border-line bg-accent px-4 text-body sm:px-6 font-semibold text-app transition-[background-color,box-shadow];
 
-    &:not(:disabled):hover {
-      @apply bg-accent-light shadow-[0_8px_30px_var(--shadow)];
+    @media (hover: hover) {
+      &:not(:disabled):hover {
+        @apply bg-accent-light;
+      }
     }
 
     &:disabled {
@@ -14,8 +20,10 @@
   .btn-secondary {
     @apply border-accent-border bg-accent-surface text-accent;
 
-    &:not(:disabled):hover {
-      @apply bg-accent-surface shadow-none brightness-125;
+    @media (hover: hover) {
+      &:not(:disabled):hover {
+        @apply bg-accent-surface brightness-125;
+      }
     }
   }
 
@@ -36,7 +44,52 @@
   }
 
   .expandable-backdrop {
-    @apply absolute inset-0 bg-black/45 backdrop-blur-md;
+    @apply absolute -inset-x-[10%] -inset-y-[20%] bg-black/45 backdrop-blur-md;
+  }
+
+  .expandable-edges {
+    @apply pointer-events-none absolute inset-0;
+  }
+
+  .expandable-edge {
+    @apply absolute inset-x-0;
+  }
+
+  .expandable-edge-top {
+    position: fixed;
+    top: 0;
+    height: calc(env(safe-area-inset-top) + 8px);
+    background-color: #0d0d0d;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      height: 64px;
+      background: linear-gradient(to bottom, #0d0d0d, transparent);
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      bottom: 100%;
+      left: 0;
+      right: 0;
+      height: 6rem;
+      background-color: #0d0d0d;
+    }
+  }
+
+  .expandable-edge-bottom {
+    bottom: -6rem;
+    height: calc(6rem + env(safe-area-inset-bottom) + 72px);
+    background: linear-gradient(
+      to top,
+      #0d0d0d calc(6rem + env(safe-area-inset-bottom)),
+      transparent
+    );
   }
 
   .expandable-pills {
@@ -58,8 +111,10 @@
   .btn-danger {
     @apply bg-danger;
 
-    &:not(:disabled):hover {
-      @apply bg-danger-light;
+    @media (hover: hover) {
+      &:not(:disabled):hover {
+        @apply bg-danger-light;
+      }
     }
   }
 
@@ -148,11 +203,15 @@
   }
 
   .top-bar {
-    @apply sticky top-0 z-10 mx-auto box-border grid min-h-14 w-full shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-2 rounded-[18px] border border-white/10 bg-surface/85 px-2.5 py-2 text-content shadow-[0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-md;
+    @apply sticky top-0 z-10 mx-auto box-border grid min-h-14 w-full shrink-0 grid-cols-[1fr_auto_1fr] items-center gap-2 rounded-[18px] border border-white/10 bg-surface/85 px-2.5 py-2 text-content transition-[background-color,box-shadow,backdrop-filter] duration-200 ease-out;
+  }
+
+  .top-bar-scrolled {
+    @apply bg-surface/70 shadow-[0_8px_24px_rgba(0,0,0,0.35)] backdrop-blur-xl backdrop-saturate-150;
   }
 
   .top-bar-brand {
-    @apply border-accent bg-surface px-4 py-3 shadow-none;
+    @apply border-accent bg-surface px-4 py-3 shadow-none backdrop-blur-none;
   }
 
   .top-bar-title {
@@ -207,6 +266,42 @@
     @apply absolute inset-0 rounded-full border-3 border-transparent border-t-accent border-r-accent;
   }
 
+  .toast-stack {
+    @apply pointer-events-none fixed inset-x-0 bottom-[calc(96px+env(safe-area-inset-bottom))] z-[998] mx-auto flex w-[calc(100%-32px)] max-w-md flex-col items-stretch gap-2;
+  }
+
+  .toast {
+    @apply pointer-events-auto flex min-h-12 items-center gap-2.5 rounded-2xl border border-white/10 bg-tile/90 py-2 pr-2 pl-4 text-body-sm font-medium text-content shadow-[0_12px_32px_rgba(0,0,0,0.45)] backdrop-blur-xl;
+  }
+
+  .toast-icon {
+    @apply shrink-0;
+  }
+
+  .toast-success .toast-icon {
+    @apply text-accent;
+  }
+
+  .toast-error {
+    @apply border-danger-border;
+
+    & .toast-icon {
+      @apply text-danger-light;
+    }
+  }
+
+  .toast-message {
+    @apply min-w-0 flex-1;
+  }
+
+  .toast-action {
+    @apply h-9 shrink-0 cursor-pointer rounded-xl border-none bg-accent-surface px-3 text-body-sm font-bold text-accent transition-transform duration-100 active:scale-[0.97];
+  }
+
+  .toast-close {
+    @apply flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-content-muted;
+  }
+
   .error-toast {
     @apply fixed inset-x-0 top-6 z-[999] mx-auto box-border flex w-[calc(100%-32px)] max-w-full flex-col overflow-hidden rounded-xl border border-danger-border bg-danger text-on-danger shadow-[0_16px_32px_var(--shadow)] sm:w-[min(460px,calc(100%-80px))];
   }
@@ -232,7 +327,7 @@
   }
 
   .overlay {
-    @apply fixed inset-0 z-[99] flex items-center justify-center p-6 backdrop-blur-xs;
+    @apply fixed inset-0 z-[300] flex items-center justify-center p-6 backdrop-blur-xs;
   }
 
   .overlay-strong {
@@ -260,11 +355,23 @@
   }
 
   .question-card {
-    @apply items-stretch gap-5 p-6;
+    @apply max-w-[360px] items-stretch gap-5 rounded-3xl border-white/10 p-6;
+  }
+
+  .question-icon {
+    @apply mx-auto flex size-12 items-center justify-center rounded-full bg-accent-surface text-accent;
+  }
+
+  .question-icon-danger {
+    @apply bg-danger/15 text-danger-light;
+  }
+
+  .question-copy {
+    @apply -mt-1 flex flex-col gap-1.5 text-center;
   }
 
   .question-title {
-    @apply m-0 -mb-2 text-center text-h2 font-bold text-content;
+    @apply m-0 text-h2 font-bold text-content;
   }
 
   .question-warning {
@@ -272,7 +379,7 @@
   }
 
   .question-text {
-    @apply m-0 text-center text-body leading-normal text-content;
+    @apply m-0 text-body-sm text-content-muted;
   }
 
   .question-actions {
@@ -280,7 +387,7 @@
   }
 
   .success-overlay {
-    @apply fixed inset-0 z-[200] flex flex-col items-center justify-center gap-4 bg-black/50 backdrop-blur-xs;
+    @apply fixed inset-0 z-[320] flex flex-col items-center justify-center gap-4 bg-black/50 backdrop-blur-xs;
   }
 
   .success-ring {
@@ -500,7 +607,7 @@
   }
 
   .drawer-sheet {
-    @apply absolute inset-x-0 bottom-0 mx-auto flex max-w-[640px] flex-col overflow-hidden rounded-t-3xl border border-b-0 border-line bg-surface text-content shadow-[0_-12px_40px_rgba(0,0,0,0.5)];
+    @apply absolute inset-x-0 bottom-0 mx-auto flex w-[95%] max-w-[640px] flex-col overflow-hidden rounded-t-3xl border border-b-0 border-white/15 bg-surface/55 text-content shadow-[0_-12px_40px_rgba(0,0,0,0.5)] backdrop-blur-lg backdrop-saturate-150 [--text-muted:#a8a8a8];
   }
 
   .drawer-header {

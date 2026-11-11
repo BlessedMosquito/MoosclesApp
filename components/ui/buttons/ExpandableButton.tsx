@@ -10,6 +10,7 @@ import {
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion, useIsPresent } from 'motion/react';
 import { IconX } from '@tabler/icons-react';
+import { fade, spring } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 
 export type ExpandableButtonOption = {
@@ -45,8 +46,8 @@ type ExpandableLayerProps = {
 };
 
 const PILL_GAP = 12;
-const EASE_OUT = [0.22, 1, 0.36, 1] as const;
 const EXIT = { duration: 0.16, ease: 'easeIn' } as const;
+const DIMMED_CHROME_COLOR = '#0d0d0d';
 
 function subscribeNoop() {
   return () => {};
@@ -70,10 +71,22 @@ function ExpandableLayer({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0, transition: EXIT }}
-        transition={{ duration: 0.25, ease: 'easeOut' }}
+        transition={fade}
         className="expandable-backdrop"
         onClick={onClose}
       />
+
+      <motion.div
+        aria-hidden="true"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0, transition: EXIT }}
+        transition={fade}
+        className="expandable-edges"
+      >
+        <span className="expandable-edge expandable-edge-top" />
+        <span className="expandable-edge expandable-edge-bottom" />
+      </motion.div>
 
       <motion.button
         type="button"
@@ -93,13 +106,13 @@ function ExpandableLayer({
           aria-hidden="true"
           initial={{ opacity: 1 }}
           animate={{ opacity: 0 }}
-          transition={{ duration: 0.25, ease: 'easeOut' }}
+          transition={fade}
           className="expandable-trigger-fill"
         />
         <motion.span
           initial={{ rotate: -90, scale: 0.6 }}
           animate={{ rotate: 0, scale: 1 }}
-          transition={{ duration: 0.3, ease: EASE_OUT }}
+          transition={spring}
           className="relative flex"
         >
           <IconX size={20} stroke={2.25} />
@@ -126,11 +139,7 @@ function ExpandableLayer({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: offset / 2, scale: 0.95, transition: EXIT }}
             whileTap={{ scale: 0.95 }}
-            transition={{
-              duration: 0.32,
-              ease: EASE_OUT,
-              delay: 0.04 + index * 0.05,
-            }}
+            transition={{ ...spring, delay: 0.04 + index * 0.05 }}
             onClick={() => onSelect(option)}
             className="expandable-pill"
           >
@@ -165,6 +174,27 @@ export default function ExpandableButton({
     (direction === 'auto' &&
       anchor !== null &&
       anchor.top + anchor.height / 2 > window.innerHeight / 2);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const root = document.documentElement;
+    const themeMeta = document.querySelector<HTMLMetaElement>(
+      'meta[name="theme-color"]'
+    );
+    const previousTheme = themeMeta?.content;
+    const previousBackground = root.style.backgroundColor;
+
+    themeMeta?.setAttribute('content', DIMMED_CHROME_COLOR);
+    root.style.backgroundColor = DIMMED_CHROME_COLOR;
+
+    return () => {
+      if (themeMeta && previousTheme) {
+        themeMeta.setAttribute('content', previousTheme);
+      }
+      root.style.backgroundColor = previousBackground;
+    };
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;

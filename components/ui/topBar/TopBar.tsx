@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
 
 type TopBarItem = ReactNode;
@@ -32,9 +32,26 @@ export default function TopBar({
   width,
   variant = 'page',
 }: TopBarProps) {
+  const navRef = useRef<HTMLElement>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const scroller = navRef.current?.closest('.app-main');
+    if (!scroller) return;
+    const update = () => setIsScrolled(scroller.scrollTop > 4);
+    update();
+    scroller.addEventListener('scroll', update, { passive: true });
+    return () => scroller.removeEventListener('scroll', update);
+  }, []);
+
   return (
     <nav
-      className={cn('top-bar', variant === 'brand' && 'top-bar-brand')}
+      ref={navRef}
+      className={cn(
+        'top-bar',
+        variant === 'brand' && 'top-bar-brand',
+        isScrolled && 'top-bar-scrolled'
+      )}
       style={{ maxWidth: width }}
     >
       <Slot slot={left} align="left" />

@@ -103,11 +103,23 @@
   --color-shade: var(--shadow);
 
   --text-display: 2.125rem;
+  --text-display--line-height: 1.1;
+  --text-display--letter-spacing: -0.025em;
   --text-h1: 1.75rem;
+  --text-h1--line-height: 1.15;
+  --text-h1--letter-spacing: -0.02em;
   --text-h2: 1.375rem;
+  --text-h2--line-height: 1.25;
+  --text-h2--letter-spacing: -0.01em;
   --text-body: 1rem;
+  --text-body--line-height: 1.5;
+  --text-body--letter-spacing: 0em;
   --text-body-sm: 0.875rem;
+  --text-body-sm--line-height: 1.45;
+  --text-body-sm--letter-spacing: 0em;
   --text-caption: 0.75rem;
+  --text-caption--line-height: 1.4;
+  --text-caption--letter-spacing: 0.01em;
 
   --color-background: #0b0c0c;
   --color-foreground: var(--foreground);
@@ -144,7 +156,8 @@
 
 html {
   min-height: 100%;
-  background-color: #050505;
+  background-color: var(--bg);
+  color-scheme: dark;
 }
 
 body {
@@ -154,7 +167,9 @@ body {
   position: relative;
   background: transparent;
   color: var(--text);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  text-rendering: optimizeLegibility;
   overscroll-behavior: none;
   overflow-x: hidden;
 }
@@ -203,4 +218,19 @@ body > div {
   --chart-scale-04: oklch(0.58 0.06 270);
   --chart-scale-05: oklch(0.68 0.07 270);
   --chart-scale-pattern-color: oklch(0.145 0 0);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .drawer-sheet,
+  .bottom-bar-nav,
+  .top-bar {
+    background-color: var(--componentsBg);
+    backdrop-filter: none;
+  }
+
+  .expandable-backdrop,
+  .drawer-backdrop,
+  .overlay {
+    backdrop-filter: none;
+  }
 }

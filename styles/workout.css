@@ -148,71 +148,127 @@
   }
 
   .workout-preview {
-    @apply mt-[18px] rounded-[20px] border border-line bg-surface p-4;
+    @apply flex flex-col gap-4 pt-1 pb-2;
   }
 
   .workout-preview-header {
-    @apply mb-1 flex items-center justify-between;
+    @apply flex items-start gap-3;
+  }
+
+  .workout-preview-icon {
+    @apply flex size-12 shrink-0 items-center justify-center rounded-2xl border border-accent-border bg-accent-surface text-accent;
+  }
+
+  .workout-preview-heading {
+    @apply flex min-w-0 flex-1 flex-col gap-0.5;
   }
 
   .workout-preview-title {
-    @apply mt-1.5 mb-0 text-h2 font-bold;
+    @apply m-0 truncate text-h2 leading-tight font-bold text-content;
   }
 
-  .workout-preview-type {
-    @apply m-0 text-caption text-content;
+  .workout-preview-meta {
+    @apply m-0 truncate text-body-sm text-content-muted;
+  }
+
+  .workout-preview-close {
+    @apply flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-white/10 bg-tile text-content-muted transition-colors hover:text-content;
+  }
+
+  .workout-preview-status {
+    @apply -mt-1 w-fit rounded-full border border-white/15 px-2.5 py-1 text-caption font-semibold text-content-muted;
+  }
+
+  .workout-preview-status-done {
+    @apply border-accent-border bg-accent-surface text-accent;
   }
 
   .workout-preview-error {
-    @apply mt-2.5 rounded-[10px] border border-danger-border bg-danger p-2.5 text-caption text-on-danger;
+    @apply rounded-xl border border-danger-border bg-danger/15 p-2.5 text-body-sm text-danger-light;
   }
 
   .workout-preview-content {
-    @apply mt-3.5 flex flex-col gap-2;
+    @apply flex flex-col gap-2;
+
+    & .accordion {
+      @apply border-white/10 bg-tile;
+    }
+
+    & .accordion-open {
+      @apply border-accent-border;
+    }
   }
 
   .workout-preview-actions {
-    @apply mt-4 flex gap-2;
+    @apply grid grid-cols-2 gap-2.5;
+  }
+
+  .workout-preview-done {
+    @apply col-span-2 flex items-center justify-center gap-2 rounded-2xl border border-accent-border bg-accent-surface p-3 text-body-sm font-semibold text-accent;
+  }
+
+  .preview-section-title {
+    @apply m-0 text-caption font-semibold tracking-wide text-content-muted uppercase;
   }
 
   .preview-empty {
-    @apply m-0 text-body-sm text-content;
+    @apply m-0 rounded-2xl border border-dashed border-white/15 p-4 text-center text-body-sm text-content-muted;
   }
 
   .preview-metrics {
-    @apply flex flex-col gap-2;
+    @apply flex flex-col gap-2.5;
   }
 
   .preview-metric-grid {
-    @apply grid grid-cols-1 gap-2;
+    @apply grid grid-cols-[repeat(var(--grid-columns),minmax(0,1fr))] gap-2;
   }
 
   .metric-card {
-    @apply rounded-xl border border-line bg-surface p-3;
-
-    & .metric-card-label {
-      @apply m-0 text-caption text-content;
-    }
-
-    & .metric-card-value {
-      @apply mt-1 mb-0 text-body font-bold;
-    }
+    @apply flex min-w-0 flex-col gap-1 rounded-2xl border border-white/10 bg-tile p-3;
   }
 
-  .metric-card-row {
-    @apply flex items-center justify-between p-3.5;
-
-    & .metric-card-label {
-      @apply pr-2.5 text-body-sm;
-    }
-
-    & .metric-card-value {
-      @apply m-0;
-    }
+  .metric-card-icon {
+    @apply mb-1 flex size-7 items-center justify-center rounded-lg bg-accent-surface text-accent;
   }
 
-  .metric-card-wellbeing {
-    @apply flex items-center gap-2;
+  .metric-card-value {
+    @apply truncate text-body font-bold text-content tabular-nums sm:text-h2;
+  }
+
+  .metric-card-label {
+    @apply text-caption text-content-muted;
+  }
+
+  .wellbeing-card {
+    @apply flex flex-col gap-2.5 rounded-2xl border border-white/10 bg-tile p-3;
+  }
+
+  .wellbeing-header {
+    @apply flex items-center justify-between gap-2;
+  }
+
+  .wellbeing-label {
+    @apply text-body-sm font-semibold text-content;
+  }
+
+  .wellbeing-value {
+    @apply flex items-center gap-2 text-body-sm font-bold text-content tabular-nums;
+  }
+
+  .wellbeing-face {
+    @apply flex size-6 items-center justify-center [&_svg]:size-5;
+  }
+
+  .metric-card .wellbeing-track {
+    @apply mt-1.5;
+  }
+
+  .wellbeing-track {
+    @apply h-1.5 w-full overflow-hidden rounded-full bg-white/10;
+  }
+
+  .wellbeing-fill {
+    @apply block h-full rounded-full bg-accent;
   }
 
   .accordion {
@@ -228,7 +284,7 @@
   }
 
   .accordion-index {
-    @apply flex size-10 shrink-0 items-center justify-center rounded-full bg-tile text-body-sm font-bold text-accent transition-colors;
+    @apply flex size-10 shrink-0 items-center justify-center rounded-full bg-tile text-body-sm font-bold text-accent transition-colors tabular-nums;
   }
 
   .accordion-open .accordion-index {
@@ -244,7 +300,7 @@
   }
 
   .accordion-meta {
-    @apply text-caption text-content-muted;
+    @apply text-caption text-content-muted tabular-nums;
   }
 
   .accordion-chevron {
@@ -272,7 +328,7 @@
   }
 
   .set-row {
-    @apply grid grid-cols-[2.5rem_1fr_1fr_2rem] items-center gap-2 border-t border-line px-3 py-2.5 text-body-sm first:border-t-0;
+    @apply grid grid-cols-[2.5rem_1fr_1fr_2rem] items-center gap-2 border-t border-line px-3 py-2.5 text-body-sm first:border-t-0 tabular-nums;
   }
 
   .set-row-head {
@@ -285,6 +341,10 @@
 
   .set-delete {
     @apply size-8 rounded-full text-content-muted transition-colors hover:text-danger;
+  }
+
+  .set-form-hint {
+    @apply -mt-3 text-body-sm font-medium text-danger-light;
   }
 
   .set-form {
@@ -300,7 +360,7 @@
   }
 
   .exp-overlay {
-    @apply fixed inset-0 z-[200] flex flex-col items-center justify-center bg-black/60 p-5 backdrop-blur-[6px];
+    @apply fixed inset-0 z-[300] flex flex-col items-center justify-center bg-black/60 p-5 backdrop-blur-[6px];
   }
 
   .exp-content {
@@ -324,7 +384,7 @@
   }
 
   .exp-level-value {
-    @apply text-[28px] leading-[1.2] font-extrabold;
+    @apply text-[28px] leading-[1.2] font-extrabold tabular-nums;
   }
 
   .exp-arrow {
@@ -336,7 +396,7 @@
   }
 
   .exp-total {
-    @apply text-h2 font-extrabold text-accent;
+    @apply text-h2 font-extrabold text-accent tabular-nums;
   }
 
   .exp-breakdown {
@@ -348,7 +408,7 @@
   }
 
   .exp-breakdown-label {
-    @apply text-body-sm font-semibold text-content;
+    @apply text-body-sm font-semibold text-content tabular-nums;
   }
 
   .exp-breakdown-amount {

@@ -248,7 +248,11 @@ function EditTemplateContent() {
 
       {showDeletePopUp && (
         <QuestionPopUp
-          text="Do you really want to delete this template?"
+          title="Delete template?"
+          text="This can't be undone."
+          noLabel="Cancel"
+          yesLabel="Delete"
+          tone="danger"
           onYes={handleDeleteTemplate}
           onNo={() => setShowDeletePopUp(false)}
         />

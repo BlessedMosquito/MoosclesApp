@@ -11,14 +11,13 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { createElement, Suspense, useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { IconArrowRight, IconClock, IconListCheck } from '@tabler/icons-react';
+import { spring } from '@/lib/motion';
 
 const workoutDataView: Record<WorkoutTypeGroup, string> = {
   DistanceDuration: '/distance-duration',
   DurationOnly: '/distance-duration',
   RepetitionBased: '/repetition-based',
 };
-
-const EASE_OUT = [0.22, 1, 0.36, 1] as const;
 
 function getCopy(group: WorkoutTypeGroup, exerciseCount: number) {
   if (group === 'RepetitionBased') {
@@ -136,7 +135,7 @@ function QuestionContent() {
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, ease: EASE_OUT }}
+        transition={spring}
         className="question-panel"
       >
         <div className="question-workout">

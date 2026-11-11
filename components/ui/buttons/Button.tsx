@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import { motion } from 'motion/react';
+import { press, PRESS_SCALE } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 
 type ButtonWidth = number | '1/4' | '1/2' | '3/4' | 'full';
@@ -28,6 +29,7 @@ type ButtonProps = {
   align?: ButtonAlign;
   type?: 'button' | 'submit' | 'reset';
   variant?: ButtonVariant;
+  keepFocus?: boolean;
 };
 
 export default function Button({
@@ -39,15 +41,16 @@ export default function Button({
   align,
   type = 'button',
   variant = 'primary',
+  keepFocus = false,
 }: ButtonProps) {
   const button = (
     <motion.button
       type={type}
       onClick={onClick}
+      onPointerDown={keepFocus ? (event) => event.preventDefault() : undefined}
       disabled={disabled}
-      whileHover={disabled ? undefined : { scale: 1.05 }}
-      whileTap={disabled ? undefined : { scale: 0.9 }}
-      transition={{ duration: 0.18, ease: 'easeOut' }}
+      whileTap={disabled ? undefined : { scale: PRESS_SCALE }}
+      transition={press}
       className={cn(
         'btn',
         variant === 'secondary' && 'btn-secondary',

@@ -3,6 +3,7 @@
 import { useId } from 'react';
 import { motion } from 'motion/react';
 import { cn } from '@/lib/utils';
+import { spring } from '@/lib/motion';
 
 type TabOption<T extends string> = {
   value: T;
@@ -39,7 +40,7 @@ export default function Tabs<T extends string>({
             {isActive && (
               <motion.span
                 layoutId={indicatorId}
-                transition={{ type: 'spring', stiffness: 420, damping: 38 }}
+                transition={spring}
                 className="tab-indicator"
               />
             )}

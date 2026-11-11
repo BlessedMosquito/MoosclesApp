@@ -10,6 +10,7 @@ import {
 } from '@tabler/icons-react';
 import Emblem from '@/components/brand/Emblem';
 import Logo from '@/components/brand/Logo';
+import { spring } from '@/lib/motion';
 
 const FEATURES = [
   { icon: IconBarbell, label: 'Log sets' },
@@ -23,7 +24,7 @@ export default function HomePage() {
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        transition={spring}
         className="home-hero"
       >
         <Emblem size={120} />

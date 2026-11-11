@@ -166,7 +166,11 @@ function PreviewContent() {
 
       {showCancelPopUp && (
         <QuestionPopUp
-          text="Do you really want to cancel workout creation?"
+          title="Discard workout?"
+          text="Everything you set up so far will be lost."
+          noLabel="Keep editing"
+          yesLabel="Discard"
+          tone="danger"
           onYes={handleCancelConfirmed}
           onNo={() => setShowCancelPopUp(false)}
         />

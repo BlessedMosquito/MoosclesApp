@@ -16,6 +16,7 @@ import {
   getExerciseHistories,
   getSessionTrend,
 } from '@/services/exerciseStats';
+import { spring } from '@/lib/motion';
 
 export default function ExercisesTab() {
   const router = useRouter();
@@ -84,10 +85,7 @@ export default function ExercisesTab() {
                 key={history.key}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  duration: 0.25,
-                  delay: Math.min(index, 10) * 0.03,
-                }}
+                transition={{ ...spring, delay: Math.min(index, 10) * 0.03 }}
               >
                 <button
                   type="button"
@@ -96,7 +94,7 @@ export default function ExercisesTab() {
                       `/library/exercise?key=${encodeURIComponent(history.key)}`
                     )
                   }
-                  className="library-card"
+                  className="library-card pressable"
                 >
                   <span className="library-card-icon library-card-icon-muscle">
                     <MuscleIcon

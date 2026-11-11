@@ -4,23 +4,19 @@
   }
 
   .app-main {
-    @apply h-full overflow-x-hidden overflow-y-auto;
+    @apply h-full overflow-x-hidden overflow-y-auto pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)];
   }
 
   .app-main-with-bar {
-    @apply pb-[90px];
-  }
-
-  .route-loader {
-    @apply pointer-events-none fixed inset-0 z-[500] flex items-center justify-center bg-(--background);
+    @apply pb-[calc(90px+env(safe-area-inset-bottom))];
   }
 
   .bottom-bar {
-    @apply pointer-events-none fixed inset-x-0 bottom-5 z-40 flex justify-center;
+    @apply pointer-events-none fixed inset-x-0 bottom-[calc(1.25rem+env(safe-area-inset-bottom))] z-40 flex justify-center;
   }
 
   .bottom-bar-fade {
-    @apply pointer-events-none fixed inset-x-0 bottom-0 z-[39] h-[120px] bg-linear-to-t from-app/80 to-transparent backdrop-blur-md [mask-image:linear-gradient(to_top,black_45%,transparent)];
+    @apply pointer-events-none fixed inset-x-0 bottom-0 z-[39] h-[calc(120px+env(safe-area-inset-bottom))] bg-linear-to-t from-app/80 to-transparent backdrop-blur-md [mask-image:linear-gradient(to_top,black_45%,transparent)];
   }
 
   .bottom-bar-nav {
@@ -45,26 +41,6 @@
 
   .bottom-bar-label {
     @apply ml-2 inline-block text-body-sm font-semibold whitespace-nowrap;
-  }
-
-  .toast-stack {
-    @apply fixed bottom-[100px] left-1/2 z-[300] flex w-[90%] max-w-[400px] -translate-x-1/2 flex-col gap-2;
-  }
-
-  .toast {
-    @apply flex items-center justify-between rounded-xl border px-4 py-3 text-sm backdrop-blur-md;
-  }
-
-  .toast-error {
-    @apply border-danger-border bg-danger text-on-danger;
-  }
-
-  .toast-success {
-    @apply border-accent-border bg-accent-surface text-accent-light;
-  }
-
-  .toast-close {
-    @apply cursor-pointer border-none bg-transparent py-0 pr-0 pl-3 text-base text-inherit;
   }
 
   .page {

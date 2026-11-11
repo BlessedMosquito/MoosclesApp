@@ -32,6 +32,8 @@ export default function ResetPasswordPage() {
     const urlError =
       url.searchParams.get('error_description') ??
       hashParams.get('error_description');
+    const hasRecoveryLink =
+      url.searchParams.has('code') || hashParams.get('type') === 'recovery';
 
     const {
       data: { subscription },
@@ -50,7 +52,7 @@ export default function ResetPasswordPage() {
 
         if (urlError) {
           setLinkError(urlError);
-        } else if (session) {
+        } else if (session && hasRecoveryLink) {
           setReady(true);
         } else {
           setLinkError('This reset link is invalid or has expired.');

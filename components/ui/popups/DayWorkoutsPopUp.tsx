@@ -6,6 +6,7 @@ import { IconChevronRight, IconX } from '@tabler/icons-react';
 import { getWorkoutTypeIcon } from '@/lib/workoutTypeIcon';
 import { cn } from '@/lib/utils';
 import { ReturnGetWorkoutsData } from '@/services/workouts';
+import { fade, spring } from '@/lib/motion';
 
 type DayWorkoutsPopUpProps = {
   dateKey: string;
@@ -13,8 +14,6 @@ type DayWorkoutsPopUpProps = {
   onSelect: (workout: ReturnGetWorkoutsData) => void;
   onClose: () => void;
 };
-
-const EASE_OUT = [0.22, 1, 0.36, 1] as const;
 
 function formatDateKey(dateKey: string) {
   const [year, month, day] = dateKey.split('-').map(Number);
@@ -43,7 +42,7 @@ export default function DayWorkoutsPopUp({
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 0.2, ease: 'easeOut' }}
+      transition={fade}
       onClick={onClose}
       className="overlay overlay-strong"
     >
@@ -53,7 +52,7 @@ export default function DayWorkoutsPopUp({
         aria-labelledby="day-workouts-title"
         initial={{ opacity: 0, y: 16, scale: 0.97 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.3, ease: EASE_OUT }}
+        transition={spring}
         onClick={(event) => event.stopPropagation()}
         className="day-workouts"
       >
@@ -89,11 +88,7 @@ export default function DayWorkoutsPopUp({
                 key={workout.id}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  duration: 0.28,
-                  ease: EASE_OUT,
-                  delay: 0.06 + index * 0.04,
-                }}
+                transition={{ ...spring, delay: 0.06 + index * 0.04 }}
               >
                 <motion.button
                   type="button"
